@@ -69,4 +69,11 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // 追加だよ
+    android {
+    defaultConfig {                                                                            
+        minSdkVersion 19
+        multiDexEnabled true // multidexサポートライブラリを使用する
+        }   
+    }       
 }

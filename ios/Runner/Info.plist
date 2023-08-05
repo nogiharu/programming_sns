@@ -47,5 +47,13 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- image_picker  追加だよ -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Main</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Main</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Main</string>
+	<!-- image_picker  追加だよ -->
 </dict>
 </plist>
