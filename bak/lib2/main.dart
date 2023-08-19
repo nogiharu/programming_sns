@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:programming_sns/common/loading.dart';
-import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/routes/router.dart';
+import '../lib2/common/loading.dart';
+import '../lib2/extensions/widget_ref_ex.dart';
+import '../lib2/routes/router.dart';
 
 late Box box;
 Future<void> main() async {
