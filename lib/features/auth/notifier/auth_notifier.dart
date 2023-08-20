@@ -11,6 +11,7 @@ final authNotifierProvider = AsyncNotifierProvider<AuthNotifier, User>(AuthNotif
 class AuthNotifier extends AsyncNotifier<User> {
   @override
   FutureOr<User> build() async {
+    throw 'AAAA';
     final account = ref.read(appwriteAccountProvider);
     // throw 'AAA';
     String errorText;

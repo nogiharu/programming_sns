@@ -16,7 +16,6 @@ final router = Provider((ref) {
   return GoRouter(
     navigatorKey: ref.read(rootNavigatorKeyProvider),
     initialLocation: ScreenA.metaData['path'],
-    initialExtra: ScreenA.metaData['index'],
     routes: [
       ShellRoute(
         navigatorKey: ref.read(shellNavigatorKeyProvider),
@@ -29,56 +28,46 @@ final router = Provider((ref) {
           GoRoute(
             path: ScreenA.metaData['path'],
             pageBuilder: (context, state) {
-              return pageAnimation(const ScreenA(), state, ScreenA.metaData['index']);
+              return _pageAnimation(
+                const ScreenA(),
+                state,
+                ref,
+              );
             },
-            // pageBuilder: (context, state) {
-            //   return CustomTransitionPage(
-            //     key: state.pageKey,
-            //     child: const Hero(tag: '', child: ScreenA()),
-            //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            //       Offset start = const Offset(-1.0, 0.0); //出てくる場所
-            //       Offset end = Offset.zero; //最終地点
-            //       Animation<Offset> offset = Tween(begin: start, end: end).animate(animation);
-
-            //       return SlideTransition(position: offset, child: child);
-            //     },
-            //   );
-            // },
             routes: [
               GoRoute(
                 path: DetailsScreen.path,
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
-                  return const Hero(tag: '', child: DetailsScreen(label: 'A'));
+                  return const DetailsScreen(label: 'A');
                 },
+                routes: [
+                  GoRoute(
+                    path: DetailsScreen2.path,
+                    parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+                    builder: (context, state) {
+                      return const DetailsScreen2(label: 'A DetailsScreen2');
+                    },
+                  ),
+                ],
               ),
             ],
           ),
           GoRoute(
             path: ScreenB.metaData['path'],
             pageBuilder: (context, state) {
-              return pageAnimation(const ScreenB(), state, ScreenB.metaData['index']);
+              return _pageAnimation(
+                const ScreenB(),
+                state,
+                ref,
+              );
             },
-            // pageBuilder: (context, state) {
-            //   return CustomTransitionPage(
-            //     key: state.pageKey,
-            //     child: const Hero(tag: '', child: ScreenB()),
-            //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            //       final flg = TabItem.screenB.index < (state.extra as int);
-            //       Offset start = Offset(flg ? -1.0 : 1.0, 0.0); //出てくる場所
-            //       Offset end = Offset.zero; //最終地点
-            //       Animation<Offset> offset = Tween(begin: start, end: end).animate(animation);
-
-            //       return SlideTransition(position: offset, child: child);
-            //     },
-            //   );
-            // },
             routes: [
               GoRoute(
                 path: DetailsScreen.path,
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
-                  return const Hero(tag: '', child: DetailsScreen(label: 'B'));
+                  return const DetailsScreen(label: 'B');
                 },
               ),
             ],
@@ -86,18 +75,21 @@ final router = Provider((ref) {
           GoRoute(
             path: HomeScreen.metaData['path'],
             pageBuilder: (context, state) {
-              return pageAnimation(const HomeScreen(), state, HomeScreen.metaData['index']);
-              // return CustomTransitionPage(
-              //   key: state.pageKey,
-              //   child: const Hero(tag: '', child: HomeScreen()),
-              //   transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              //     Offset start = const Offset(1.0, 0.0); //出てくる場所
-              //     Offset end = Offset.zero; //最終地点
-              //     Animation<Offset> offset = Tween(begin: start, end: end).animate(animation);
-              //     return SlideTransition(position: offset, child: child);
-              //   },
-              // );
+              return _pageAnimation(
+                const HomeScreen(),
+                state,
+                ref,
+              );
             },
+            routes: [
+              GoRoute(
+                path: DetailsScreen.path,
+                parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+                builder: (context, state) {
+                  return const DetailsScreen(label: 'HOME');
+                },
+              ),
+            ],
           ),
         ],
       )
@@ -105,22 +97,17 @@ final router = Provider((ref) {
   );
 });
 
-CustomTransitionPage pageAnimation(
-  Widget child,
-  GoRouterState state,
-  int tabIndex,
-) {
+CustomTransitionPage _pageAnimation(Widget child, GoRouterState state, ProviderRef ref) {
+  int preIndex = ref.read(currentIndexProvider)['preIndex'];
+  int index = ref.read(currentIndexProvider)['index'];
   return CustomTransitionPage(
     key: state.pageKey,
-    child: Hero(tag: '', child: child),
+    child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      print(state.extra);
-      if (state.extra == null) return child;
-      final flg = tabIndex < (state.extra as int);
+      final flg = index < preIndex;
       Offset start = Offset(flg ? -1.0 : 1.0, 0.0);
       Offset end = Offset.zero; //最終地点
       Animation<Offset> offset = Tween(begin: start, end: end).animate(animation);
-
       return SlideTransition(position: offset, child: child);
     },
   );

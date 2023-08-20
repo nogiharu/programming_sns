@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/features/auth/notifier/auth_notifier.dart';
 
 class ScreenA extends ConsumerWidget {
   const ScreenA({super.key});
@@ -97,6 +99,40 @@ class DetailsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Details Screen'),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Text(
+              'Details for $label',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            TextButton(
+              onPressed: () {
+                GoRouter.of(context).go('/a/details/details2');
+              },
+              child: const Text('View B details'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DetailsScreen2 extends ConsumerWidget {
+  const DetailsScreen2({
+    required this.label,
+    super.key,
+  });
+  static const String path = 'details2';
+  final String label;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Details Screen2'),
       ),
       body: Center(
         child: Text(
