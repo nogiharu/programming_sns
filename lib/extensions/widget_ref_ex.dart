@@ -29,7 +29,7 @@ extension WidgetRefEx on WidgetRef {
         return Container();
       },
       loading: () {
-        return const CircularProgressIndicator();
+        return const Center(child: CircularProgressIndicator());
       },
     );
   }

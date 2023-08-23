@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/auth/notifier/auth_notifier.dart';
+import 'package:programming_sns/features/auth/controller/auth_controller.dart';
 import 'package:programming_sns/temp/tempScreen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -19,25 +19,25 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // final auth = ref.watch(authNotifierProvider).value;
 
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('AppBar'),
-        ),
-        body: Center(
-            child: Column(
-          children: [
-            const Text('Text'),
-            TextButton(
-              onPressed: () {
-                context.go(metaData['path'] + '/' + DetailsScreen.path);
-              },
-              child: const Text('View B details'),
-            ),
-          ],
-        )));
+    // return Scaffold(
+    //     appBar: AppBar(
+    //       title: const Text('AppBar'),
+    //     ),
+    //     body: Center(
+    //         child: Column(
+    //       children: [
+    //         const Text('Text'),
+    //         TextButton(
+    //           onPressed: () {
+    //             context.go(metaData['path'] + '/' + DetailsScreen.path);
+    //           },
+    //           child: const Text('View B details'),
+    //         ),
+    //       ],
+    //     )));
 
     return ref.watchEX(
-      authNotifierProvider,
+      authControllerProvider,
       complete: (data) {
         return Scaffold(
             appBar: AppBar(
@@ -46,7 +46,7 @@ class HomeScreen extends ConsumerWidget {
             body: Center(
                 child: Column(
               children: [
-                const Text('Text'),
+                Text(data.$id),
                 TextButton(
                   onPressed: () {
                     context.go(metaData['path'] + '/' + DetailsScreen.path);

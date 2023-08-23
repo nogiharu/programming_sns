@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/auth/notifier/auth_notifier.dart';
 
 class ScreenA extends ConsumerWidget {
   const ScreenA({super.key});
@@ -79,6 +77,44 @@ class ScreenB extends ConsumerWidget {
   }
 }
 
+class ScreenC extends ConsumerWidget {
+  const ScreenC({super.key});
+  // static const String path = '/b';
+  static const Map<String, dynamic> metaData = {
+    'path': '/c',
+    'label': 'スクリーンC',
+    'icon': Icon(Icons.chat),
+    'index': 3,
+  };
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () async {
+                //  await userService.signIn();
+                //  context.go(ScreenB.id);
+              },
+              child: const Text('ログイン'),
+            ),
+            const Text('Screen C'),
+            TextButton(
+              onPressed: () {
+                GoRouter.of(context).go('/b/details');
+              },
+              child: const Text('View B details'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class DetailsScreen extends ConsumerWidget {
   const DetailsScreen({
     required this.label,
@@ -89,13 +125,6 @@ class DetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ref.watchEX(
-    //   authNotifierProvider,
-    //   complete: (a) {
-    //     return const Text('text');
-    //   },
-    // );
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Details Screen'),

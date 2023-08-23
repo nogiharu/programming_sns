@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/scaffold_with_navbar.dart';
+import 'package:programming_sns/features/chat/screen/chat_screen.dart';
 import 'package:programming_sns/features/home/screen/home_screen.dart';
 import 'package:programming_sns/temp/tempScreen.dart';
 
@@ -13,14 +14,22 @@ final shellNavigatorKeyProvider = Provider(
 );
 
 final router = Provider((ref) {
+  final bottomItems = [
+    ScreenB.metaData,
+    HomeScreen.metaData,
+    ScreenA.metaData,
+    ChatScreen.metaData,
+  ];
+
   return GoRouter(
     navigatorKey: ref.read(rootNavigatorKeyProvider),
-    initialLocation: ScreenA.metaData['path'],
+    initialLocation: ref.read(currentBottomIndexProvider)['path'],
     routes: [
       ShellRoute(
         navigatorKey: ref.read(shellNavigatorKeyProvider),
         builder: (context, state, child) {
           return ScaffoldWithNavbar(
+            bottomItems: bottomItems,
             child: child,
           );
         },
@@ -31,7 +40,7 @@ final router = Provider((ref) {
               return _pageAnimation(
                 const ScreenA(),
                 state,
-                ref,
+                ref: ref,
               );
             },
             routes: [
@@ -41,6 +50,10 @@ final router = Provider((ref) {
                 builder: (context, state) {
                   return const DetailsScreen(label: 'A');
                 },
+                // Heroアニメ
+                // pageBuilder: (context, state) {
+                //   return _pageAnimation(const DetailsScreen(label: 'A'), state);
+                // },
                 routes: [
                   GoRoute(
                     path: DetailsScreen2.path,
@@ -48,6 +61,9 @@ final router = Provider((ref) {
                     builder: (context, state) {
                       return const DetailsScreen2(label: 'A DetailsScreen2');
                     },
+                    // pageBuilder: (context, state) {
+                    //   return _pageAnimation(const DetailsScreen2(label: 'A DetailsScreen2'), state);
+                    // },
                   ),
                 ],
               ),
@@ -59,7 +75,7 @@ final router = Provider((ref) {
               return _pageAnimation(
                 const ScreenB(),
                 state,
-                ref,
+                ref: ref,
               );
             },
             routes: [
@@ -78,7 +94,7 @@ final router = Provider((ref) {
               return _pageAnimation(
                 const HomeScreen(),
                 state,
-                ref,
+                ref: ref,
               );
             },
             routes: [
@@ -91,21 +107,45 @@ final router = Provider((ref) {
               ),
             ],
           ),
+          GoRoute(
+            path: ChatScreen.metaData['path'],
+            pageBuilder: (context, state) {
+              return _pageAnimation(
+                const ChatScreen(),
+                state,
+                ref: ref,
+              );
+            },
+          ),
         ],
       )
     ],
+    redirect: (context, state) {
+      final path = ref.watch(currentBottomIndexProvider)['path'];
+      final uri = state.uri.toString();
+      if (!uri.startsWith(path)) {
+        final currentBottomIndex = ref.read(currentBottomIndexProvider.notifier).state;
+        bottomItems.where((e) => uri == e['path']).forEach((e) {
+          currentBottomIndex['path'] = e['path'];
+          currentBottomIndex['index'] = e['index'];
+        });
+      }
+      return;
+    },
   );
 });
 
-CustomTransitionPage _pageAnimation(Widget child, GoRouterState state, ProviderRef ref) {
-  int preIndex = ref.read(currentIndexProvider)['preIndex'];
-  int index = ref.read(currentIndexProvider)['index'];
+/// ページ遷移時のアニメーション
+/// ボトムナヴィのみ使用
+CustomTransitionPage _pageAnimation(Widget child, GoRouterState state, {ProviderRef? ref}) {
   return CustomTransitionPage(
     key: state.pageKey,
-    child: child,
+    child: Hero(tag: '', child: child),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      final flg = index < preIndex;
-      Offset start = Offset(flg ? -1.0 : 1.0, 0.0);
+      if (ref == null) return child;
+      int preIndex = ref.read(currentBottomIndexProvider)['preIndex']!;
+      int index = ref.read(currentBottomIndexProvider)['index']!;
+      Offset start = Offset(index < preIndex ? -1.0 : 1.0, 0.0);
       Offset end = Offset.zero; //最終地点
       Animation<Offset> offset = Tween(begin: start, end: end).animate(animation);
       return SlideTransition(position: offset, child: child);
