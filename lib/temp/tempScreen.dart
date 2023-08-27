@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 
 class ScreenA extends ConsumerWidget {
   const ScreenA({super.key});
@@ -50,29 +52,34 @@ class ScreenB extends ConsumerWidget {
   };
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () async {
-                //  await userService.signIn();
-                //  context.go(ScreenB.id);
-              },
-              child: const Text('ログイン'),
+    return ref.watchEX(
+      authProvider,
+      complete: (_) {
+        return Scaffold(
+          appBar: AppBar(),
+          body: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: () async {
+                    //  await userService.signIn();
+                    //  context.go(ScreenB.id);
+                  },
+                  child: const Text('ログイン'),
+                ),
+                const Text('Screen B'),
+                TextButton(
+                  onPressed: () {
+                    GoRouter.of(context).go('/b/details');
+                  },
+                  child: const Text('View B details'),
+                ),
+              ],
             ),
-            const Text('Screen B'),
-            TextButton(
-              onPressed: () {
-                GoRouter.of(context).go('/b/details');
-              },
-              child: const Text('View B details'),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

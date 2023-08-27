@@ -4,7 +4,7 @@ class AppwriteConstants {
   // static const String endPoint = 'http://192.168.1.3:80/v1';
   static const String endPoint = 'http://localhost/v1';
   static const String messagesCollection = '64e2917e86d88d32700f';
-  // static const String usersCollection = '64a1288a11936d28e478';
+  static const String usersCollection = '64e9c32e0b2309c2e450';
   // static const String tweetsCollection = '64aa43cfe8683324cc8a';
   // static const String imagesBucket = '64ac7e5c87212f830a5e';
   // static const String notificationsCollection = '64c4d7d817d658b7e996';

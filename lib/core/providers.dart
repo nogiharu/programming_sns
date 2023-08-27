@@ -19,3 +19,8 @@ final appwriteDatabaseProvider = Provider((ref) {
   final Client client = ref.watch(appwriteClientProvider);
   return Databases(client);
 });
+
+final appwriteRealtimeProvider = Provider((ref) {
+  final Client client = ref.watch(appwriteClientProvider);
+  return Realtime(client);
+});

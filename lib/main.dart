@@ -9,9 +9,11 @@ late Box box;
 Future<void> main() async {
   await Hive.initFlutter();
   box = await Hive.openBox('users');
-  runApp(const ProviderScope(
-    child: Main(),
-  ));
+  runApp(
+    const ProviderScope(
+      child: Main(),
+    ),
+  );
 }
 
 class Main extends ConsumerWidget {

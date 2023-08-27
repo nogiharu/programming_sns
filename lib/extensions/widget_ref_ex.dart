@@ -26,6 +26,7 @@ extension WidgetRefEx on WidgetRef {
             builder: (context) => ErrorDialog(error: e.toString()),
           );
         });
+
         return Container();
       },
       loading: () {

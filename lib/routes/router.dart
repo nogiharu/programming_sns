@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/scaffold_with_navbar.dart';
-import 'package:programming_sns/features/chat/screen/chat_screen.dart';
-import 'package:programming_sns/features/home/screen/home_screen.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/home/screens/home_screen.dart';
 import 'package:programming_sns/temp/tempScreen.dart';
 
 final rootNavigatorKeyProvider = Provider(
