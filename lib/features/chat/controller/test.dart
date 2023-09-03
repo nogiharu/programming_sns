@@ -1,6 +1,6 @@
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/dependencies.dart';
-import 'package:programming_sns/core/providers.dart';
+import 'package:programming_sns/core/appwrite_providers.dart';
 import 'package:appwrite/appwrite.dart';
 
 final appwriteRealtimeMessageProvider = StreamProvider((ref) {

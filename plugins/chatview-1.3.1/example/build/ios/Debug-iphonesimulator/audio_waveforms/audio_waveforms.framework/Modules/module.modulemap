@@ -1,0 +1,11 @@
+framework module audio_waveforms {
+  umbrella header "audio_waveforms-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module audio_waveforms.Swift {
+  header "audio_waveforms-Swift.h"
+  requires objc
+}

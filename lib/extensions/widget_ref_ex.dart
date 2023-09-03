@@ -15,9 +15,7 @@ extension WidgetRefEx on WidgetRef {
     required Widget Function(T) complete,
   }) {
     return watch(asyncValueProvider).when(
-      data: (data) {
-        return complete.call(data);
-      },
+      data: complete,
       error: (e, _) {
         /// 画面の描画が始まったタイミングで状態の変更をする。
         WidgetsBinding.instance.addPostFrameCallback((_) {

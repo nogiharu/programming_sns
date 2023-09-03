@@ -2,11 +2,8 @@ import 'dart:async';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-import 'package:chatview/chatview.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:programming_sns/constants/appwrite_constants.dart';
-import 'package:programming_sns/core/providers.dart';
-import 'package:programming_sns/extensions/message_ex.dart';
+import 'package:programming_sns/core/appwrite_providers.dart';
+import 'package:programming_sns/core/dependencies.dart';
 
 final authProvider = AsyncNotifierProvider<AuthNotifier, User>(AuthNotifier.new);
 
@@ -44,15 +41,5 @@ class AuthNotifier extends AsyncNotifier<User> {
         )
         .then((value) => value)
         .catchError((_) => throw 'やだああああ');
-  }
-
-  Future<Document> createMessage(Message message) async {
-    final doc = await ref.read(appwriteDatabaseProvider).createDocument(
-          databaseId: AppwriteConstants.databaseId,
-          collectionId: AppwriteConstants.messagesCollection,
-          documentId: ID.unique(),
-          data: message.toMap(),
-        );
-    return doc;
   }
 }

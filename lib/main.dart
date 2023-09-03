@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:programming_sns/common/loading.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/routes/router.dart';
 
 late Box box;
@@ -21,6 +22,7 @@ class Main extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ref.watch(authProvider);
     return MaterialApp.router(
       // title: 'Flutter Demo',
       theme: ThemeData(

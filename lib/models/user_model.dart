@@ -4,32 +4,40 @@ import 'package:chatview/chatview.dart';
 import 'package:flutter/foundation.dart';
 
 @immutable
-class UserModel extends ChatUser {
-  @override
+class UserModel {
   final String id;
-  @override
+
   final String name;
-  @override
+
   final String? profilePhoto;
-  UserModel({
+
+  final DateTime? createdAt;
+
+  final DateTime? updatedAt;
+
+  // final bool isDeleted;
+
+  const UserModel({
     required this.id,
     required this.name,
     this.profilePhoto,
-  }) : super(
-          id: id,
-          name: name,
-          profilePhoto: profilePhoto,
-        );
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
   UserModel copyWith({
     String? id,
     String? name,
     String? profilePhoto,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
       profilePhoto: profilePhoto ?? this.profilePhoto,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -37,6 +45,12 @@ class UserModel extends ChatUser {
     final result = <String, dynamic>{};
 
     result.addAll({'name': name});
+    if (createdAt != null) {
+      result.addAll({'createdAt': createdAt!.millisecondsSinceEpoch});
+    }
+    if (updatedAt != null) {
+      result.addAll({'updatedAt': updatedAt!.millisecondsSinceEpoch});
+    }
     if (profilePhoto != null) {
       result.addAll({'profilePhoto': profilePhoto});
     }
@@ -48,12 +62,15 @@ class UserModel extends ChatUser {
     return UserModel(
       id: map['\$id'] ?? '',
       name: map['name'] ?? '',
-      profilePhoto: map['profilePhoto'],
+      profilePhoto: map['profilePhoto'] ?? '',
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt']),
     );
   }
 
   @override
-  String toString() => 'UserModel(id: $id, name: $name, profilePhoto: $profilePhoto)';
+  String toString() =>
+      'UserModel(id: $id, name: $name, profilePhoto: $profilePhoto, createdAt: $createdAt, updatedAt: $updatedAt)';
 
   @override
   bool operator ==(Object other) {
@@ -62,9 +79,36 @@ class UserModel extends ChatUser {
     return other is UserModel &&
         other.id == id &&
         other.name == name &&
-        other.profilePhoto == profilePhoto;
+        other.profilePhoto == profilePhoto &&
+        other.createdAt == createdAt &&
+        other.updatedAt == updatedAt;
   }
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ profilePhoto.hashCode;
+  int get hashCode =>
+      id.hashCode ^ name.hashCode ^ profilePhoto.hashCode ^ createdAt.hashCode ^ updatedAt.hashCode;
+
+  factory UserModel.instance({
+    String? id,
+    String? name,
+    String? profilePhoto,
+    DateTime? updatedAt,
+  }) {
+    return UserModel(
+      id: id ?? 'aaa',
+      name: name ?? 'HOGEEEE',
+      profilePhoto:
+          "https://raw.githubusercontent.com/SimformSolutionsPvtLtd/flutter_showcaseview/master/example/assets/simform.png",
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  static ChatUser toChatUser(UserModel userModel) {
+    return ChatUser(
+      id: userModel.id,
+      name: userModel.name,
+      profilePhoto: userModel.profilePhoto,
+    );
+  }
 }

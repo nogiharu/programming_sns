@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/user/providers/user_provider.dart';
+import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/temp/tempScreen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -40,6 +40,7 @@ class HomeScreen extends ConsumerWidget {
       userModelProvider,
       // userModelProvider.notifier,
       complete: (data) {
+        // print(data.name);
         return Scaffold(
           appBar: AppBar(
             title: const Text('AppBar'),
@@ -56,9 +57,10 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 TextButton(
                   onPressed: () async {
-                    data = data.copyWith(name: '田島');
-                    final aa = await ref.read(userModelProvider.notifier).getUserModel(data.id);
-                    print(aa);
+                    data = data.copyWith(name: '田島くん');
+                    final aa = await ref.read(userModelProvider.notifier).updateUserModel(data);
+                    final aaa = await ref.read(userModelProvider.notifier).getUserModelList();
+                    print(aaa);
                   },
                   child: const Text('名前変更'),
                 ),

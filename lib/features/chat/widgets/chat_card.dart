@@ -3,7 +3,7 @@ import 'package:programming_sns/utils/markdown/custom_pre_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
 
-class ChatCard extends StatelessWidget {
+class ChatCard extends ConsumerWidget {
   const ChatCard({
     super.key,
     required this.currentUser,
@@ -18,7 +18,7 @@ class ChatCard extends StatelessWidget {
   final Message message;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // TODO カスタムバブル
     final markdownRegex = RegExp(r'(\*{1,2}|_{1,2}|`{1,2}|~{1,2}|#{1,6})');
 
