@@ -43,6 +43,12 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
         );
   }
 
+  /// 自分を取る
+  UserModel get currentUser => state.maybeWhen(
+        orElse: UserModel.instance,
+        data: (data) => data,
+      );
+
   Future<UserModel> getUserModel(String id) async {
     _futureGuard(
       () async {
@@ -93,6 +99,10 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
 
     return userModelList;
   }
+
+  // Future<void> realtimeUpdate(UserModel userModel) async {
+  //   update((data) => userModel);
+  // }
 
   Future<void> _futureGuard(Future<UserModel> Function() futureFunction) async {
     final prevState = state.copyWithPrevious(state);

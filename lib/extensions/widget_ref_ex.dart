@@ -13,6 +13,7 @@ extension WidgetRefEx on WidgetRef {
   Widget watchEX<T>(
     ProviderListenable<AsyncValue<T>> asyncValueProvider, {
     required Widget Function(T) complete,
+    Widget? loading,
   }) {
     return watch(asyncValueProvider).when(
       data: complete,
@@ -28,7 +29,12 @@ extension WidgetRefEx on WidgetRef {
         return Container();
       },
       loading: () {
-        return const Center(child: CircularProgressIndicator());
+        if (loading == null) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return loading;
       },
     );
   }

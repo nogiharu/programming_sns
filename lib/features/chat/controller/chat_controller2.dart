@@ -10,84 +10,56 @@ import 'package:programming_sns/extensions/message_ex.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/models/user_model.dart';
 
-// class ChatControllerNotifier extends AsyncNotifier<ChatController> {
-//   @override
-//   FutureOr<ChatController> build() async {
-//     final messageList = (await ref.watch(messageAPIProvider).getMessagesDocumentList())
-//         .documents
-//         .map((e) => MessageEx.fromMap(e.data))
-//         .toList();
+final getMessagesAndChatUsersProvider =
+    FutureProvider<(List<Message>, List<ChatUser>)>((ref) async {
+  final messageList = (await ref.watch(messageAPIProvider).getMessagesDocumentList())
+      .documents
+      .map((e) => MessageEX.fromMap(e.data))
+      .toList();
 
-//     final userModelList = await ref.watch(userModelProvider.notifier).getUserModelList();
+  final chatUserList = (await ref.watch(userAPIProvider).getUsersDocumentList())
+      .documents
+      .map((e) => UserModel.toChatUser(UserModel.fromMap(e.data)))
+      .toList();
 
-//     return ChatController(
-//       chatUsers: userModelList,
-//       scrollController: ScrollController(),
-//       initialMessageList: messageList,
-//     );
-//   }
-
-//   Future<void> _onSendTap(
-//     String message,
-//     ReplyMessage replyMessage,
-//     MessageType messageType,
-//     UserModel userModel,
-//   ) async {
-//     // ref.watch(userModelProvider).value;
-//     // final id = int.parse(Data.messageList.last.id) + 1;
-
-//     final msg = Message(
-//       id: ID.unique(),
-//       createdAt: DateTime.now(),
-//       message: message,
-//       sendBy: userModel.id,
-//       replyMessage: replyMessage,
-//       messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
-//     );
-
-//     // Future.delayed(const Duration(milliseconds: 300), () {
-//     //   _chatController.initialMessageList.last.setStatus = MessageStatus.undelivered;
-//     // });
-//     // Future.delayed(const Duration(seconds: 1), () {
-//     //   _chatController.initialMessageList.last.setStatus = MessageStatus.read;
-//     // });
-//   }
-// }
+  print('毎回かな？');
+  return (messageList, chatUserList);
+});
 
 final chatControllerProvider2 =
-    NotifierProviderFamily<ChatControllerNotifier2, ChatController, ScrollController>(
-        ChatControllerNotifier2.new);
+    NotifierProvider<ChatControllerNotifier2, ChatController>(ChatControllerNotifier2.new);
 
-class ChatControllerNotifier2 extends FamilyNotifier<ChatController, ScrollController> {
+class ChatControllerNotifier2 extends Notifier<ChatController> {
   @override
-  ChatController build(arg) {
-    // final messageList = (await ref.watch(messageAPIProvider).getMessagesDocumentList())
-    //     .documents
-    //     .map((e) => MessageEx.fromMap(e.data))
-    //     .toList();
-
-    // final chatUserList = (await ref.watch(userModelProvider.notifier).getUserModelList())
-    //     .map((e) => UserModel.toChatUser(e))
-    //     .toList();
-
+  ChatController build() {
     return ChatController(
       chatUsers: [],
-      scrollController: arg,
+      scrollController: ScrollController(),
       initialMessageList: [],
     );
   }
 
+  /// ScrollControllerが破棄されないため
+  void initScrollController() {
+    state.scrollController = ScrollController();
+  }
+
+  ChatController initializeController(List<Message> initialMessageList, List<ChatUser> chatUsers) {
+    state.chatUsers = chatUsers;
+    state.initialMessageList = initialMessageList;
+
+    return state;
+  }
+
   MessageAPI get _messageAPI => ref.watch(messageAPIProvider);
+  UserAPI get _userAPI => ref.watch(userAPIProvider);
+
   UserModel get getCurrentUser => ref.watch(userModelProvider).maybeWhen(
         orElse: UserModel.instance,
         data: (data) => data,
       );
 
-  Future<void> onSendTap(
-    String message,
-    ReplyMessage replyMessage,
-    MessageType messageType,
-  ) async {
+  Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
     final msg = Message(
       id: ID.unique(),
       createdAt: DateTime.now(),
@@ -96,9 +68,24 @@ class ChatControllerNotifier2 extends FamilyNotifier<ChatController, ScrollContr
       replyMessage: replyMessage,
       messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
     );
+    print('送信');
+    final doc = await _messageAPI.createMessageDocument(msg);
+    // state.addMessage(MessageEX.fromMap(doc.data));
+    // .whenComplete(() => state.addMessage(msg));
+    // state.addMessage(msg);
     // addMessage(msg);
   }
 
+  Future<void> delete() async {
+    final messageList = await ref
+        .watch(messageAPIProvider)
+        .getMessagesDocumentList()
+        .then((docList) => docList.documents.map((doc) => MessageEX.fromMap(doc.data)).toList());
+
+    await Future.forEach(messageList, (e) async {
+      await _messageAPI.deleteMessageDocument(e.id);
+    });
+  }
   // Future<void> addMessage(Message message) async {
   //   _futureGuard(
   //     () async {
@@ -114,10 +101,23 @@ class ChatControllerNotifier2 extends FamilyNotifier<ChatController, ScrollContr
   // }
 
   // Future<void> _futureGuard(Future<ChatController> Function() futureFunction) async {
-  //   final prevState = state.copyWithPrevious(state);
-  //   state = await AsyncValue.guard(futureFunction);
-  //   if (state.hasError) {
+  //  final asyncState = AsyncData(state);
+  //   final prevState = asyncState.copyWithPrevious(asyncState);
+  //   state = await AsyncValue.guard(futureFunction).then((value) => value.value!);
+  //   if (asyncState.hasError) {
   //     Future.delayed(const Duration(milliseconds: 1000), () => state = prevState);
   //   }
+  // }
+
+  // copyWith({
+  //   List<ChatUser>? chatUsers,
+  //   List<Message>? initialMessageList,
+  //   ScrollController? scrollController,
+  // }) {
+  //   return ChatController(
+  //     chatUsers: state.chatUsers,
+  //     initialMessageList: state.initialMessageList,
+  //     scrollController: state.scrollController,
+  //   );
   // }
 }

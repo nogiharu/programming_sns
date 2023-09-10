@@ -41,4 +41,12 @@ class MessageAPI {
       ],
     );
   }
+
+  Future<dynamic> deleteMessageDocument(String id) async {
+    return await _db.deleteDocument(
+      databaseId: AppwriteConstants.databaseId,
+      collectionId: AppwriteConstants.messagesCollection,
+      documentId: id,
+    );
+  }
 }

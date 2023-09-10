@@ -1,7 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:programming_sns/apis/message_api.dart';
+import 'package:programming_sns/extensions/message_ex.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/features/chat/controller/chat_controller.dart';
+import 'package:programming_sns/features/chat/controller/chat_controller2.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/temp/tempScreen.dart';
 
@@ -57,12 +61,36 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 TextButton(
                   onPressed: () async {
-                    data = data.copyWith(name: '田島くん');
+                    String name;
+                    if (data.name == '田島') {
+                      name = '山田';
+                    } else if (data.name == '山田') {
+                      name = 'チコリータ';
+                    } else {
+                      name = '田島';
+                    }
+
+                    data = data.copyWith(name: name);
                     final aa = await ref.read(userModelProvider.notifier).updateUserModel(data);
                     final aaa = await ref.read(userModelProvider.notifier).getUserModelList();
-                    print(aaa);
+                    // print(aaa);
                   },
                   child: const Text('名前変更'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final messageList = await ref
+                        .watch(messageAPIProvider)
+                        .getMessagesDocumentList()
+                        .then((docList) =>
+                            docList.documents.map((doc) => MessageEX.fromMap(doc.data)).toList());
+
+                    await Future.forEach(messageList, (e) async {
+                      print(e.id);
+                      ref.read(messageAPIProvider).deleteMessageDocument(e.id);
+                    });
+                  },
+                  child: const Text('メッセージ全消し'),
                 ),
               ],
             ),

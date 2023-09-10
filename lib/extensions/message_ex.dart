@@ -17,6 +17,7 @@ extension MessageEX on Message {
     result.addAll({'replyToUserId': replyMessage.replyTo});
     result.addAll({'replyMessageType': replyMessage.messageType.toString()});
     result.addAll({'replyMessageId': replyMessage.messageId});
+    result.addAll({'replyMessage': replyMessage.message});
     result.addAll({'status': status.toString()});
     return result;
   }
@@ -37,6 +38,7 @@ extension MessageEX on Message {
         replyTo: map['replyToUserId'],
         messageType: (map['replyMessageType'] as String).messageTypeToEnum(),
         messageId: map['replyMessageId'],
+        message: map['replyMessage'] ?? '',
       ),
       status: (map['status'] as String).messageStatusToEnum(),
     );

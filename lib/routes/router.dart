@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/scaffold_with_navbar.dart';
+import 'package:programming_sns/features/chat/screens/aa.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen_bak.dart';
 import 'package:programming_sns/features/home/screens/home_screen.dart';
@@ -113,6 +114,7 @@ final router = Provider((ref) {
             pageBuilder: (context, state) {
               return _pageAnimation(
                 const ChatScreen(),
+                // const ChatScreenExanple(),
                 state,
                 ref: ref,
               );
@@ -151,6 +153,6 @@ CustomTransitionPage _pageAnimation(Widget child, GoRouterState state, {Provider
       Animation<Offset> offset = Tween(begin: start, end: end).animate(animation);
       return SlideTransition(position: offset, child: child);
     },
-    // transitionDuration: Duration(milliseconds: state.uri.toString() == '/chat' ? 500 : 300),
+    transitionDuration: Duration(milliseconds: state.uri.toString() == '/chat' ? 500 : 300),
   );
 }
