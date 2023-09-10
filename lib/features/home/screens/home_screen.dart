@@ -4,8 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:programming_sns/apis/message_api.dart';
 import 'package:programming_sns/extensions/message_ex.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/chat/controller/chat_controller.dart';
-import 'package:programming_sns/features/chat/controller/chat_controller2.dart';
+
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/temp/tempScreen.dart';
 

@@ -6,10 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:programming_sns/apis/message_api.dart';
-import 'package:programming_sns/extensions/message_ex.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/chat/controller/chat_controller2.dart';
-import 'package:programming_sns/features/chat/controller/message_provider.dart';
+import 'package:programming_sns/features/chat/providers/messages_with_chatusers_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/models/user_model.dart';
@@ -30,9 +28,6 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
-  // ChatControllerNotifier get chatControllerNotifier => ref.read(chatControllerProvider.notifier);
-  // ChatController get chatController => ref.read(chatControllerProvider.notifier).chatController;
-
   AppTheme theme = LightTheme();
   bool isDarkTheme = false;
 
@@ -44,13 +39,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     chatUsers: [],
   );
 
-  String currentUserId = '';
-
   @override
   void initState() {
     super.initState();
-
-    // ref.read(chatControllerProvider2.notifier).initScrollController();
 
     chatController.scrollController = ScrollController();
   }
@@ -70,27 +61,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
         /// CHAT
         return ref.watchEX(
-          chatMessagesAndChatUsersProvider,
+          messagesWithChatUsersProvider,
           complete: (chatList) {
-            // final chatController = ref.read(chatControllerProvider2.notifier).initializeController(
-            //       chatList.$1,
-            //       chatList.$2,
-            //     );
-
-            // final chatControllerNotifier = ref.read(chatControllerProvider2.notifier);
-
-            // ref.watch(realtimeMessageProvider).when(
-            //       data: (message) {
-            //         if (message.sendBy != currentUserModel.id) {
-            //           chatController.addMessage(message);
-            //           // chatList.$1.add(message);
-            //           // chatController.addMessage(message);
-            //         }
-            //         // chatList.$1.add(message);
-            //       },
-            //       error: (error, stackTrace) {},
-            //       loading: () {},
-            //     );
             chatController.initialMessageList = chatList.$1;
             chatController.chatUsers = chatList.$2;
 
@@ -144,9 +116,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               // TODO わからん
               chatBubbleConfig: ChatBubbleConfiguration(
                 onDoubleTap: (message) {
-                  // setState(() {
-                  //   showReaction = !showReaction;
-                  // });
+                  setState(() {
+                    showReaction = !showReaction;
+                  });
                 },
                 // TODO わからん
                 outgoingChatBubbleConfig: const ChatBubble(
@@ -210,8 +182,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
     );
     print('IIIIII');
-    // if (currentUserId == '') return;
+
     ref.read(messageAPIProvider).createMessageDocument(msg);
-    // chatController.addMessage(MessageEX.fromMap(doc.data));
   }
 }

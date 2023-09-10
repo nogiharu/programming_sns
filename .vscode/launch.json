@@ -10,7 +10,7 @@
             "type": "dart",
             "args": [
                 "--web-port",
-                "1092",
+                "1093",
                 "--web-renderer",
                 "html"
             ]
