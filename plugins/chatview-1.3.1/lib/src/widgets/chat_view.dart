@@ -54,10 +54,8 @@ class ChatView extends StatefulWidget {
     required this.chatViewState,
     ChatViewStateConfiguration? chatViewStateConfig,
     this.featureActiveConfig = const FeatureActiveConfig(),
-  })  : chatBackgroundConfig =
-            chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
-        chatViewStateConfig =
-            chatViewStateConfig ?? const ChatViewStateConfiguration(),
+  })  : chatBackgroundConfig = chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
+        chatViewStateConfig = chatViewStateConfig ?? const ChatViewStateConfiguration(),
         super(key: key);
 
   /// Provides configuration related to user profile circle avatar.
@@ -141,30 +139,27 @@ class ChatView extends StatefulWidget {
   State<ChatView> createState() => _ChatViewState();
 }
 
-class _ChatViewState extends State<ChatView>
-    with SingleTickerProviderStateMixin {
+class _ChatViewState extends State<ChatView> with SingleTickerProviderStateMixin {
   final GlobalKey<SendMessageWidgetState> _sendMessageKey = GlobalKey();
-  ValueNotifier<ReplyMessage> replyMessage =
-      ValueNotifier(const ReplyMessage());
+  ValueNotifier<ReplyMessage> replyMessage = ValueNotifier(const ReplyMessage());
 
   ChatController get chatController => widget.chatController;
 
   // bool get showTypingIndicator => widget.showTypingIndicator;
 
-  ChatBackgroundConfiguration get chatBackgroundConfig =>
-      widget.chatBackgroundConfig;
+  ChatBackgroundConfiguration get chatBackgroundConfig => widget.chatBackgroundConfig;
 
   ChatViewState get chatViewState => widget.chatViewState;
 
-  ChatViewStateConfiguration? get chatViewStateConfig =>
-      widget.chatViewStateConfig;
+  ChatViewStateConfiguration? get chatViewStateConfig => widget.chatViewStateConfig;
 
   FeatureActiveConfig get featureActiveConfig => widget.featureActiveConfig;
 
   @override
   void initState() {
     super.initState();
-    setLocaleMessages('en', ReceiptsCustomMessages());
+    // setLocaleMessages('en', ReceiptsCustomMessages()); 変更
+    setLocaleMessages('ja', JaMessages());
     // Adds current user in users list.
     chatController.chatUsers.add(widget.currentUser);
   }
@@ -175,8 +170,7 @@ class _ChatViewState extends State<ChatView>
     // TODO: Remove this in new versions.
     // ignore: deprecated_member_use_from_same_package
     if (widget.showTypingIndicator ||
-        widget.chatController.showTypingIndicator &&
-            chatViewState.hasMessages) {
+        widget.chatController.showTypingIndicator && chatViewState.hasMessages) {
       chatController.scrollToLastMessage();
     }
     return ChatViewInheritedWidget(
@@ -184,8 +178,7 @@ class _ChatViewState extends State<ChatView>
       featureActiveConfig: featureActiveConfig,
       currentUser: widget.currentUser,
       child: Container(
-        height:
-            chatBackgroundConfig.height ?? MediaQuery.of(context).size.height,
+        height: chatBackgroundConfig.height ?? MediaQuery.of(context).size.height,
         width: chatBackgroundConfig.width ?? MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           color: chatBackgroundConfig.backgroundColor ?? Colors.white,
@@ -206,21 +199,18 @@ class _ChatViewState extends State<ChatView>
                 children: [
                   if (chatViewState.isLoading)
                     ChatViewStateWidget(
-                      chatViewStateWidgetConfig:
-                          chatViewStateConfig?.loadingWidgetConfig,
+                      chatViewStateWidgetConfig: chatViewStateConfig?.loadingWidgetConfig,
                       chatViewState: chatViewState,
                     )
                   else if (chatViewState.noMessages)
                     ChatViewStateWidget(
-                      chatViewStateWidgetConfig:
-                          chatViewStateConfig?.noMessageWidgetConfig,
+                      chatViewStateWidgetConfig: chatViewStateConfig?.noMessageWidgetConfig,
                       chatViewState: chatViewState,
                       onReloadButtonTap: chatViewStateConfig?.onReloadButtonTap,
                     )
                   else if (chatViewState.isError)
                     ChatViewStateWidget(
-                      chatViewStateWidgetConfig:
-                          chatViewStateConfig?.errorWidgetConfig,
+                      chatViewStateWidgetConfig: chatViewStateConfig?.errorWidgetConfig,
                       chatViewState: chatViewState,
                       onReloadButtonTap: chatViewStateConfig?.onReloadButtonTap,
                     )
@@ -247,9 +237,8 @@ class _ChatViewState extends State<ChatView>
                           repliedMessageConfig: widget.repliedMessageConfig,
                           swipeToReplyConfig: widget.swipeToReplyConfig,
                           onChatListTap: widget.onChatListTap,
-                          assignReplyMessage: (message) => _sendMessageKey
-                              .currentState
-                              ?.assignReplyMessage(message),
+                          assignReplyMessage: (message) =>
+                              _sendMessageKey.currentState?.assignReplyMessage(message),
                         );
                       },
                     ),
@@ -262,8 +251,7 @@ class _ChatViewState extends State<ChatView>
                       backgroundColor: chatBackgroundConfig.backgroundColor,
                       onSendTap: _onSendTap,
                       onReplyCallback: (reply) => replyMessage.value = reply,
-                      onReplyCloseCallback: () =>
-                          replyMessage.value = const ReplyMessage(),
+                      onReplyCloseCallback: () => replyMessage.value = const ReplyMessage(),
                     ),
                 ],
               ),

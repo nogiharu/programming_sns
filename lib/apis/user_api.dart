@@ -45,9 +45,9 @@ class UserAPI {
     return await _db.listDocuments(
       databaseId: AppwriteConstants.databaseId,
       collectionId: AppwriteConstants.usersCollection,
-      queries: [
-        Query.orderAsc('createdAt'),
-      ],
+      // queries: [
+      //   Query.orderAsc('createdAt'),
+      // ],
     );
   }
 }

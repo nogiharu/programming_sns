@@ -21,6 +21,7 @@
  */
 import 'package:chatview/src/extensions/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class MessageTimeWidget extends StatelessWidget {
   const MessageTimeWidget({
@@ -46,6 +47,7 @@ class MessageTimeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    initializeDateFormatting("ja"); // 追加変更
     return Align(
       alignment: Alignment.centerRight,
       child: Padding(

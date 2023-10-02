@@ -1,7 +1,9 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/apis/message_api.dart';
+import 'package:programming_sns/core/dependencies.dart';
 import 'package:programming_sns/extensions/message_ex.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 
@@ -81,15 +83,35 @@ class HomeScreen extends ConsumerWidget {
                     final messageList = await ref
                         .watch(messageAPIProvider)
                         .getMessagesDocumentList()
-                        .then((docList) =>
-                            docList.documents.map((doc) => MessageEX.fromMap(doc.data)).toList());
+                        .then((docList) => docList.documents.map((doc) => doc.data).toList());
 
                     await Future.forEach(messageList, (e) async {
-                      print(e.id);
-                      ref.read(messageAPIProvider).deleteMessageDocument(e.id);
+                      print(e['\$id']);
+                      await ref.read(messageAPIProvider).deleteMessageDocument(e['\$id']);
                     });
                   },
                   child: const Text('メッセージ全消し'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final user = ref.watch(userModelProvider).value;
+
+                    if (user == null) return;
+                    int a = 0;
+                    await Future.forEach(List.generate(50, (index) => index), (e) async {
+                      final msg = Message(
+                          id: ID.unique(),
+                          createdAt: DateTime.now(),
+                          message: 'ほげええええ',
+                          sendBy: user.id,
+                          // replyMessage: replyMessage,
+                          messageType: MessageType.custom);
+                      await ref.read(messageAPIProvider).createMessageDocument(msg);
+                      a += e;
+                      print(a);
+                    });
+                  },
+                  child: const Text('メッセージ50送信'),
                 ),
               ],
             ),

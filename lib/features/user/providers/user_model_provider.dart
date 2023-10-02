@@ -35,7 +35,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
                   },
                 );
               }
-              throw '${e.code}: USER:やり直してね(；ω；)';
+              throw '$e: USER:やり直してね(；ω；)';
             });
             return userModel;
           },
@@ -44,36 +44,36 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   }
 
   /// 自分を取る
-  UserModel get currentUser => state.maybeWhen(
-        orElse: UserModel.instance,
-        data: (data) => data,
-      );
+  // UserModel get currentUser => state.maybeWhen(
+  //       orElse: UserModel.instance,
+  //       data: (data) => data,
+  //     );
 
-  Future<UserModel> getUserModel(String id) async {
-    _futureGuard(
-      () async {
-        final doc = await _userAPI
-            .getUserDocument(id)
-            .catchError((e) => throw ('${e.code}: USER_GET: 出来ない！'));
-        return UserModel.fromMap(doc.data);
-      },
-    );
+  // Future<UserModel> getUserModel(String id) async {
+  //   _futureGuard(
+  //     () async {
+  //       final doc = await _userAPI
+  //           .getUserDocument(id)
+  //           .catchError((e) => throw ('${e.code}: USER_GET: 出来ない！'));
+  //       return UserModel.fromMap(doc.data);
+  //     },
+  //   );
 
-    return state.value!;
-  }
+  //   return state.value!;
+  // }
 
-  Future<UserModel> createUserModel(UserModel userModel) async {
-    _futureGuard(
-      () async {
-        final doc = await _userAPI
-            .createUserDocument(userModel)
-            .catchError((e) => throw '${e.code}: USER_CREATE: ユーザ取得できない( ;  ; ）');
-        return UserModel.fromMap(doc.data);
-      },
-    );
+  // Future<UserModel> createUserModel(UserModel userModel) async {
+  //   _futureGuard(
+  //     () async {
+  //       final doc = await _userAPI
+  //           .createUserDocument(userModel)
+  //           .catchError((e) => throw '${e.code}: USER_CREATE: ユーザ取得できない( ;  ; ）');
+  //       return UserModel.fromMap(doc.data);
+  //     },
+  //   );
 
-    return state.value!;
-  }
+  //   return state.value!;
+  // }
 
   Future<UserModel> updateUserModel(UserModel userModel) async {
     _futureGuard(
@@ -99,10 +99,6 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
 
     return userModelList;
   }
-
-  // Future<void> realtimeUpdate(UserModel userModel) async {
-  //   update((data) => userModel);
-  // }
 
   Future<void> _futureGuard(Future<UserModel> Function() futureFunction) async {
     final prevState = state.copyWithPrevious(state);

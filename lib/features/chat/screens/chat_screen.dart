@@ -6,16 +6,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:programming_sns/apis/message_api.dart';
+import 'package:programming_sns/common/scaffold_with_navbar.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/chat/providers/messages_with_chatusers_provider.dart';
+import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/models/user_model.dart';
 import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
 
-class ChatScreen extends ConsumerStatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+class ChatScreenTapple extends ConsumerStatefulWidget {
+  const ChatScreenTapple({Key? key}) : super(key: key);
   static const Map<String, dynamic> metaData = {
     'path': '/chat',
     'label': 'チャット',
@@ -27,23 +28,50 @@ class ChatScreen extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends ConsumerState<ChatScreen> {
+class _ChatScreenState extends ConsumerState<ChatScreenTapple> {
   AppTheme theme = LightTheme();
   bool isDarkTheme = false;
 
   bool showReaction = true;
 
-  ChatController chatController = ChatController(
-    initialMessageList: [],
-    scrollController: ScrollController(),
-    chatUsers: [],
-  );
+  bool isCurrentScreen = true;
+
+  late ChatController chatController;
 
   @override
   void initState() {
     super.initState();
 
-    chatController.scrollController = ScrollController();
+    chatController = ChatController(
+      initialMessageList: [],
+      scrollController: ScrollController(
+        onDetach: (position) async {
+          if (isCurrentScreen) {
+            await ref.read(chatControllerProvider.notifier).addMessages();
+            chatController.scrollController.attach(position);
+          }
+        },
+      ),
+      chatUsers: [],
+    );
+
+    chatController.scrollController.addListener(() {
+      final position = chatController.scrollController.position;
+      final maxScrollLimit = position.maxScrollExtent;
+      final currentPosition = position.pixels;
+      if (currentPosition == maxScrollLimit) {
+        chatController.scrollController.detach(position);
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // ウィジェットの依存関係に変更があった時、or initState()の直後にdidChangeDependenciesが呼ばれる。
+    // つまり、ScrollControllerのonDetach（ウィジェットの依存関係に変更）を検知した時、
+    // didChangeDependenciesが呼ばれるため、didChangeDependenciesで書く必要がある。
+    isCurrentScreen = ModalRoute.of(context)!.isCurrent;
   }
 
   @override
@@ -57,11 +85,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       userModelProvider,
       complete: (currentUserModel) {
         final ChatUser currentChatUser = UserModel.toChatUser(currentUserModel);
-        // currentUserId = currentUserModel.id;
 
         /// CHAT
         return ref.watchEX(
-          messagesWithChatUsersProvider,
+          chatControllerProvider,
           complete: (chatList) {
             chatController.initialMessageList = chatList.$1;
             chatController.chatUsers = chatList.$2;
@@ -181,7 +208,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       replyMessage: replyMessage,
       messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
     );
-    print('IIIIII');
 
     ref.read(messageAPIProvider).createMessageDocument(msg);
   }

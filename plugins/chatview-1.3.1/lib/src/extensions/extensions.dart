@@ -31,7 +31,8 @@ import '../utils/package_strings.dart';
 extension TimeDifference on DateTime {
   String get getDay {
     final DateTime formattedDate = DateFormat(dateFormat).parse(toString());
-    final DateFormat formatter = DateFormat.yMMMMd(enUS);
+    // final DateFormat formatter = DateFormat.yMMMMd(enUS);  変更
+    final DateFormat formatter = DateFormat.yMMMMd('ja');
     final differenceInDays = formattedDate.difference(DateTime.now()).inDays;
     if (differenceInDays == 0) {
       return PackageStrings.today;
@@ -47,7 +48,8 @@ extension TimeDifference on DateTime {
     return formatter.format(this);
   }
 
-  String get getTimeFromDateTime => DateFormat.Hm().format(this);
+  // String get getTimeFromDateTime => DateFormat.Hm().format(this); 変更
+  String get getTimeFromDateTime => DateFormat.Hm('ja').format(this);
 }
 
 /// Extension on String which implements different types string validations.
@@ -79,8 +81,7 @@ extension ValidateString on String {
       padding: profileCirclePadding ?? const EdgeInsets.only(left: 4),
       child: CircleAvatar(
         radius: profileCircleRadius ?? 8,
-        backgroundImage:
-            NetworkImage(getChatUser(this)?.profilePhoto ?? profileImage),
+        backgroundImage: NetworkImage(getChatUser(this)?.profilePhoto ?? profileImage),
       ),
     );
   }

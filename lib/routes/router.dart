@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/scaffold_with_navbar.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/features/home/screens/home_screen.dart';
 import 'package:programming_sns/temp/tempScreen.dart';
 
@@ -18,7 +19,8 @@ final router = Provider((ref) {
     ScreenB.metaData,
     HomeScreen.metaData,
     ScreenA.metaData,
-    ChatScreen.metaData,
+    // ChatScreen.metaData,
+    ChatScreenTapple.metaData,
   ];
 
   return GoRouter(
@@ -108,10 +110,11 @@ final router = Provider((ref) {
             ],
           ),
           GoRoute(
-            path: ChatScreen.metaData['path'],
+            path: ChatScreenTapple.metaData['path'],
             pageBuilder: (context, state) {
               return _pageAnimation(
-                const ChatScreen(),
+                // const ChatScreen(),
+                const ChatScreenTapple(),
                 // const ChatScreenExanple(),
                 state,
                 ref: ref,

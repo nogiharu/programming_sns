@@ -29,8 +29,7 @@ import '../../widgets/chat_message_sending_to_sent_animation.dart';
 const String enUS = "en_US";
 const String emojiRegExpression =
     r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])';
-const String imageUrlRegExpression =
-    r'(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)';
+const String imageUrlRegExpression = r'(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)';
 const String dateFormat = "yyyy-MM-dd";
 const String jpg = ".jpg";
 const String png = ".png";
@@ -61,8 +60,10 @@ const double textFieldBorderRadius = 27;
 
 applicationDateFormatter(DateTime inputTime) {
   if (DateTime.now().difference(inputTime).inDays <= 3) {
-    return timeago.format(inputTime);
+    // return timeago.format(inputTime); 変更
+    return timeago.format(inputTime, locale: 'ja');
   } else {
+    // return DateFormat('dd MMM yyyy').format(inputTime); 変更
     return DateFormat('dd MMM yyyy').format(inputTime);
   }
 }
@@ -81,7 +82,8 @@ Widget lastSeenAgoBuilder(Message message, String formattedDate) {
   return Padding(
     padding: const EdgeInsets.all(2),
     child: Text(
-      'Seen ${applicationDateFormatter(message.createdAt)}    ',
+      // 'Seen ${applicationDateFormatter(message.createdAt)}    ', 変更
+      '${applicationDateFormatter(message.createdAt)}    ',
       style: const TextStyle(color: Colors.grey, fontSize: 12),
     ),
   );

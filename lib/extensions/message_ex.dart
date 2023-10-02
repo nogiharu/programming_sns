@@ -27,6 +27,7 @@ extension MessageEX on Message {
       id: map['\$id'] ?? '',
       message: map['message'] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      // createdAt: DateTime.parse(map['\$createdAt']),
       sendBy: map['sendByUserId'],
       messageType: (map['messageType'] as String).messageTypeToEnum(),
       reaction: Reaction(

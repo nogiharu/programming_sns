@@ -95,8 +95,8 @@ class UserModel {
     DateTime? updatedAt,
   }) {
     return UserModel(
-      id: id ?? 'aaa',
-      name: name ?? 'HOGEEEE',
+      id: id ?? 'ユーザーがいません！',
+      name: name ?? 'ユーザーがいません！',
       profilePhoto:
           "https://raw.githubusercontent.com/SimformSolutionsPvtLtd/flutter_showcaseview/master/example/assets/simform.png",
       createdAt: DateTime.now(),

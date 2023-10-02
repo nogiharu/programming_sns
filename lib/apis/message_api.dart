@@ -32,13 +32,23 @@ class MessageAPI {
     );
   }
 
-  Future<DocumentList> getMessagesDocumentList() async {
+  Future<DocumentList> getMessagesDocumentList({String? id}) async {
+    final queries = [
+      Query.orderDesc('createdAt'),
+    ];
+
+    /// idより前を取得
+    if (id == null) {
+      queries.add(Query.limit(50));
+    } else {
+      queries.add(Query.cursorAfter(id));
+      queries.add(Query.limit(25));
+    }
+
     return await _db.listDocuments(
       databaseId: AppwriteConstants.databaseId,
       collectionId: AppwriteConstants.messagesCollection,
-      queries: [
-        Query.orderAsc('createdAt'),
-      ],
+      queries: queries,
     );
   }
 
