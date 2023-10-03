@@ -43,15 +43,15 @@ class ChatControllerNotifier extends AsyncNotifier<(List<Message>, List<ChatUser
       final isMessageCreateEvent =
           event.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.create');
 
+      /// ユーザー作成イベント
       if (isUserCreateEvent) {
         print('USER_CREATE');
         final user = UserModel.fromMap(event.payload);
         final chatUser = UserModel.toChatUser(user);
-        update((data) {
-          data.$2.add(chatUser);
-          return data;
-        });
+        update((data) => data..$2.add(chatUser));
       }
+
+      /// メッセージ更新イベント
       if (isUserUpdateEvent) {
         print('USER_UPDATE');
         final user = UserModel.fromMap(event.payload);
@@ -62,24 +62,24 @@ class ChatControllerNotifier extends AsyncNotifier<(List<Message>, List<ChatUser
           return data;
         });
       }
+
+      /// メッセージ作成イベント
       if (isMessageCreateEvent) {
         print('MESSAGE_CREATE');
         final message = MessageEX.fromMap(event.payload);
-        update((data) {
-          data.$1.add(message);
-          print('ADDです：${message.createdAt}');
-          return data;
-        });
+        update((data) => data..$1.add(message));
       }
     });
   }
 
+  /// ユーザーリスト取得し、チャットユーザーリストに変換
   Future<List<ChatUser>> getChatUsers() async {
     return (await ref.read(userModelProvider.notifier).getUserModelList())
         .map((userModel) => UserModel.toChatUser(userModel))
         .toList();
   }
 
+  /// メッセージ一覧取得
   Future<List<Message>> getMessages({String? id}) async {
     final messages = await _messageAPI
         .getMessagesDocumentList(id: id)
@@ -97,8 +97,8 @@ class ChatControllerNotifier extends AsyncNotifier<(List<Message>, List<ChatUser
     return messages;
   }
 
+  /// メッセージリストに過去２５件メッセージ追加
   Future<void> addMessages() async {
-    print('メッセージ追加！');
     await update((data) async {
       final messages = data.$1;
       final messages25Ago = await getMessages(id: messages.first.id);
