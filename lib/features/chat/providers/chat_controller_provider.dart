@@ -1,18 +1,19 @@
 import 'dart:async';
 
+import 'package:chatview/chatview.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/core/dependencies.dart';
 import 'package:programming_sns/extensions/message_ex.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
-import 'package:programming_sns/models/user_model.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
 
-final chatControllerProvider =
-    AsyncNotifierProvider<ChatControllerNotifier, (List<Message>, List<ChatUser>)>(
-        ChatControllerNotifier.new);
+final chatMessageProvider =
+    AsyncNotifierProvider<ChatMessageNotifier, (List<Message>, List<ChatUser>)>(
+        ChatMessageNotifier.new);
 
-class ChatControllerNotifier extends AsyncNotifier<(List<Message>, List<ChatUser>)> {
+class ChatMessageNotifier extends AsyncNotifier<(List<Message>, List<ChatUser>)> {
   MessageAPI get _messageAPI => ref.watch(messageAPIProvider);
 
   @override

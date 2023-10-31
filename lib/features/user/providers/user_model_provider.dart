@@ -1,11 +1,11 @@
 import 'dart:async';
-
 import 'package:appwrite/appwrite.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/user_api.dart';
-
+import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
-import 'package:programming_sns/models/user_model.dart';
-import 'package:programming_sns/core/dependencies.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
 
 final userModelProvider =
     AsyncNotifierProvider<UserModelNotifier, UserModel>(UserModelNotifier.new);
@@ -15,68 +15,37 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
 
   @override
   FutureOr<UserModel> build() async {
-    return ref.watch(authProvider).maybeWhen(
-          data: (user) async {
-            final userModel = await _userAPI.getUserDocument(user.$id).then((doc) {
-              print('ユーザ取得完了！');
-              return UserModel.fromMap(doc.data);
-            }).catchError((e) async {
-              print('存在しないエラー404');
-              // 存在しないエラー404
-              if (e is AppwriteException && e.code == 404) {
-                final userModel = UserModel.instance(
-                  id: user.$id,
-                  name: user.$id.substring(15, user.$id.length),
-                );
-                return await _userAPI.createUserDocument(userModel).then(
-                  (doc) {
-                    print('ユーザ登録完了！');
-                    return UserModel.fromMap(doc.data);
-                  },
-                );
-              }
-              throw '$e: USER:やり直してね(；ω；)';
-            });
-            return userModel;
-          },
-          orElse: UserModel.instance,
+    final user = await ref.watch(authProvider.notifier).build();
+    final userModel = await _getUserModel(user.userId).catchError((e) async {
+      // 存在しないエラー404
+      if (e is AppwriteException && e.code == 404) {
+        final userModel = UserModel.instance(
+          id: user.userId,
+          name: user.userId.substring(15, user.$id.length),
         );
+        debugPrint('ユーザー作成OK!');
+        return await _createUserModel(userModel).catchError((e) => exceptionMessage(e));
+      }
+      throw exceptionMessage(e);
+    });
+    return userModel;
   }
 
-  /// 自分を取る
-  // UserModel get currentUser => state.maybeWhen(
-  //       orElse: UserModel.instance,
-  //       data: (data) => data,
-  //     );
+  /// ユーザー取得
+  Future<UserModel> _getUserModel(String id) async {
+    final doc = await _userAPI.getUserDocument(id);
+    return UserModel.fromMap(doc.data);
+  }
 
-  // Future<UserModel> getUserModel(String id) async {
-  //   _futureGuard(
-  //     () async {
-  //       final doc = await _userAPI
-  //           .getUserDocument(id)
-  //           .catchError((e) => throw ('${e.code}: USER_GET: 出来ない！'));
-  //       return UserModel.fromMap(doc.data);
-  //     },
-  //   );
+  /// ユーザー作成
+  Future<UserModel> _createUserModel(UserModel userModel) async {
+    final doc = await _userAPI.createUserDocument(userModel);
+    return UserModel.fromMap(doc.data);
+  }
 
-  //   return state.value!;
-  // }
-
-  // Future<UserModel> createUserModel(UserModel userModel) async {
-  //   _futureGuard(
-  //     () async {
-  //       final doc = await _userAPI
-  //           .createUserDocument(userModel)
-  //           .catchError((e) => throw '${e.code}: USER_CREATE: ユーザ取得できない( ;  ; ）');
-  //       return UserModel.fromMap(doc.data);
-  //     },
-  //   );
-
-  //   return state.value!;
-  // }
-
+  /// ユーザー更新
   Future<UserModel> updateUserModel(UserModel userModel) async {
-    _futureGuard(
+    await futureGuard(
       () async {
         final doc = await _userAPI
             .updateUserDocument(
@@ -84,27 +53,35 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
                 updatedAt: DateTime.now(),
               ),
             )
-            .catchError((e) => throw ('${e.code}: USER_UPDATE: 出来ない！'));
+            .catchError((e) => exceptionMessage(e));
         return UserModel.fromMap(doc.data);
       },
     );
+
     return state.value!;
   }
 
+  /// AUTHからパスワードを取れないため、ユーザーズコレクションにパスワードを保存
+  Future<void> updateAuthUserModel({required String loginId, required String loginPassword}) async {
+    await update((userModel) async {
+      final doc = await _userAPI.updateUserDocument(
+        userModel.copyWith(
+          loginId: loginId,
+          loginPassword: loginPassword,
+          isAnonymous: false,
+        ),
+      );
+      return UserModel.fromMap(doc.data);
+    });
+  }
+
+  /// ユーザー一覧取得
   Future<List<UserModel>> getUserModelList() async {
-    final doc = await _userAPI
-        .getUsersDocumentList()
-        .catchError((e) => throw '${e.code}: USER_LSIT ユーザ取得できない( ;  ; ）');
+    final doc = await _userAPI.getUsersDocumentList().catchError(
+          (e) => exceptionMessage(e),
+        );
     final userModelList = doc.documents.map((doc) => UserModel.fromMap(doc.data)).toList();
 
     return userModelList;
-  }
-
-  Future<void> _futureGuard(Future<UserModel> Function() futureFunction) async {
-    final prevState = state.copyWithPrevious(state);
-    state = await AsyncValue.guard(futureFunction);
-    if (state.hasError) {
-      Future.delayed(const Duration(milliseconds: 1000), () => state = prevState);
-    }
   }
 }

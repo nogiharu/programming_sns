@@ -24,3 +24,8 @@ final appwriteRealtimeProvider = Provider((ref) {
   final Client client = ref.read(appwriteClientProvider);
   return Realtime(client);
 });
+
+// final appwriteUsersProvider = Provider((ref) {
+//   final Client client = ref.read(appwriteClientProvider);
+//   return Users(client);
+// });

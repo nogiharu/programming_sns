@@ -1,19 +1,17 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:chatview/chatview.dart';
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api.dart';
-import 'package:programming_sns/common/scaffold_with_navbar.dart';
-import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
-import 'package:programming_sns/models/user_model.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class ChatScreenTapple extends ConsumerStatefulWidget {
   const ChatScreenTapple({Key? key}) : super(key: key);
@@ -47,7 +45,7 @@ class _ChatScreenState extends ConsumerState<ChatScreenTapple> {
       scrollController: ScrollController(
         onDetach: (position) async {
           if (isCurrentScreen) {
-            await ref.read(chatControllerProvider.notifier).addMessages();
+            await ref.read(chatMessageProvider.notifier).addMessages();
             chatController.scrollController.attach(position);
           }
         },
@@ -55,6 +53,7 @@ class _ChatScreenState extends ConsumerState<ChatScreenTapple> {
       chatUsers: [],
     );
 
+    /// イベント追加
     chatController.scrollController.addListener(() {
       final position = chatController.scrollController.position;
       final maxScrollLimit = position.maxScrollExtent;
@@ -77,7 +76,6 @@ class _ChatScreenState extends ConsumerState<ChatScreenTapple> {
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting("ja");
-
     return Scaffold(
 
         /// USER
@@ -88,7 +86,7 @@ class _ChatScreenState extends ConsumerState<ChatScreenTapple> {
 
         /// CHAT
         return ref.watchEX(
-          chatControllerProvider,
+          chatMessageProvider,
           complete: (chatList) {
             chatController.initialMessageList = chatList.$1;
             chatController.chatUsers = chatList.$2;
@@ -207,6 +205,7 @@ class _ChatScreenState extends ConsumerState<ChatScreenTapple> {
       sendBy: user.id,
       replyMessage: replyMessage,
       messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
+      // chatRoomId: ,
     );
 
     ref.read(messageAPIProvider).createMessageDocument(msg);

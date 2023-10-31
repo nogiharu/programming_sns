@@ -1,9 +1,10 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:chatview/chatview.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/core/dependencies.dart';
-import 'package:programming_sns/extensions/message_ex.dart';
+import 'package:programming_sns/extensions/extensions.dart';
 
 final messageAPIProvider = Provider(
   (ref) => MessageAPI(

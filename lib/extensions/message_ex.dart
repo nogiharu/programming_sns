@@ -1,5 +1,4 @@
 import 'package:chatview/chatview.dart';
-import 'package:flutter/foundation.dart';
 import 'package:programming_sns/core/enums/message_status_ex.dart';
 import 'package:programming_sns/core/enums/message_type_ex.dart';
 
@@ -19,6 +18,7 @@ extension MessageEX on Message {
     result.addAll({'replyMessageId': replyMessage.messageId});
     result.addAll({'replyMessage': replyMessage.message});
     result.addAll({'status': status.toString()});
+    // result.addAll({'chatRoomId': chatRoomId});
     return result;
   }
 
@@ -42,6 +42,7 @@ extension MessageEX on Message {
         message: map['replyMessage'] ?? '',
       ),
       status: (map['status'] as String).messageStatusToEnum(),
+      // chatRoomId: map['chatRoomId'] ?? '',
     );
   }
 }

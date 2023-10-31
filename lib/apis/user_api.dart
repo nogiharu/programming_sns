@@ -3,7 +3,7 @@ import 'package:appwrite/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/models/user_model.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
 
 final userAPIProvider = Provider(
   (ref) => UserAPI(
@@ -48,6 +48,14 @@ class UserAPI {
       // queries: [
       //   Query.orderAsc('createdAt'),
       // ],
+    );
+  }
+
+  Future<Document> deleteUserDocument(UserModel userModel) async {
+    return await _db.deleteDocument(
+      databaseId: AppwriteConstants.databaseId,
+      collectionId: AppwriteConstants.usersCollection,
+      documentId: userModel.id,
     );
   }
 }

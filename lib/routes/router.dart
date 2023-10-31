@@ -2,9 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/scaffold_with_navbar.dart';
+import 'package:programming_sns/features/auth/screens/login_credentials_update_screen.dart';
+import 'package:programming_sns/features/auth/screens/login_screen.dart';
+import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
-import 'package:programming_sns/features/chat/screens/chat_screen.dart';
-import 'package:programming_sns/features/home/screens/home_screen.dart';
+import 'package:programming_sns/features/user/screens/home_screen.dart';
+
 import 'package:programming_sns/temp/tempScreen.dart';
 
 final rootNavigatorKeyProvider = Provider(
@@ -92,6 +95,7 @@ final router = Provider((ref) {
           ),
           GoRoute(
             path: HomeScreen.metaData['path'],
+            name: HomeScreen.metaData['path'],
             pageBuilder: (context, state) {
               return _pageAnimation(
                 const HomeScreen(),
@@ -101,12 +105,62 @@ final router = Provider((ref) {
             },
             routes: [
               GoRoute(
-                path: DetailsScreen.path,
+                path: LoginScreen.path,
+                name: LoginScreen.path,
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
-                  return const DetailsScreen(label: 'HOME');
+                  return const LoginScreen();
                 },
               ),
+              GoRoute(
+                path: SignupScreen.path,
+                name: SignupScreen.path,
+                parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+                builder: (context, state) {
+                  return const SignupScreen();
+                },
+              ),
+              GoRoute(
+                path: LoginCredentialsUpdateScreen.path,
+                name: LoginCredentialsUpdateScreen.path,
+                parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+                builder: (context, state) {
+                  final map = state.extra as Map<String, dynamic>;
+                  return LoginCredentialsUpdateScreen(
+                    label: map['label'],
+                    isIdUpdate: map['isIdUpdate'],
+                  );
+                  // if (state.extra == null) {
+                  //   print('あああ');
+                  //   context.go(HomeScreen.metaData['path']);
+                  //   return const HomeScreen();
+                  // } else {
+                  //   print('いいい');
+                  //   final map = state.extra as Map<String, dynamic>;
+
+                  //   return LoginCredentialsUpdateScreen(
+                  //     label: map['label'],
+                  //     isIdUpdate: map['isIdUpdate'],
+                  //   );
+                  // }
+                },
+              ),
+              // GoRoute(
+              //   path: PasswordUpdateScreen.path,
+              //   name: PasswordUpdateScreen.path,
+              //   parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+              //   builder: (context, state) {
+              //     return const PasswordUpdateScreen();
+              //   },
+              // ),
+              // GoRoute(
+              //   path: LoginIdUpdateScreen.path,
+              //   name: LoginIdUpdateScreen.path,
+              //   parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+              //   builder: (context, state) {
+              //     return const LoginIdUpdateScreen();
+              //   },
+              // ),
             ],
           ),
           GoRoute(
@@ -128,13 +182,18 @@ final router = Provider((ref) {
       final path = ref.watch(currentBottomIndexProvider)['path'];
       final uri = state.uri.toString();
       if (!uri.startsWith(path)) {
+        // 画面リロードされたらパスと選択中のボトムアイコンに差異が生じるため
         final currentBottomIndex = ref.read(currentBottomIndexProvider.notifier).state;
         bottomItems.where((e) => uri == e['path']).forEach((e) {
           currentBottomIndex['path'] = e['path'];
           currentBottomIndex['index'] = e['index'];
         });
       }
-      return;
+      // ログイン情報更新画面でリロードされたらextraがnullになる
+      if (uri.contains(LoginCredentialsUpdateScreen.path) && state.extra == null) {
+        return HomeScreen.metaData['path'];
+      }
+      return null;
     },
   );
 });

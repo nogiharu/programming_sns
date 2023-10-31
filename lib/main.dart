@@ -26,8 +26,8 @@ class Main extends ConsumerWidget {
     return MaterialApp.router(
       // title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.amber,
-      ),
+          primarySwatch: Colors.amber,
+          textTheme: const TextTheme(bodyLarge: TextStyle(color: Colors.black))),
       builder: (context, child) => Loading(
         child: child,
       ),

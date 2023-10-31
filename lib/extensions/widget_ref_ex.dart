@@ -10,6 +10,9 @@ final scaffoldMessengerKeyProvider = Provider(
 );
 
 extension WidgetRefEx on WidgetRef {
+  /// - asyncValueProvider AsyncValueを返すプロバイダー
+  /// - complete 取得完了後のコールバック
+  /// - loading ローディング中に出したいやつ
   Widget watchEX<T>(
     ProviderListenable<AsyncValue<T>> asyncValueProvider, {
     required Widget Function(T) complete,
@@ -22,14 +25,15 @@ extension WidgetRefEx on WidgetRef {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           showDialog<void>(
             context: read(rootNavigatorKeyProvider).currentContext!,
-            builder: (context) => ErrorDialog(error: e.toString()),
+            builder: (_) => ErrorDialog(error: e.toString()),
           );
         });
-
+        // TODO ここがダサい
         return Container();
       },
       loading: () {
         if (loading == null) {
+          debugPrint('ローディング');
           return const Center(
             child: CircularProgressIndicator(),
           );

@@ -38,3 +38,21 @@ rm /opt/homebrew/Caskroom/flutter/3.10.5/flutter/bin/cache/flutter_tools.stamp
 
 ##
 
+## docker INSTALL
+docker run -it --rm \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
+    --entrypoint="install" \
+    appwrite/appwrite:1.4.5
+
+## docker UPGRADE
+docker run -it --rm \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
+    --entrypoint="upgrade" \
+    appwrite/appwrite:1.4.5
+
+上やった後に下やる！
+ 
+cd appwrite/
+docker compose exec appwrite migrate

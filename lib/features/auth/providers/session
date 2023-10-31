@@ -1,0 +1,26 @@
+// class AuthNotifier extends AsyncNotifier<User> {
+//   Account get _account => ref.watch(appwriteAccountProvider);
+//   UserAPI get _userAPI => ref.watch(userAPIProvider);
+
+//   @override
+//   FutureOr<User> build() async {
+//     final sessions = await _account.listSessions().then((sessionList) {
+//       final session = sessionList.sessions.reduce((acc, current) =>
+//           DateTime.parse(acc.$createdAt).isAfter(DateTime.parse(current.$createdAt))
+//               ? acc
+//               : current);
+
+//       return session;
+//     }).catchError((e) async {
+//       // 権限エラー401
+//       if (e is AppwriteException && e.code == 401) {
+//         return await _account.createAnonymousSession().then(
+//           (session) async {
+//             print('アカウント仮登録成功！');
+//             return session;
+//           },
+//         ).catchError((_) => throw '${e.code}:AUTH やり直してね( ；∀；)');
+//       }
+//       throw '${e.code}:AUTH やり直してね(T ^ T)';
+//     });
+// return sessions
