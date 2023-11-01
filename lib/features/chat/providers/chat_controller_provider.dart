@@ -1,11 +1,12 @@
 import 'dart:async';
 
 import 'package:chatview/chatview.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/extensions/message_ex.dart';
+import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 
@@ -46,7 +47,7 @@ class ChatMessageNotifier extends AsyncNotifier<(List<Message>, List<ChatUser>)>
 
       /// ユーザー作成イベント
       if (isUserCreateEvent) {
-        print('USER_CREATE');
+        debugPrint('USER_CREATE!');
         final user = UserModel.fromMap(event.payload);
         final chatUser = UserModel.toChatUser(user);
         update((data) => data..$2.add(chatUser));
@@ -54,7 +55,7 @@ class ChatMessageNotifier extends AsyncNotifier<(List<Message>, List<ChatUser>)>
 
       /// メッセージ更新イベント
       if (isUserUpdateEvent) {
-        print('USER_UPDATE');
+        debugPrint('USER_UPDATE!');
         final user = UserModel.fromMap(event.payload);
         final chatUser = UserModel.toChatUser(user);
         update((data) {
@@ -66,7 +67,7 @@ class ChatMessageNotifier extends AsyncNotifier<(List<Message>, List<ChatUser>)>
 
       /// メッセージ作成イベント
       if (isMessageCreateEvent) {
-        print('MESSAGE_CREATE');
+        debugPrint('MESSAGE_CREATE!');
         final message = MessageEX.fromMap(event.payload);
         update((data) => data..$1.add(message));
       }

@@ -155,7 +155,6 @@ class ChatCard extends ConsumerWidget {
                       child: InkWell(
                         mouseCursor: SystemMouseCursors.click,
                         onTap: () {
-                          print('ああああああ');
                           showModalBottomSheet(
                             context: context,
                             builder: (context) {

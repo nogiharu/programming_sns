@@ -27,8 +27,6 @@ class HomeScreen extends ConsumerWidget {
       body: ref.watchEX(
         userModelProvider,
         complete: (data) {
-          print(data.toString());
-
           return Center(
             child: Column(
               children: [

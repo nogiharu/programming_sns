@@ -39,7 +39,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         errorMessage = ref.watch(authProvider).error.toString();
       } else {
         if (errorMessage == '') {
-          ref.read(snackBarProvider('登録完だよ(*^_^*)'));
+          ref.read(snackBarProvider('ログイン完了だよ(*^_^*)'));
           // ignore: use_build_context_synchronously
           context.pop();
         }
