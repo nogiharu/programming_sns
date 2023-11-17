@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/temp/tempScreen.dart';
+import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 
 final currentBottomIndexProvider = StateProvider((ref) {
   return {
-    'path': ScreenA.metaData['path'],
-    'index': ScreenA.metaData['index'],
-    'preIndex': ScreenA.metaData['index'],
+    'path': ChatThreadScreen.metaData['path'],
+    'index': ChatThreadScreen.metaData['index'],
+    'preIndex': ChatThreadScreen.metaData['index'],
   };
 });
 

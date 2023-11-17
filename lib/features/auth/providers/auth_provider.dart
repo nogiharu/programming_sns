@@ -8,6 +8,7 @@ import 'package:programming_sns/core/core.dart';
 
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/auth/validation/auth_exception_message.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
 final authProvider = AsyncNotifierProvider<AuthNotifier, Session>(AuthNotifier.new);
@@ -41,6 +42,8 @@ class AuthNotifier extends AsyncNotifier<Session> {
   /// ログイン
   Future<Session> login({required String loginId, required String loginPassword}) async {
     await futureGuard(() async {
+      final msg = authExceptionMessage(loginId: loginId, loginPassword: loginPassword);
+      if (msg.isNotEmpty) throw msg;
       return await _account
           .createEmailSession(
             email: '$loginId@gmail.com',
@@ -55,37 +58,51 @@ class AuthNotifier extends AsyncNotifier<Session> {
   }
 
   /// アカウント登録
-  Future<void> accountUpdate({required String loginId, required String loginPassword}) async {
+  Future<void> accountUpdate({required UserModel userModel}) async {
     await futureGuard(() async {
+      final msg =
+          authExceptionMessage(loginId: userModel.loginId, loginPassword: userModel.loginPassword);
+      if (msg.isNotEmpty) throw msg;
+
       return await _account
           .updateEmail(
-        email: '$loginId@gmail.com',
-        password: loginPassword,
+        email: '${userModel.loginId}@gmail.com',
+        password: userModel.loginPassword,
       )
           .then((_) async {
-        await ref.read(userModelProvider.notifier).updateAuthUserModel(
-              loginId: loginId,
-              loginPassword: loginPassword,
-            );
-        return await login(loginId: loginId, loginPassword: loginPassword);
+        await ref.read(userModelProvider.notifier).updateUserModel(userModel);
+        // ログインしないとセッション更新されない
+        return await login(loginId: userModel.loginId, loginPassword: userModel.loginPassword);
+      }).catchError((e) => throw authExceptionMessage(error: e));
+    });
+  }
+
+  /// パスワード更新
+  Future<void> loginPasswordUpdate(
+      {required String newLoginPassword, required UserModel userModel}) async {
+    await futureGuard(() async {
+      final msg = authExceptionMessage(loginPassword: newLoginPassword);
+      if (msg.isNotEmpty) throw msg;
+
+      return await _account
+          .updatePassword(password: newLoginPassword, oldPassword: userModel.loginPassword)
+          .then((_) async {
+        await ref
+            .read(userModelProvider.notifier)
+            .updateUserModel(userModel.copyWith(loginPassword: newLoginPassword));
+        // ログインしないとセッション更新されない
+        return await login(loginId: userModel.loginId, loginPassword: newLoginPassword);
       }).catchError(
         (e) => throw authExceptionMessage(error: e),
       );
     });
-
-    // if (state.hasError) {
-    //   return state.error.toString();
-    // }
-    // return '';
   }
 
   Future<dynamic> logout() async {
-    return ref
-        .read(appwriteAccountProvider)
-        .deleteSession(
-          sessionId: 'current',
-        )
-        .then((value) => value)
-        .catchError((_) => throw 'やだああああ');
+    await _account.deleteSession(sessionId: 'current');
+  }
+
+  Future<dynamic> deleteAccount() async {
+    await _account.deleteIdentity(identityId: state.value!.userId);
   }
 }

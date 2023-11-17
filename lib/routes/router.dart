@@ -6,6 +6,7 @@ import 'package:programming_sns/features/auth/screens/login_credentials_update_s
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/user/screens/home_screen.dart';
 
 import 'package:programming_sns/temp/tempScreen.dart';
@@ -19,11 +20,10 @@ final shellNavigatorKeyProvider = Provider(
 
 final router = Provider((ref) {
   final bottomItems = [
-    ScreenB.metaData,
+    // ScreenB.metaData,
     HomeScreen.metaData,
-    ScreenA.metaData,
+    ChatThreadScreen.metaData,
     // ChatScreen.metaData,
-    ChatScreenTapple.metaData,
   ];
 
   return GoRouter(
@@ -39,60 +39,52 @@ final router = Provider((ref) {
           );
         },
         routes: [
+          /// CHAT
           GoRoute(
-            path: ScreenA.metaData['path'],
+            path: ChatThreadScreen.metaData['path'],
             pageBuilder: (context, state) {
               return _pageAnimation(
-                const ScreenA(),
+                const ChatThreadScreen(),
                 state,
                 ref: ref,
               );
             },
             routes: [
               GoRoute(
-                path: DetailsScreen.path,
+                path: ChatScreen.path,
+                name: ChatScreen.path,
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
-                  return const DetailsScreen(label: 'A');
-                },
-                // Heroアニメ
-                // pageBuilder: (context, state) {
-                //   return _pageAnimation(const DetailsScreen(label: 'A'), state);
-                // },
-                routes: [
-                  GoRoute(
-                    path: DetailsScreen2.path,
-                    parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
-                    builder: (context, state) {
-                      return const DetailsScreen2(label: 'A DetailsScreen2');
-                    },
-                    // pageBuilder: (context, state) {
-                    //   return _pageAnimation(const DetailsScreen2(label: 'A DetailsScreen2'), state);
-                    // },
-                  ),
-                ],
-              ),
-            ],
-          ),
-          GoRoute(
-            path: ScreenB.metaData['path'],
-            pageBuilder: (context, state) {
-              return _pageAnimation(
-                const ScreenB(),
-                state,
-                ref: ref,
-              );
-            },
-            routes: [
-              GoRoute(
-                path: DetailsScreen.path,
-                parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
-                builder: (context, state) {
-                  return const DetailsScreen(label: 'B');
+                  final map = state.extra as Map<String, dynamic>;
+                  return ChatScreen(
+                    label: map['label'],
+                    chatRoomId: map['chatRoomId'],
+                  );
                 },
               ),
             ],
           ),
+          // GoRoute(
+          //   path: ScreenB.metaData['path'],
+          //   pageBuilder: (context, state) {
+          //     return _pageAnimation(
+          //       const ScreenB(),
+          //       state,
+          //       ref: ref,
+          //     );
+          //   },
+          //   routes: [
+          //     GoRoute(
+          //       path: DetailsScreen.path,
+          //       parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+          //       builder: (context, state) {
+          //         return const DetailsScreen(label: 'B');
+          //       },
+          //     ),
+          //   ],
+          // ),
+
+          /// HOME
           GoRoute(
             path: HomeScreen.metaData['path'],
             name: HomeScreen.metaData['path'],
@@ -130,50 +122,9 @@ final router = Provider((ref) {
                     label: map['label'],
                     isIdUpdate: map['isIdUpdate'],
                   );
-                  // if (state.extra == null) {
-                  //   print('あああ');
-                  //   context.go(HomeScreen.metaData['path']);
-                  //   return const HomeScreen();
-                  // } else {
-                  //   print('いいい');
-                  //   final map = state.extra as Map<String, dynamic>;
-
-                  //   return LoginCredentialsUpdateScreen(
-                  //     label: map['label'],
-                  //     isIdUpdate: map['isIdUpdate'],
-                  //   );
-                  // }
                 },
               ),
-              // GoRoute(
-              //   path: PasswordUpdateScreen.path,
-              //   name: PasswordUpdateScreen.path,
-              //   parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
-              //   builder: (context, state) {
-              //     return const PasswordUpdateScreen();
-              //   },
-              // ),
-              // GoRoute(
-              //   path: LoginIdUpdateScreen.path,
-              //   name: LoginIdUpdateScreen.path,
-              //   parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
-              //   builder: (context, state) {
-              //     return const LoginIdUpdateScreen();
-              //   },
-              // ),
             ],
-          ),
-          GoRoute(
-            path: ChatScreenTapple.metaData['path'],
-            pageBuilder: (context, state) {
-              return _pageAnimation(
-                // const ChatScreen(),
-                const ChatScreenTapple(),
-                // const ChatScreenExanple(),
-                state,
-                ref: ref,
-              );
-            },
           ),
         ],
       )
@@ -192,6 +143,9 @@ final router = Provider((ref) {
       // ログイン情報更新画面でリロードされたらextraがnullになる
       if (uri.contains(LoginCredentialsUpdateScreen.path) && state.extra == null) {
         return HomeScreen.metaData['path'];
+      }
+      if (uri.contains(ChatScreen.path) && state.extra == null) {
+        return ChatThreadScreen.metaData['path'];
       }
       return null;
     },

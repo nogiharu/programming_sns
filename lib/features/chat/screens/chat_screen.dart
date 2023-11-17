@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api.dart';
 import 'package:programming_sns/extensions/extensions.dart';
-import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
+import 'package:programming_sns/features/chat/providers/chat_message_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
@@ -13,20 +13,22 @@ import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-class ChatScreenTapple extends ConsumerStatefulWidget {
-  const ChatScreenTapple({Key? key}) : super(key: key);
-  static const Map<String, dynamic> metaData = {
-    'path': '/chat',
-    'label': 'チャット',
-    'icon': Icon(Icons.chat),
-    'index': 3,
-  };
+class ChatScreen extends ConsumerStatefulWidget {
+  final String label;
+  final String chatRoomId;
+  const ChatScreen({
+    super.key,
+    required this.label,
+    required this.chatRoomId,
+  });
+
+  static const String path = 'chatScreen';
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends ConsumerState<ChatScreenTapple> {
+class _ChatScreenState extends ConsumerState<ChatScreen> {
   AppTheme theme = LightTheme();
   bool isDarkTheme = false;
 
@@ -45,7 +47,7 @@ class _ChatScreenState extends ConsumerState<ChatScreenTapple> {
       scrollController: ScrollController(
         onDetach: (position) async {
           if (isCurrentScreen) {
-            await ref.read(chatMessageProvider.notifier).addMessages();
+            await ref.read(chatMessageProvider(widget.chatRoomId).notifier).addMessages();
             chatController.scrollController.attach(position);
           }
         },
@@ -77,121 +79,122 @@ class _ChatScreenState extends ConsumerState<ChatScreenTapple> {
   Widget build(BuildContext context) {
     initializeDateFormatting("ja");
     return Scaffold(
+        appBar: AppBar(title: Text(widget.label)),
 
         /// USER
         body: ref.watchEX(
-      userModelProvider,
-      complete: (currentUserModel) {
-        final ChatUser currentChatUser = UserModel.toChatUser(currentUserModel);
+          userModelProvider,
+          complete: (currentUserModel) {
+            final ChatUser currentChatUser = UserModel.toChatUser(currentUserModel);
 
-        /// CHAT
-        return ref.watchEX(
-          chatMessageProvider,
-          complete: (chatList) {
-            chatController.initialMessageList = chatList.$1;
-            chatController.chatUsers = chatList.$2;
+            /// CHAT
+            return ref.watchEX(
+              chatMessageProvider(widget.chatRoomId),
+              complete: (chatList) {
+                chatController.initialMessageList = chatList.$1;
+                chatController.chatUsers = chatList.$2;
 
-            return ChatView(
-              currentUser: currentChatUser,
-              chatController: chatController,
-              onSendTap: onSendTap,
-              featureActiveConfig: const FeatureActiveConfig(
-                enableSwipeToReply: !kIsWeb, // TODO
-                enableSwipeToSeeTime: false,
-              ),
-              chatViewState: ChatViewState.hasMessages,
-              appBar: AppBar(
-                title: const Text('AppBar'),
-              ),
-
-              /// TODO chat全体背景
-              chatBackgroundConfig: ChatBackgroundConfiguration(
-                messageTimeIconColor: theme.messageTimeIconColor,
-                messageTimeTextStyle: TextStyle(color: theme.messageTimeTextColor),
-                defaultGroupSeparatorConfig: DefaultGroupSeparatorConfiguration(
-                  textStyle: TextStyle(
-                    color: theme.chatHeaderColor,
-                    fontSize: 17,
+                return ChatView(
+                  currentUser: currentChatUser,
+                  chatController: chatController,
+                  onSendTap: onSendTap,
+                  featureActiveConfig: const FeatureActiveConfig(
+                    enableSwipeToReply: !kIsWeb, // TODO
+                    enableSwipeToSeeTime: false,
                   ),
-                ),
-                backgroundColor: Colors.amber.shade100,
-              ),
-              sendMessageConfig: SendMessageConfiguration(
-                allowRecordingVoice: false, // ボイスなし
-                imagePickerIconsConfig: const ImagePickerIconsConfiguration(
-                  cameraImagePickerIcon: SizedBox(), // カメラなし
-                ),
-                replyMessageColor: theme.replyMessageColor,
-                defaultSendButtonColor: Colors.amber,
-                replyDialogColor: Colors.amber.shade200, // リプライ背景色
-                replyTitleColor: Colors.amber.shade900,
+                  chatViewState: ChatViewState.hasMessages,
+                  // appBar: AppBar(
+                  //   title: Text(widget.label),
+                  // ),
 
-                textFieldBackgroundColor: Colors.grey.shade100, // 背景色
-                closeIconColor: theme.closeIconColor,
-                textFieldConfig: TextFieldConfiguration(
-                  maxLines: 100, // 入力文字の行
-                  contentPadding: const EdgeInsets.all(10),
-                  hintText: '文字入れてね', // TODO ヒント
-                  compositionThresholdTime: const Duration(seconds: 5),
-                  textStyle: TextStyle(
-                    color: theme.textFieldTextColor,
+                  /// TODO chat全体背景
+                  chatBackgroundConfig: ChatBackgroundConfiguration(
+                    messageTimeIconColor: theme.messageTimeIconColor,
+                    messageTimeTextStyle: TextStyle(color: theme.messageTimeTextColor),
+                    defaultGroupSeparatorConfig: DefaultGroupSeparatorConfiguration(
+                      textStyle: TextStyle(
+                        color: theme.chatHeaderColor,
+                        fontSize: 17,
+                      ),
+                    ),
+                    backgroundColor: Colors.amber.shade100,
                   ),
-                ),
-              ),
-              // TODO わからん
-              chatBubbleConfig: ChatBubbleConfiguration(
-                onDoubleTap: (message) {
-                  setState(() {
-                    showReaction = !showReaction;
-                  });
-                },
-                // TODO わからん
-                outgoingChatBubbleConfig: const ChatBubble(
-                  receiptsWidgetConfig: ReceiptsWidgetConfig(
-                    showReceiptsIn: ShowReceiptsIn.all, // チャット横幅
+                  sendMessageConfig: SendMessageConfiguration(
+                    allowRecordingVoice: false, // ボイスなし
+                    imagePickerIconsConfig: const ImagePickerIconsConfiguration(
+                      cameraImagePickerIcon: SizedBox(), // カメラなし
+                    ),
+                    replyMessageColor: theme.replyMessageColor,
+                    defaultSendButtonColor: Colors.amber,
+                    replyDialogColor: Colors.amber.shade200, // リプライ背景色
+                    replyTitleColor: Colors.amber.shade900,
+
+                    textFieldBackgroundColor: Colors.grey.shade100, // 背景色
+                    closeIconColor: theme.closeIconColor,
+                    textFieldConfig: TextFieldConfiguration(
+                      maxLines: 100, // 入力文字の行
+                      contentPadding: const EdgeInsets.all(10),
+                      hintText: '文字入れてね', // TODO ヒント
+                      compositionThresholdTime: const Duration(seconds: 5),
+                      textStyle: TextStyle(
+                        color: theme.textFieldTextColor,
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                  // TODO わからん
+                  chatBubbleConfig: ChatBubbleConfiguration(
+                    onDoubleTap: (message) {
+                      setState(() {
+                        showReaction = !showReaction;
+                      });
+                    },
+                    // TODO わからん
+                    outgoingChatBubbleConfig: const ChatBubble(
+                      receiptsWidgetConfig: ReceiptsWidgetConfig(
+                        showReceiptsIn: ShowReceiptsIn.all, // チャット横幅
+                      ),
+                    ),
+                  ),
 
-              messageConfig: MessageConfiguration(
-                customMessageBuilder: (p0) {
-                  return ChatCard(
-                    currentUser: currentChatUser,
-                    showReaction: showReaction,
-                    chatController: chatController,
-                    message: p0,
-                  );
-                },
-              ),
-              profileCircleConfig: const ProfileCircleConfiguration(
-                profileImageUrl: Data.profileImage,
-              ),
+                  messageConfig: MessageConfiguration(
+                    customMessageBuilder: (p0) {
+                      return ChatCard(
+                        currentUser: currentChatUser,
+                        showReaction: showReaction,
+                        chatController: chatController,
+                        message: p0,
+                      );
+                    },
+                  ),
+                  profileCircleConfig: const ProfileCircleConfiguration(
+                    profileImageUrl: Data.profileImage,
+                  ),
 
-              repliedMessageConfig: RepliedMessageConfiguration(
-                backgroundColor: Colors.amber,
-                verticalBarColor: Colors.amber,
-                repliedMsgAutoScrollConfig: RepliedMsgAutoScrollConfig(
-                  enableHighlightRepliedMsg: true,
-                  highlightColor: Colors.amber.shade100,
-                  highlightScale: 1.1,
-                ),
-                textStyle: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.25,
-                ),
-                replyTitleTextStyle: TextStyle(color: theme.repliedTitleTextColor),
-              ),
+                  repliedMessageConfig: RepliedMessageConfiguration(
+                    backgroundColor: Colors.amber,
+                    verticalBarColor: Colors.amber,
+                    repliedMsgAutoScrollConfig: RepliedMsgAutoScrollConfig(
+                      enableHighlightRepliedMsg: true,
+                      highlightColor: Colors.amber.shade100,
+                      highlightScale: 1.1,
+                    ),
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.25,
+                    ),
+                    replyTitleTextStyle: TextStyle(color: theme.repliedTitleTextColor),
+                  ),
 
-              /// TODO スワイプ
-              swipeToReplyConfig: SwipeToReplyConfiguration(
-                replyIconColor: theme.swipeToReplyIconColor,
-              ),
+                  /// TODO スワイプ
+                  swipeToReplyConfig: SwipeToReplyConfiguration(
+                    replyIconColor: theme.swipeToReplyIconColor,
+                  ),
+                );
+              },
             );
           },
-        );
-      },
-    ));
+        ));
   }
 
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
@@ -205,7 +208,7 @@ class _ChatScreenState extends ConsumerState<ChatScreenTapple> {
       sendBy: user.id,
       replyMessage: replyMessage,
       messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
-      // chatRoomId: ,
+      chatRoomId: widget.chatRoomId,
     );
 
     ref.read(messageAPIProvider).createMessageDocument(msg);

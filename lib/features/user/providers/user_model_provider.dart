@@ -15,7 +15,8 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
 
   @override
   FutureOr<UserModel> build() async {
-    final user = await ref.watch(authProvider.notifier).build();
+    final user = ref.watch(authProvider).value;
+    if (user == null) return UserModel.instance();
     final userModel = await _getUserModel(user.userId).catchError((e) async {
       // 存在しないエラー404
       if (e is AppwriteException && e.code == 404) {
@@ -23,6 +24,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
           id: user.userId,
           name: user.userId.substring(15, user.$id.length),
         );
+        print(userModel);
         debugPrint('ユーザー作成OK!');
         return await _createUserModel(userModel).catchError((e) => exceptionMessage(e));
       }
@@ -34,6 +36,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   /// ユーザー取得
   Future<UserModel> _getUserModel(String id) async {
     final doc = await _userAPI.getUserDocument(id);
+
     return UserModel.fromMap(doc.data);
   }
 
@@ -62,22 +65,22 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   }
 
   /// AUTHからパスワードを取れないため、ユーザーズコレクションにパスワードを保存
-  Future<void> updateAuthUserModel({required String loginId, required String loginPassword}) async {
-    await update((userModel) async {
-      final doc = await _userAPI.updateUserDocument(
-        userModel.copyWith(
-          loginId: loginId,
-          loginPassword: loginPassword,
-          isAnonymous: false,
-        ),
-      );
-      return UserModel.fromMap(doc.data);
-    });
-  }
+  // Future<void> updateAuthUserModel({required String loginId, required String loginPassword}) async {
+  //   await update((userModel) async {
+  //     final doc = await _userAPI.updateUserDocument(
+  //       userModel.copyWith(
+  //         loginId: loginId,
+  //         loginPassword: loginPassword,
+  //         isAnonymous: false,
+  //       ),
+  //     );
+  //     return UserModel.fromMap(doc.data);
+  //   });
+  // }
 
   /// ユーザー一覧取得
-  Future<List<UserModel>> getUserModelList() async {
-    final doc = await _userAPI.getUsersDocumentList().catchError(
+  Future<List<UserModel>> getUserModelList({String? chatRoomId}) async {
+    final doc = await _userAPI.getUsersDocumentList(chatRoomId: chatRoomId).catchError(
           (e) => exceptionMessage(e),
         );
     final userModelList = doc.documents.map((doc) => UserModel.fromMap(doc.data)).toList();

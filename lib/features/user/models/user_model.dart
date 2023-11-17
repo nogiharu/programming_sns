@@ -3,7 +3,6 @@
 import 'package:chatview/chatview.dart';
 import 'package:flutter/foundation.dart';
 
-@immutable
 class UserModel {
   final String id;
 
@@ -22,8 +21,9 @@ class UserModel {
   final bool isAnonymous;
 
   // final bool isDeleted;
+  List<String>? chatRoomIds;
 
-  const UserModel({
+  UserModel({
     required this.id,
     required this.name,
     required this.profilePhoto,
@@ -32,6 +32,7 @@ class UserModel {
     required this.loginPassword,
     required this.loginId,
     required this.isAnonymous,
+    this.chatRoomIds,
   });
 
   UserModel copyWith({
@@ -43,6 +44,7 @@ class UserModel {
     String? loginPassword,
     String? loginId,
     bool? isAnonymous,
+    List<String>? chatRoomIds,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -53,6 +55,7 @@ class UserModel {
       loginPassword: loginPassword ?? this.loginPassword,
       loginId: loginId ?? this.loginId,
       isAnonymous: isAnonymous ?? this.isAnonymous,
+      chatRoomIds: chatRoomIds ?? this.chatRoomIds,
     );
   }
 
@@ -68,6 +71,9 @@ class UserModel {
     result.addAll({'loginId': loginId});
 
     result.addAll({'isAnonymous': isAnonymous});
+    if (chatRoomIds != null) {
+      result.addAll({'chatRoomIds': chatRoomIds});
+    }
 
     return result;
   }
@@ -82,12 +88,13 @@ class UserModel {
       loginPassword: map['loginPassword'] ?? '',
       loginId: map['loginId'] ?? '',
       isAnonymous: map['isAnonymous'] ?? true,
+      chatRoomIds: List<String>.from(map['chatRoomIds']),
     );
   }
 
   @override
   String toString() =>
-      'UserModel(id: $id, name: $name, profilePhoto: $profilePhoto, createdAt: $createdAt, updatedAt: $updatedAt, loginPassword: $loginPassword, loginId: $loginId, isAnonymous: $isAnonymous)';
+      'UserModel(id: $id, name: $name, profilePhoto: $profilePhoto, createdAt: $createdAt, updatedAt: $updatedAt, loginPassword: $loginPassword, loginId: $loginId, isAnonymous: $isAnonymous   chatRoomIds: $chatRoomIds)';
 
   @override
   bool operator ==(Object other) {
@@ -101,7 +108,8 @@ class UserModel {
         other.updatedAt == updatedAt &&
         other.loginPassword == loginPassword &&
         other.loginId == loginId &&
-        other.isAnonymous == isAnonymous;
+        other.isAnonymous == isAnonymous &&
+        listEquals(other.chatRoomIds, chatRoomIds);
   }
 
   @override
@@ -113,7 +121,8 @@ class UserModel {
       updatedAt.hashCode ^
       loginPassword.hashCode ^
       loginId.hashCode ^
-      isAnonymous.hashCode;
+      isAnonymous.hashCode ^
+      chatRoomIds.hashCode;
 
   factory UserModel.instance({
     String? id,
@@ -123,6 +132,7 @@ class UserModel {
     String? loginPassword,
     String? loginId,
     bool? isAnonymous,
+    List<String>? chatRoomIds,
   }) {
     return UserModel(
       id: id ?? '',
@@ -134,6 +144,7 @@ class UserModel {
       loginPassword: loginPassword ?? '',
       loginId: loginId ?? '',
       isAnonymous: isAnonymous ?? true,
+      chatRoomIds: chatRoomIds ?? [],
     );
   }
 

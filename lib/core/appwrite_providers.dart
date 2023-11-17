@@ -29,3 +29,8 @@ final appwriteRealtimeProvider = Provider((ref) {
 //   final Client client = ref.read(appwriteClientProvider);
 //   return Users(client);
 // });
+// final appwriteDatabaseProviderDart = Provider((ref) {
+//   final Client client = ref.watch(appwriteClientProvider);
+//   Databases(client).createDocument(databaseId: databaseId, collectionId: collectionId, documentId: documentId, data: data)
+//   return Databases(client);
+// });

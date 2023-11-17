@@ -41,13 +41,11 @@ class UserAPI {
     );
   }
 
-  Future<DocumentList> getUsersDocumentList() async {
+  Future<DocumentList> getUsersDocumentList({String? chatRoomId}) async {
     return await _db.listDocuments(
       databaseId: AppwriteConstants.databaseId,
       collectionId: AppwriteConstants.usersCollection,
-      // queries: [
-      //   Query.orderAsc('createdAt'),
-      // ],
+      queries: chatRoomId == null ? [] : [Query.equal('chatRoomIds', chatRoomId)],
     );
   }
 

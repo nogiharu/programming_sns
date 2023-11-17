@@ -6,26 +6,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/features/chat/models/message_ex.dart';
+import 'package:programming_sns/extensions/extensions.dart';
+import 'package:programming_sns/extensions/family_async_notifier_ex.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 
 final chatMessageProvider =
-    AsyncNotifierProvider<ChatMessageNotifier, (List<Message>, List<ChatUser>)>(
+    AsyncNotifierProviderFamily<ChatMessageNotifier, (List<Message>, List<ChatUser>), String>(
         ChatMessageNotifier.new);
 
-class ChatMessageNotifier extends AsyncNotifier<(List<Message>, List<ChatUser>)> {
+class ChatMessageNotifier extends FamilyAsyncNotifier<(List<Message>, List<ChatUser>), String> {
   MessageAPI get _messageAPI => ref.watch(messageAPIProvider);
 
   @override
-  FutureOr<(List<Message>, List<ChatUser>)> build() async {
+  FutureOr<(List<Message>, List<ChatUser>)> build(arg) async {
     print('呼ばれたMessgae');
     final messages = await getMessages();
 
+    print('呼ばれたMessgae2');
     final chatUsers = await getChatUsers();
 
     chatEvent();
-
     return (messages, chatUsers);
   }
 
@@ -84,7 +85,7 @@ class ChatMessageNotifier extends AsyncNotifier<(List<Message>, List<ChatUser>)>
   /// メッセージ一覧取得
   Future<List<Message>> getMessages({String? id}) async {
     final messages = await _messageAPI
-        .getMessagesDocumentList(id: id)
+        .getMessagesDocumentList(chatRoomId: arg, id: id)
         .then(
           (docs) => docs.documents
               .map(
@@ -94,7 +95,7 @@ class ChatMessageNotifier extends AsyncNotifier<(List<Message>, List<ChatUser>)>
               .reversed
               .toList(),
         )
-        .catchError((e) => throw '${e.code}: MESSAGE_LSIT メッセージ取得できない( ;  ; ）');
+        .catchError((e) => exceptionMessage(e));
 
     return messages;
   }

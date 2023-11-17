@@ -33,9 +33,10 @@ class MessageAPI {
     );
   }
 
-  Future<DocumentList> getMessagesDocumentList({String? id}) async {
+  Future<DocumentList> getMessagesDocumentList({required String chatRoomId, String? id}) async {
     final queries = [
       Query.orderDesc('createdAt'),
+      Query.equal('chatRoomId', chatRoomId),
     ];
 
     /// idより前を取得

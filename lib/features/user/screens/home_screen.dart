@@ -10,12 +10,12 @@ import 'package:programming_sns/test_tool/test_tool.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
-  // static const String path = '/home';
+
   static const Map<String, dynamic> metaData = {
     'path': '/home',
     'label': 'ホーム',
     'icon': Icon(Icons.home),
-    'index': 2,
+    'index': 1,
   };
 
   @override

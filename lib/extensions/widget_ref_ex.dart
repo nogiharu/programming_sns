@@ -9,7 +9,7 @@ final scaffoldMessengerKeyProvider = Provider(
   (_) => GlobalKey<ScaffoldMessengerState>(),
 );
 
-extension WidgetRefEx on WidgetRef {
+extension WidgetRefEX on WidgetRef {
   /// - asyncValueProvider AsyncValueを返すプロバイダー
   /// - complete 取得完了後のコールバック
   /// - loading ローディング中に出したいやつ
@@ -22,23 +22,21 @@ extension WidgetRefEx on WidgetRef {
       data: complete,
       error: (e, _) {
         /// 画面の描画が始まったタイミングで状態の変更をする。
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          showDialog<void>(
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => showDialog<void>(
             context: read(rootNavigatorKeyProvider).currentContext!,
             builder: (_) => ErrorDialog(error: e.toString()),
-          );
-        });
+          ),
+        );
         // TODO ここがダサい
         return Container();
       },
       loading: () {
-        if (loading == null) {
-          debugPrint('ローディング');
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        return loading;
+        debugPrint('ローディング');
+        if (loading != null) return loading;
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
       },
     );
   }

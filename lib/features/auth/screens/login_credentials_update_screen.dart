@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/core/utils.dart';
-import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
-import 'package:programming_sns/features/auth/validation/auth_exception_message.dart';
 import 'package:programming_sns/features/auth/widgets/auth_field.dart';
-import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
 class LoginCredentialsUpdateScreen extends ConsumerStatefulWidget {
@@ -36,42 +33,10 @@ class _LoginCredentialsUpdateScreenState extends ConsumerState<LoginCredentialsU
     passwordController.dispose();
   }
 
-  /// ID更新
-  Future<void> loginIdUpdate(UserModel userModel) async {
-    setState(() {
-      errorMessage = authExceptionMessage(
-        loginId: idController.text,
-        loginPassword: userModel.loginPassword,
-      );
-    });
-    if (errorMessage == '') {
-      await ref.read(authProvider.notifier).accountUpdate(
-            loginId: idController.text,
-            loginPassword: userModel.loginPassword,
-          );
-    }
-  }
-
-  /// Password更新
-  Future<void> loginPasswordUpdate(UserModel userModel) async {
-    setState(() {
-      errorMessage = authExceptionMessage(
-        loginId: userModel.loginId,
-        loginPassword: passwordController.text,
-      );
-    });
-
-    if (errorMessage == '') {
-      await ref.read(authProvider.notifier).accountUpdate(
-            loginId: userModel.loginId,
-            loginPassword: passwordController.text,
-          );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (ref.watch(userModelProvider).value == null) {
+    final userModel = ref.watch(userModelProvider).value;
+    if (userModel == null) {
       return const Center(
         child: CircularProgressIndicator(),
       );
@@ -101,34 +66,38 @@ class _LoginCredentialsUpdateScreenState extends ConsumerState<LoginCredentialsU
                       hintText: 'パスワードは日本語以外で半角で8桁以上で入れてね(^^)',
                     ),
                   const SizedBox(height: 10),
-                  ref.watchEX(
-                    userModelProvider,
-                    complete: (userModel) {
-                      return Align(
-                        alignment: Alignment.topRight,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (widget.isIdUpdate) {
-                              await loginIdUpdate(userModel);
-                            } else {
-                              await loginPasswordUpdate(userModel);
-                            }
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final authNotifier = ref.read(authProvider.notifier);
 
-                            if (ref.watch(authProvider).hasError) {
-                              errorMessage = ref.watch(authProvider).error.toString();
-                            }
-                            if (errorMessage == '') {
-                              ref.read(snackBarProvider('更新完了だよ(*^_^*)'));
-                              // ignore: use_build_context_synchronously
-                              context.pop();
-                            }
-                          },
-                          child: const Text('更新'),
-                        ),
-                      );
-                    },
+                        if (widget.isIdUpdate) {
+                          await authNotifier.accountUpdate(
+                            userModel: userModel.copyWith(loginId: idController.text),
+                          );
+                        } else {
+                          await authNotifier.loginPasswordUpdate(
+                            userModel: userModel,
+                            newLoginPassword: passwordController.text,
+                          );
+                        }
+                        final auth = ref.watch(authProvider);
+
+                        if (auth.hasError) {
+                          errorMessage = auth.error.toString();
+                          return;
+                        }
+
+                        ref.read(snackBarProvider('更新完了だよ(*^_^*)'));
+
+                        if (context.mounted) context.pop();
+                      },
+                      child: const Text('更新'),
+                    ),
                   ),
-                  if (errorMessage != '')
+
+                  if (errorMessage.isNotEmpty)
                     Text(
                       errorMessage,
                       style: const TextStyle(

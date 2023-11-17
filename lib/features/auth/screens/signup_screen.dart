@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/core/utils.dart';
-import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
-import 'package:programming_sns/features/auth/validation/auth_exception_message.dart';
 import 'package:programming_sns/features/auth/widgets/auth_field.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
@@ -31,34 +29,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     passwordController.dispose();
   }
 
-  /// 送信
-  Future<void> onPressed() async {
-    setState(() {
-      errorMessage = authExceptionMessage(
-        loginId: idController.text,
-        loginPassword: passwordController.text,
-      );
-    });
-
-    if (errorMessage == '') {
-      await ref.read(authProvider.notifier).login(
-            loginId: idController.text,
-            loginPassword: passwordController.text,
-          );
-      if (ref.watch(authProvider).hasError) {
-        errorMessage = ref.watch(authProvider).error.toString();
-      } else {
-        if (errorMessage == '') {
-          ref.read(snackBarProvider('登録完だよ(*^_^*)'));
-          // ignore: use_build_context_synchronously
-          context.pop();
-        }
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final userModel = ref.watch(userModelProvider).value;
+    if (userModel == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('アカウント登録'),
@@ -81,19 +60,35 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     hintText: 'パスワードは日本語以外で半角で8桁以上で入れてね(^^)',
                   ),
                   const SizedBox(height: 10),
-                  ref.watchEX(
-                    userModelProvider,
-                    complete: (data) {
-                      return Align(
-                        alignment: Alignment.topRight,
-                        child: ElevatedButton(
-                          onPressed: onPressed,
-                          child: const Text('アカウント登録'),
-                        ),
-                      );
-                    },
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: ElevatedButton(
+                      /// 送信
+                      onPressed: () async {
+                        await ref.read(authProvider.notifier).accountUpdate(
+                              userModel: userModel.copyWith(
+                                loginId: idController.text,
+                                loginPassword: passwordController.text,
+                                isAnonymous: false,
+                              ),
+                            );
+
+                        final auth = ref.watch(authProvider);
+
+                        if (auth.hasError) {
+                          errorMessage = auth.error.toString();
+                          return;
+                        }
+
+                        ref.read(snackBarProvider('更新完了だよ(*^_^*)'));
+
+                        if (context.mounted) context.pop();
+                      },
+                      child: const Text('アカウント登録'),
+                    ),
                   ),
-                  if (errorMessage != '')
+                  const SizedBox(height: 10),
+                  if (errorMessage.isNotEmpty)
                     Text(
                       errorMessage,
                       style: const TextStyle(

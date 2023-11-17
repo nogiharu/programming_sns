@@ -18,7 +18,7 @@ extension MessageEX on Message {
     result.addAll({'replyMessageId': replyMessage.messageId});
     result.addAll({'replyMessage': replyMessage.message});
     result.addAll({'status': status.toString()});
-    // result.addAll({'chatRoomId': chatRoomId});
+    result.addAll({'chatRoomId': chatRoomId});
     return result;
   }
 
@@ -42,7 +42,7 @@ extension MessageEX on Message {
         message: map['replyMessage'] ?? '',
       ),
       status: (map['status'] as String).messageStatusToEnum(),
-      // chatRoomId: map['chatRoomId'] ?? '',
+      chatRoomId: map['chatRoomId'] ?? '',
     );
   }
 }
