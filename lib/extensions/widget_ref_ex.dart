@@ -16,6 +16,7 @@ extension WidgetRefEX on WidgetRef {
   Widget watchEX<T>(
     ProviderListenable<AsyncValue<T>> asyncValueProvider, {
     required Widget Function(T) complete,
+    bool isBackColorNone = false,
     Widget? loading,
   }) {
     return watch(asyncValueProvider).when(
@@ -24,6 +25,7 @@ extension WidgetRefEX on WidgetRef {
         /// 画面の描画が始まったタイミングで状態の変更をする。
         WidgetsBinding.instance.addPostFrameCallback(
           (_) => showDialog<void>(
+            barrierColor: isBackColorNone ? null : Colors.black54,
             context: read(rootNavigatorKeyProvider).currentContext!,
             builder: (_) => ErrorDialog(error: e.toString()),
           ),

@@ -135,7 +135,7 @@ class UserModel {
     List<String>? chatRoomIds,
   }) {
     return UserModel(
-      id: id ?? '',
+      id: id ?? 'ユーザーがいません！',
       name: name ?? 'ユーザーがいません！',
       profilePhoto:
           "https://raw.githubusercontent.com/SimformSolutionsPvtLtd/flutter_showcaseview/master/example/assets/simform.png",

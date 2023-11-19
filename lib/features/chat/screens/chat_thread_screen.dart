@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:programming_sns/core/utils.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_provider.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
@@ -12,7 +13,6 @@ class ChatThreadScreen extends ConsumerStatefulWidget {
     'path': '/chatThread',
     'label': 'スレ',
     'icon': Icon(Icons.home),
-    'index': 0,
   };
 
   @override
@@ -30,14 +30,18 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ref.watchEX(
-      userModelProvider,
-      complete: (userModel) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('チャットスレッド'),
-          ),
-          body: Center(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('チャットスレッド'),
+      ),
+      body: ref.watchEX(userModelProvider, complete: (userModel) {
+        return RefreshIndicator(
+          onRefresh: () async {
+            await Future.delayed(
+              const Duration(seconds: 3),
+            );
+          },
+          child: SingleChildScrollView(
             child: Column(
               children: [
                 TextButton(
@@ -50,9 +54,9 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                       builder: (context) {
                         return TextFormField(
                           // maxLines: 20,
-                          autofocus: true, // 追加変更
+                          autofocus: true,
                           decoration: InputDecoration(
-                            hintText: '部屋名は5文字以上で入れてね(*^_^*)',
+                            hintText: 'スレ名は5文字以上で入れてね(*^_^*)',
                             contentPadding: const EdgeInsets.all(15),
                             suffixIcon: IconButton(
                               onPressed: () async {
@@ -60,10 +64,13 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                                     .read(chatRoomProvider.notifier)
                                     .createChatRoom(
                                         ownerId: userModel.id, name: textController.text)
-                                    .then((_) {
-                                  // TODO thenはcatchできない
-                                  context.pop();
-                                  textController.text = '';
+                                    .whenComplete(() {
+                                  // なぜかキャッチされないためwhenComplete使用
+                                  if (!ref.watch(chatRoomProvider).hasError) {
+                                    context.pop();
+                                    textController.text = '';
+                                    ref.read(snackBarProvider('作成完了だよ(*^_^*)'));
+                                  }
                                 });
                               },
                               icon: const Icon(
@@ -81,6 +88,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                 ),
                 ref.watchEX(
                   chatRoomProvider,
+                  isBackColorNone: ref.watch(chatRoomProvider).hasError,
                   complete: (chatRoom) {
                     return ListView.builder(
                       itemCount: chatRoom.length,
@@ -115,7 +123,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
             ),
           ),
         );
-      },
+      }),
     );
   }
 }

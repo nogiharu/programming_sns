@@ -15,6 +15,9 @@ class AppwriteConstants {
 
   static const usersDocumentsChannels =
       'databases.${AppwriteConstants.databaseId}.collections.${AppwriteConstants.usersCollection}.documents';
+
+  static const chatRoomDocmentsChannels =
+      'databases.${AppwriteConstants.databaseId}.collections.${AppwriteConstants.chatRoomCollection}.documents';
 }
 
 // Androidの場合

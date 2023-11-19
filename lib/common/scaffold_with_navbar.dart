@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 
-final currentBottomIndexProvider = StateProvider((ref) {
-  return {
-    'path': ChatThreadScreen.metaData['path'],
-    'index': ChatThreadScreen.metaData['index'],
-    'preIndex': ChatThreadScreen.metaData['index'],
-  };
-});
+final currentBottomIndexProvider = Provider<Map<String, int>>((_) => {
+      'index': 0,
+      'preIndex': 0,
+    });
 
 class ScaffoldWithNavbar extends ConsumerWidget {
   const ScaffoldWithNavbar({
@@ -22,9 +18,7 @@ class ScaffoldWithNavbar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    bottomItems.sort((a, b) => a['index'].compareTo(b['index']));
-
-    final curentIndex = ref.read(currentBottomIndexProvider.notifier).state;
+    final currentBottomMap = ref.read(currentBottomIndexProvider);
 
     return Scaffold(
       body: (child as HeroControllerScope).child,
@@ -45,8 +39,8 @@ class ScaffoldWithNavbar extends ConsumerWidget {
             .toList(),
         currentIndex: ref.watch(currentBottomIndexProvider)['index']!,
         onTap: (index) {
-          curentIndex['preIndex'] = curentIndex['index']!;
-          curentIndex['index'] = index;
+          currentBottomMap['preIndex'] = currentBottomMap['index']!;
+          currentBottomMap['index'] = index;
           context.go(bottomItems[index]['path']);
         },
       ),

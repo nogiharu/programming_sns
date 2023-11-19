@@ -26,11 +26,11 @@ class ChatMessageNotifier extends FamilyAsyncNotifier<(List<Message>, List<ChatU
     print('呼ばれたMessgae2');
     final chatUsers = await getChatUsers();
 
-    chatEvent();
+    chatMessageEvent();
     return (messages, chatUsers);
   }
 
-  void chatEvent() {
+  void chatMessageEvent() {
     final stream = ref.watch(appwriteRealtimeProvider).subscribe([
       AppwriteConstants.messagesDocmentsChannels,
       AppwriteConstants.usersDocumentsChannels,

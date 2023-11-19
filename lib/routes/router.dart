@@ -19,16 +19,16 @@ final shellNavigatorKeyProvider = Provider(
 );
 
 final router = Provider((ref) {
+  // タブの順番
   final bottomItems = [
-    // ScreenB.metaData,
-    HomeScreen.metaData,
     ChatThreadScreen.metaData,
-    // ChatScreen.metaData,
+    ScreenB.metaData,
+    HomeScreen.metaData,
   ];
 
   return GoRouter(
     navigatorKey: ref.read(rootNavigatorKeyProvider),
-    initialLocation: ref.read(currentBottomIndexProvider)['path'],
+    initialLocation: bottomItems.first['path'],
     routes: [
       ShellRoute(
         navigatorKey: ref.read(shellNavigatorKeyProvider),
@@ -49,6 +49,9 @@ final router = Provider((ref) {
                 ref: ref,
               );
             },
+            // builder: (context, state) {
+            //   return const ChatThreadScreen();
+            // },
             routes: [
               GoRoute(
                 path: ChatScreen.path,
@@ -64,25 +67,28 @@ final router = Provider((ref) {
               ),
             ],
           ),
-          // GoRoute(
-          //   path: ScreenB.metaData['path'],
-          //   pageBuilder: (context, state) {
-          //     return _pageAnimation(
-          //       const ScreenB(),
-          //       state,
-          //       ref: ref,
-          //     );
-          //   },
-          //   routes: [
-          //     GoRoute(
-          //       path: DetailsScreen.path,
-          //       parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
-          //       builder: (context, state) {
-          //         return const DetailsScreen(label: 'B');
-          //       },
-          //     ),
-          //   ],
-          // ),
+          GoRoute(
+            path: ScreenB.metaData['path'],
+            pageBuilder: (context, state) {
+              return _pageAnimation(
+                const ScreenB(),
+                state,
+                ref: ref,
+              );
+            },
+            // builder: (context, state) {
+            //   return const ScreenB();
+            // },
+            routes: [
+              GoRoute(
+                path: DetailsScreen.path,
+                parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+                builder: (context, state) {
+                  return const DetailsScreen(label: 'B');
+                },
+              ),
+            ],
+          ),
 
           /// HOME
           GoRoute(
@@ -95,6 +101,9 @@ final router = Provider((ref) {
                 ref: ref,
               );
             },
+            // builder: (context, state) {
+            //   return const HomeScreen();
+            // },
             routes: [
               GoRoute(
                 path: LoginScreen.path,
@@ -130,16 +139,14 @@ final router = Provider((ref) {
       )
     ],
     redirect: (context, state) {
-      final path = ref.watch(currentBottomIndexProvider)['path'];
       final uri = state.uri.toString();
-      if (!uri.startsWith(path)) {
-        // 画面リロードされたらパスと選択中のボトムアイコンに差異が生じるため
-        final currentBottomIndex = ref.read(currentBottomIndexProvider.notifier).state;
-        bottomItems.where((e) => uri == e['path']).forEach((e) {
-          currentBottomIndex['path'] = e['path'];
-          currentBottomIndex['index'] = e['index'];
-        });
+
+      // 画面リロードされたらパスと選択中のボトムアイコンに差異が生じるため
+      if (bottomItems.map((e) => e['path']).contains(uri)) {
+        final currentBottomMap = ref.read(currentBottomIndexProvider);
+        currentBottomMap['index'] = bottomItems.indexWhere((e) => uri == e['path']);
       }
+
       // ログイン情報更新画面でリロードされたらextraがnullになる
       if (uri.contains(LoginCredentialsUpdateScreen.path) && state.extra == null) {
         return HomeScreen.metaData['path'];
@@ -163,10 +170,9 @@ CustomTransitionPage _pageAnimation(Widget child, GoRouterState state, {Provider
       int preIndex = ref.read(currentBottomIndexProvider)['preIndex']!;
       int index = ref.read(currentBottomIndexProvider)['index']!;
       Offset start = Offset(index < preIndex ? -1.0 : 1.0, 0.0);
-      Offset end = Offset.zero; //最終地点
-      Animation<Offset> offset = Tween(begin: start, end: end).animate(animation);
+      Animation<Offset> offset = Tween(begin: start, end: Offset.zero).animate(animation);
       return SlideTransition(position: offset, child: child);
     },
-    transitionDuration: Duration(milliseconds: state.uri.toString() == '/chat' ? 500 : 300),
+    // transitionDuration: Duration(milliseconds: state.uri.toString() == '/chat' ? 500 : 300),
   );
 }

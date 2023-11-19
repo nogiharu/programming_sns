@@ -22,15 +22,14 @@ class Main extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ref.watch(authProvider);
     return MaterialApp.router(
       // title: 'Flutter Demo',
       theme: ThemeData(
           primarySwatch: Colors.amber,
           textTheme: const TextTheme(bodyLarge: TextStyle(color: Colors.black))),
-      builder: (context, child) => Loading(
-        child: child,
-      ),
+      // builder: (context, child) => Loading(
+      //   child: child,
+      // ),
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(
         router,

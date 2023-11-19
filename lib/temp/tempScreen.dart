@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
+import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
 class ScreenA extends ConsumerWidget {
   const ScreenA({super.key});
@@ -41,8 +42,65 @@ class ScreenA extends ConsumerWidget {
   }
 }
 
-class ScreenB extends ConsumerWidget {
+class ScreenB extends ConsumerStatefulWidget {
   const ScreenB({super.key});
+  static const Map<String, dynamic> metaData = {
+    'path': '/b',
+    'label': 'スクリーンB',
+    'icon': Icon(Icons.business),
+    'index': 1,
+  };
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _ScreenRefreshState();
+}
+
+class _ScreenRefreshState extends ConsumerState<ScreenB> {
+  @override
+  Widget build(BuildContext context) {
+    final a = [
+      Container(
+        color: Colors.amber,
+        // width: 100,
+        height: 100,
+      ),
+      Container(
+        color: Colors.black,
+        // width: 100,
+        height: 100,
+      ),
+      Container(
+        color: Colors.blue,
+        // width: 100,
+        height: 100,
+      ),
+    ];
+    return Scaffold(
+        appBar: AppBar(title: const Text('text')),
+        body: ref.watchEX(
+          userModelProvider,
+          complete: (p0) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                // setState(() {});
+                return await Future.delayed(
+                  const Duration(seconds: 3),
+                );
+              },
+              child: ListView.builder(
+                itemCount: a.length,
+                itemBuilder: (context, index) {
+                  return a[index];
+                },
+              ),
+            );
+          },
+        ));
+    return Container();
+  }
+}
+
+class ScreenM extends ConsumerWidget {
+  const ScreenM({super.key});
   // static const String path = '/b';
   static const Map<String, dynamic> metaData = {
     'path': '/b',
@@ -52,6 +110,41 @@ class ScreenB extends ConsumerWidget {
   };
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final a = [
+      Container(
+        color: Colors.amber,
+        // width: 100,
+        height: 100,
+      ),
+      Container(
+        color: Colors.black,
+        // width: 100,
+        height: 100,
+      ),
+      Container(
+        color: Colors.blue,
+        // width: 100,
+        height: 100,
+      ),
+    ];
+    return RefreshIndicator(
+        onRefresh: () async {
+          return Future.delayed(
+            const Duration(seconds: 3),
+          );
+        },
+        child: ref.watchEX(
+          userModelProvider,
+          complete: (p0) {
+            return ListView.builder(
+              itemCount: a.length,
+              itemBuilder: (context, index) {
+                return a[index];
+              },
+            );
+          },
+        ));
+
     return ref.watchEX(
       authProvider,
       complete: (_) {

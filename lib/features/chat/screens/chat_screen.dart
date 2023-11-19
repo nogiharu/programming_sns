@@ -210,7 +210,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
       chatRoomId: widget.chatRoomId,
     );
-
-    ref.read(messageAPIProvider).createMessageDocument(msg);
+    await ref.read(messageAPIProvider).createMessageDocument(msg);
   }
 }

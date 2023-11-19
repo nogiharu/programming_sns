@@ -24,8 +24,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
           id: user.userId,
           name: user.userId.substring(15, user.$id.length),
         );
-        print(userModel);
-        debugPrint('ユーザー作成OK!');
+        debugPrint('ユーザー作成OK!:$userModel');
         return await _createUserModel(userModel).catchError((e) => exceptionMessage(e));
       }
       throw exceptionMessage(e);

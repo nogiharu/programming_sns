@@ -15,7 +15,6 @@ class HomeScreen extends ConsumerWidget {
     'path': '/home',
     'label': 'ホーム',
     'icon': Icon(Icons.home),
-    'index': 1,
   };
 
   @override

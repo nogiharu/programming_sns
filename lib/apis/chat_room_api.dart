@@ -40,9 +40,7 @@ class ChatRoomAPI {
     return await _db.listDocuments(
       databaseId: AppwriteConstants.databaseId,
       collectionId: AppwriteConstants.chatRoomCollection,
-      queries: [
-        // Query.orderDesc()
-      ],
+      queries: [Query.orderDesc('updatedAt')],
     );
   }
 }
