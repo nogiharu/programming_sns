@@ -7,6 +7,7 @@ import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
 import 'package:programming_sns/extensions/async_notifier_ex.dart';
 import 'package:programming_sns/features/chat/models/chat_room.dart';
+import 'package:programming_sns/features/event/realtime_event_provider.dart';
 
 final chatRoomProvider =
     AsyncNotifierProvider<ChatRoomNotifier, List<ChatRoom>>(ChatRoomNotifier.new);
@@ -21,9 +22,7 @@ class ChatRoomNotifier extends AsyncNotifier<List<ChatRoom>> {
   }
 
   void chatMessageEvent() {
-    final stream = ref.watch(appwriteRealtimeProvider).subscribe([
-      AppwriteConstants.chatRoomDocmentsChannels,
-    ]).stream;
+    final stream = ref.watch(realtimeEventProvider);
 
     stream.listen((event) {
       final isChatRoomCreateEvent =
@@ -36,10 +35,6 @@ class ChatRoomNotifier extends AsyncNotifier<List<ChatRoom>> {
         debugPrint('CHAT_ROOM_CREATE!');
         update((data) {
           return data..insert(0, ChatRoom.fromMap(event.payload));
-          // return data
-          //   ..where((e) => e.id != event.payload['\$id'])
-          //       .toList()
-          //       .insert(0, ChatRoom.fromMap(event.payload));
         });
       }
     });

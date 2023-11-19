@@ -8,6 +8,7 @@ import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/extensions/family_async_notifier_ex.dart';
+import 'package:programming_sns/features/event/realtime_event_provider.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 
@@ -20,31 +21,30 @@ class ChatMessageNotifier extends FamilyAsyncNotifier<(List<Message>, List<ChatU
 
   @override
   FutureOr<(List<Message>, List<ChatUser>)> build(arg) async {
-    print('呼ばれたMessgae');
     final messages = await getMessages();
 
-    print('呼ばれたMessgae2');
     final chatUsers = await getChatUsers();
 
     chatMessageEvent();
+
     return (messages, chatUsers);
   }
 
   void chatMessageEvent() {
-    final stream = ref.watch(appwriteRealtimeProvider).subscribe([
-      AppwriteConstants.messagesDocmentsChannels,
-      AppwriteConstants.usersDocumentsChannels,
-    ]).stream;
+    final stream = ref.watch(realtimeEventProvider);
 
     stream.listen((event) {
       final isUserCreateEvent =
-          event.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.create');
+          event.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.create') &&
+              event.payload.containsValue(arg);
 
       final isUserUpdateEvent =
-          event.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.update');
+          event.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.update') &&
+              event.payload.containsValue(arg);
 
       final isMessageCreateEvent =
-          event.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.create');
+          event.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.create') &&
+              event.payload.containsValue(arg);
 
       /// ユーザー作成イベント
       if (isUserCreateEvent) {
@@ -61,8 +61,7 @@ class ChatMessageNotifier extends FamilyAsyncNotifier<(List<Message>, List<ChatU
         final chatUser = UserModel.toChatUser(user);
         update((data) {
           final index = data.$2.indexWhere((e) => e.id == chatUser.id);
-          data.$2[index] = chatUser;
-          return data;
+          return data..$2[index] = chatUser;
         });
       }
 
