@@ -80,8 +80,7 @@ class ChatController {
     required String messageId,
     required String userId,
   }) {
-    final message =
-        initialMessageList.firstWhere((element) => element.id == messageId);
+    final message = initialMessageList.firstWhere((element) => element.id == messageId);
     final reactedUserIds = message.reaction.reactedUserIds;
     final indexOfMessage = initialMessageList.indexOf(message);
     final userIndex = reactedUserIds.indexOf(userId);
@@ -127,6 +126,5 @@ class ChatController {
   }
 
   /// Function for getting ChatUser object from user id
-  ChatUser getUserFromId(String userId) =>
-      chatUsers.firstWhere((element) => element.id == userId);
+  ChatUser getUserFromId(String userId) => chatUsers.firstWhere((element) => element.id == userId);
 }

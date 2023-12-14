@@ -4,41 +4,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/chat_room_api.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
-import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/extensions/async_notifier_ex.dart';
+import 'package:programming_sns/extensions/auto_dispose_async_notifier_ex.dart';
+
 import 'package:programming_sns/features/chat/models/chat_room.dart';
 import 'package:programming_sns/features/event/realtime_event_provider.dart';
 
 final chatRoomProvider =
-    AsyncNotifierProvider<ChatRoomNotifier, List<ChatRoom>>(ChatRoomNotifier.new);
+    AutoDisposeAsyncNotifierProvider<ChatRoomNotifier, List<ChatRoom>>(ChatRoomNotifier.new);
 
-class ChatRoomNotifier extends AsyncNotifier<List<ChatRoom>> {
+class ChatRoomNotifier extends AutoDisposeAsyncNotifier<List<ChatRoom>> {
   ChatRoomAPI get _chatRoomAPI => ref.watch(chatRoomAPIProvider);
 
   @override
   FutureOr<List<ChatRoom>> build() async {
-    chatMessageEvent();
+    // chatMessageEvent();
     return await getChatRoomList();
   }
 
-  void chatMessageEvent() {
-    final stream = ref.watch(realtimeEventProvider);
+  // void chatMessageEvent() {
+  //   final stream = ref.watch(realtimeEventProvider);
 
-    stream.listen((event) {
-      final isChatRoomCreateEvent =
-          event.events.contains('${AppwriteConstants.chatRoomDocmentsChannels}.*.create');
-      final isChatRoomUpdateEvent =
-          event.events.contains('${AppwriteConstants.chatRoomDocmentsChannels}.*.update');
+  //   stream.listen((event) {
+  //     final isChatRoomCreateEvent =
+  //         event.events.contains('${AppwriteConstants.chatRoomDocmentsChannels}.*.create');
+  //     final isChatRoomUpdateEvent =
+  //         event.events.contains('${AppwriteConstants.chatRoomDocmentsChannels}.*.update');
 
-      /// ユーザー作成イベント
-      if (isChatRoomCreateEvent || isChatRoomUpdateEvent) {
-        debugPrint('CHAT_ROOM_CREATE!');
-        update((data) {
-          return data..insert(0, ChatRoom.fromMap(event.payload));
-        });
-      }
-    });
-  }
+  //     /// ユーザー作成イベント
+  //     if (isChatRoomCreateEvent || isChatRoomUpdateEvent) {
+  //       debugPrint('CHAT_ROOM_CREATE!');
+  //       update((data) {
+  //         return data..insert(0, ChatRoom.fromMap(event.payload));
+  //       });
+  //     }
+  //   });
+  // }
 
   Future<void> createChatRoom({required String ownerId, required String name}) async {
     await futureGuard(

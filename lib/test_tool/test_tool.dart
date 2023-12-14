@@ -7,6 +7,7 @@ import 'package:programming_sns/apis/message_api.dart';
 import 'package:programming_sns/apis/user_api.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
+import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/chat/models/chat_room.dart';
@@ -85,21 +86,22 @@ class TestToolcreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () async {
-                  final kk = await ref
-                      .watch(chatRoomAPIProvider)
-                      .getChatRoomDocument('654824d5add3b04b9eb9');
+                  // final kk = await ref
+                  //     .watch(chatRoomAPIProvider)
+                  //     .getChatRoomDocument('654824d5add3b04b9eb9');
 
-                  print(kk.data['messages']?.length);
+                  // print(kk.data['messages']?.length);
                   int a = 0;
                   await Future.forEach(List.generate(10000, (index) async => index), (e) async {
                     final msg = Message(
-                      id: ID.unique(),
+                      // id: ID.unique(),
                       createdAt: DateTime.now(),
                       message: 'ほげええええ',
                       sendBy: data.id,
-                      chatRoomId: '654824d5add3b04b9eb9',
+                      chatRoomId: '655a9b9cc6a4c4b7ddbd',
                       messageType: MessageType.custom,
                     );
+
                     await ref.read(messageAPIProvider).createMessageDocument(msg);
 
                     print(a);

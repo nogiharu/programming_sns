@@ -7,7 +7,6 @@ import 'package:programming_sns/apis/message_api.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event.dart';
-import 'package:programming_sns/features/chat/providers/chat_message_list_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/theme/theme_color.dart';
@@ -40,6 +39,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   bool isCurrentScreen = true;
 
+  String? userId;
+
+  // final ChatController _chatController = ChatController(
+  //   initialMessageList: [],
+  //   scrollController: ScrollController(),
+  //   chatUsers: [],
+  // );
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   _chatController.scrollController.addListener(
+  //     () async {
+  //       final position = _chatController.scrollController.position;
+  //       if (position.pixels == position.maxScrollExtent) {}
+  //       print(position.pixels);
+  //     },
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting("ja");
@@ -51,39 +70,39 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         body: ref.watchEX(
           userModelProvider,
           complete: (currentUserModel) {
+            userId ??= currentUserModel.id;
             final ChatUser currentChatUser = UserModel.toChatUser(currentUserModel);
 
             /// CHAT
             return ref.watchEX(
               chatControllerProvider(widget.chatRoomId),
+              // chatMessageUserListProvider(widget.chatRoomId),
               loading: const SizedBox(width: 0, height: 0),
               complete: (chatController) {
-                print('BUILD');
+                print('AAA');
+
+                print(chatController.initialMessageList.length);
 
                 /// EVENT
                 ref.watch(chatMessageEventProvider(widget.chatRoomId));
 
-                // chatController.initialMessageList =
-                //     chatController.initialMessageList.take(50).toList();
-
                 return ChatView(
                   currentUser: currentChatUser,
-                  chatController: chatController.$1,
+                  chatController: chatController,
                   onSendTap: onSendTap,
                   featureActiveConfig: const FeatureActiveConfig(
                     enableSwipeToReply: !kIsWeb, // TODO
                     enableSwipeToSeeTime: false,
                     enablePagination: true, // ページネーション
                   ),
-                  loadingWidget: const SizedBox(height: 0),
 
                   /// ページネーション
                   loadMoreData: () async {
                     await ref
                         .read(chatControllerProvider(widget.chatRoomId).notifier)
                         .addMessages();
-                    print(chatController.$1.initialMessageList.length);
-                    print(chatController.$2.length);
+
+                    print('length:${chatController.initialMessageList.length}');
                   },
 
                   /// チャットの状態
@@ -148,7 +167,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       return ChatCard(
                         currentUser: currentChatUser,
                         showReaction: showReaction,
-                        chatController: chatController.$1,
+                        chatController: chatController,
                         message: p0,
                       );
                     },
@@ -185,24 +204,23 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
-    final user = ref.watch(userModelProvider).value;
-    if (user == null) return;
+    if (userId == null) return;
     final msg = Message(
       // id: ID.unique(),
       createdAt: DateTime.now(),
       message: message,
-      sendBy: user.id,
+      sendBy: userId!,
       replyMessage: replyMessage,
       messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
       chatRoomId: widget.chatRoomId,
     );
     await ref.read(messageAPIProvider).createMessageDocument(msg);
 
-    // final chatController = ref.watch(chatControllerProvider(widget.chatRoomId)).value;
-    // if (chatController != null && chatController.initialMessageList.length > 100) {
-    //   print('BBBBBBB');
-    //   chatController.initialMessageList =
-    //       await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
-    // }
+    final chatController = ref.watch(chatControllerProvider(widget.chatRoomId)).value;
+    if (chatController!.initialMessageList.length > 100) {
+      print('AAA');
+      chatController.initialMessageList =
+          await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
+    }
   }
 }

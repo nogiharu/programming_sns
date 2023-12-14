@@ -37,14 +37,15 @@ class MessageAPI {
     final queries = [
       Query.orderDesc('createdAt'),
       Query.equal('chatRoomId', chatRoomId),
+      Query.limit(50),
     ];
 
     /// idより前を取得
-    if (id == null) {
-      queries.add(Query.limit(50));
-    } else {
+    if (id != null) {
       queries.add(Query.cursorAfter(id));
-      queries.add(Query.limit(25));
+      // queries.add(Query.cursorBefore(id));
+    } else {
+      queries.add(Query.limit(50));
     }
 
     return await _db.listDocuments(
