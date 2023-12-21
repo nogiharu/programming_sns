@@ -3,6 +3,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/user_api.dart';
+import 'package:programming_sns/exceptions/exception_message.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
@@ -17,7 +18,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   FutureOr<UserModel> build() async {
     final user = ref.watch(authProvider).value;
     if (user == null) return UserModel.instance();
-    final userModel = await _getUserModel(user.userId).catchError((e) async {
+    return await _getUserModel(user.userId).catchError((e) async {
       // 存在しないエラー404
       if (e is AppwriteException && e.code == 404) {
         final userModel = UserModel.instance(
@@ -25,17 +26,16 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
           name: user.userId.substring(15, user.$id.length),
         );
         debugPrint('ユーザー作成OK!:$userModel');
-        return await _createUserModel(userModel).catchError((e) => exceptionMessage(e));
+        return await _createUserModel(userModel);
       }
-      throw exceptionMessage(e);
+      throw exceptionMessage(error: e); // アロー（return省略）じゃないためthrowキーワードつけないといけない
     });
-    return userModel;
   }
 
   /// ユーザー取得
+  /// errorCodeを取りたいためキャッチしない
   Future<UserModel> _getUserModel(String id) async {
-    final doc = await _userAPI.getUserDocument(id);
-
+    final doc = await _userAPI.getUserDocument(id, isCatch: false);
     return UserModel.fromMap(doc.data);
   }
 
@@ -49,13 +49,9 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   Future<UserModel> updateUserModel(UserModel userModel) async {
     await futureGuard(
       () async {
-        final doc = await _userAPI
-            .updateUserDocument(
-              userModel.copyWith(
-                updatedAt: DateTime.now(),
-              ),
-            )
-            .catchError((e) => exceptionMessage(e));
+        final doc = await _userAPI.updateUserDocument(
+          userModel.copyWith(updatedAt: DateTime.now()),
+        );
         return UserModel.fromMap(doc.data);
       },
     );
@@ -79,9 +75,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
 
   /// ユーザー一覧取得
   Future<List<UserModel>> getUserModelList({String? chatRoomId}) async {
-    final doc = await _userAPI.getUsersDocumentList(chatRoomId: chatRoomId).catchError(
-          (e) => exceptionMessage(e),
-        );
+    final doc = await _userAPI.getUsersDocumentList(chatRoomId: chatRoomId);
     final userModelList = doc.documents.map((doc) => UserModel.fromMap(doc.data)).toList();
 
     return userModelList;

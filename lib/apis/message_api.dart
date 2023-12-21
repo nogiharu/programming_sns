@@ -4,6 +4,7 @@ import 'package:chatview/chatview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
+import 'package:programming_sns/exceptions/exception_message.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 
 final messageAPIProvider = Provider(
@@ -24,42 +25,48 @@ class MessageAPI {
   //   );
   // }
 
-  Future<Document> createMessageDocument(Message message) async {
-    return await _db.createDocument(
-      databaseId: AppwriteConstants.databaseId,
-      collectionId: AppwriteConstants.messagesCollection,
-      documentId: ID.unique(),
-      data: message.toMap(),
-    );
+  Future<Document> createMessageDocument(Message message, {bool isCatch = true}) async {
+    return await _db
+        .createDocument(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.messagesCollection,
+          documentId: ID.unique(),
+          data: message.toMap(),
+        )
+        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
   }
 
-  Future<DocumentList> getMessagesDocumentList({required String chatRoomId, String? id}) async {
+  Future<DocumentList> getMessagesDocumentList(
+      {required String chatRoomId, String? id, bool isCatch = true}) async {
     final queries = [
       Query.orderDesc('createdAt'),
       Query.equal('chatRoomId', chatRoomId),
-      Query.limit(50),
+      Query.limit(25),
     ];
 
     /// idより前を取得
     if (id != null) {
       queries.add(Query.cursorAfter(id));
       // queries.add(Query.cursorBefore(id));
-    } else {
-      queries.add(Query.limit(50));
+      // queries.add(Query.limit(100));
     }
 
-    return await _db.listDocuments(
-      databaseId: AppwriteConstants.databaseId,
-      collectionId: AppwriteConstants.messagesCollection,
-      queries: queries,
-    );
+    return await _db
+        .listDocuments(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.messagesCollection,
+          queries: queries,
+        )
+        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
   }
 
-  Future<dynamic> deleteMessageDocument(String id) async {
-    return await _db.deleteDocument(
-      databaseId: AppwriteConstants.databaseId,
-      collectionId: AppwriteConstants.messagesCollection,
-      documentId: id,
-    );
+  Future<dynamic> deleteMessageDocument(String id, {bool isCatch = true}) async {
+    return await _db
+        .deleteDocument(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.messagesCollection,
+          documentId: id,
+        )
+        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
   }
 }

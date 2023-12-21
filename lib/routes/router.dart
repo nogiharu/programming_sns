@@ -33,6 +33,7 @@ final router = Provider((ref) {
       ShellRoute(
         navigatorKey: ref.read(shellNavigatorKeyProvider),
         builder: (context, state, child) {
+          print(Theme.of(context).primaryColor);
           return ScaffoldWithNavbar(
             bottomItems: bottomItems,
             child: child,

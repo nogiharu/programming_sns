@@ -21,7 +21,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AppBar'),
+        title: const Text('ホーム'),
       ),
       body: ref.watchEX(
         userModelProvider,
@@ -49,6 +49,7 @@ class HomeScreen extends ConsumerWidget {
                     },
                     child: const Text(
                       'アカウント持ってる',
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                 ] else ...[

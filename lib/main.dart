@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:programming_sns/common/loading.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/auth/providers/auth_provider.dart';
+import 'package:programming_sns/features/theme/theme_color.dart';
 import 'package:programming_sns/routes/router.dart';
 
 late Box box;
@@ -25,11 +24,31 @@ class Main extends ConsumerWidget {
     return MaterialApp.router(
       // title: 'Flutter Demo',
       theme: ThemeData(
-          primarySwatch: Colors.amber,
-          textTheme: const TextTheme(bodyLarge: TextStyle(color: Colors.black))),
-      // builder: (context, child) => Loading(
-      //   child: child,
-      // ),
+        // アプバー
+        appBarTheme: const AppBarTheme(color: ThemeColor.main),
+        // プライマリーカラー
+        primaryColor: ThemeColor.main,
+        // テキストボタン
+        textButtonTheme: const TextButtonThemeData(
+          style: ButtonStyle(
+            foregroundColor: MaterialStatePropertyAll(ThemeColor.strong),
+          ),
+        ),
+        // エレベイテッドボタン
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: const MaterialStatePropertyAll(ThemeColor.main),
+            foregroundColor: const MaterialStatePropertyAll(Colors.black),
+            shape: MaterialStatePropertyAll(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+          ),
+        ),
+        // テキストフィールドの縦棒
+        textSelectionTheme: const TextSelectionThemeData(cursorColor: ThemeColor.main),
+      ),
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(
         router,

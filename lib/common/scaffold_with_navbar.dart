@@ -24,6 +24,7 @@ class ScaffoldWithNavbar extends ConsumerWidget {
       body: (child as HeroControllerScope).child,
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.white,
         selectedIconTheme: IconThemeData(
           color: Theme.of(context).primaryColor,
         ),

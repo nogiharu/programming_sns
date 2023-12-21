@@ -1,4 +1,3 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +6,6 @@ import 'package:programming_sns/apis/message_api.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event.dart';
-import 'package:programming_sns/features/chat/providers/chat_message_list_provider.dart';
-import 'package:programming_sns/features/chat/providers/chat_message_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
@@ -56,19 +53,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             /// CHAT
             return ref.watchEX(
               chatControllerProvider(widget.chatRoomId),
-              loading: const SizedBox(width: 0, height: 0),
+              loading: Container(),
               complete: (chatController) {
-                print('BUILD');
-
                 /// EVENT
                 ref.watch(chatMessageEventProvider(widget.chatRoomId));
 
-                // chatController.initialMessageList =
-                //     chatController.initialMessageList.take(50).toList();
-
                 return ChatView(
                   currentUser: currentChatUser,
-                  chatController: chatController.$1,
+                  chatController: chatController,
                   onSendTap: onSendTap,
                   featureActiveConfig: const FeatureActiveConfig(
                     enableSwipeToReply: !kIsWeb, // TODO
@@ -82,8 +74,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     await ref
                         .read(chatControllerProvider(widget.chatRoomId).notifier)
                         .addMessages();
-                    print(chatController.$1.initialMessageList.length);
-                    print(chatController.$2.length);
+                    final a = ref
+                        .watch(chatControllerProvider(widget.chatRoomId))
+                        .value!
+                        .initialMessageList;
+
+                    print(a.length);
                   },
 
                   /// チャットの状態
@@ -148,7 +144,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       return ChatCard(
                         currentUser: currentChatUser,
                         showReaction: showReaction,
-                        chatController: chatController.$1,
+                        chatController: chatController,
                         message: p0,
                       );
                     },
@@ -198,11 +194,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
     await ref.read(messageAPIProvider).createMessageDocument(msg);
 
-    // final chatController = ref.watch(chatControllerProvider(widget.chatRoomId)).value;
-    // if (chatController != null && chatController.initialMessageList.length > 100) {
-    //   print('BBBBBBB');
-    //   chatController.initialMessageList =
-    //       await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
-    // }
+    final chatController = ref.watch(chatControllerProvider(widget.chatRoomId)).value;
+    if (chatController != null && chatController.initialMessageList.length > 100) {
+      chatController.initialMessageList =
+          await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
+    }
   }
 }

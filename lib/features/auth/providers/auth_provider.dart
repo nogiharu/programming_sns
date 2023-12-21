@@ -5,9 +5,9 @@ import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/core/core.dart';
+import 'package:programming_sns/exceptions/exception_message.dart';
 
 import 'package:programming_sns/extensions/extensions.dart';
-import 'package:programming_sns/features/auth/validation/auth_exception_message.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
@@ -18,7 +18,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
 
   @override
   FutureOr<Session> build() async {
-    final session = await _account.getSession(sessionId: 'current').then(
+    return await _account.getSession(sessionId: 'current').then(
       (session) async {
         debugPrint('アカウント取得成功！');
         return session;
@@ -31,27 +31,22 @@ class AuthNotifier extends AsyncNotifier<Session> {
             debugPrint('アカウント作成OK!');
             return session;
           },
-        ).catchError((e) => throw ':AUTH やり直してね( ；∀；)');
+        ).catchError((e) => exceptionMessage(error: e));
       }
-
-      throw 'AUTH やり直してね(T ^ T)';
+      throw exceptionMessage(error: e); // アロー（return省略）じゃないためthrowキーワードつけないといけない
     });
-    return session;
   }
 
   /// ログイン
   Future<Session> login({required String loginId, required String loginPassword}) async {
     await futureGuard(() async {
-      final msg = authExceptionMessage(loginId: loginId, loginPassword: loginPassword);
-      if (msg.isNotEmpty) throw msg;
+      exceptionMessage(loginId: loginId, loginPassword: loginPassword);
       return await _account
           .createEmailSession(
             email: '$loginId@gmail.com',
             password: loginPassword,
           )
-          .catchError(
-            (e) => throw authExceptionMessage(error: e),
-          );
+          .catchError((e) => exceptionMessage(error: e));
     });
 
     return state.value!;
@@ -60,9 +55,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
   /// アカウント登録
   Future<void> accountUpdate({required UserModel userModel}) async {
     await futureGuard(() async {
-      final msg =
-          authExceptionMessage(loginId: userModel.loginId, loginPassword: userModel.loginPassword);
-      if (msg.isNotEmpty) throw msg;
+      exceptionMessage(loginId: userModel.loginId, loginPassword: userModel.loginPassword);
 
       return await _account
           .updateEmail(
@@ -73,7 +66,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
         await ref.read(userModelProvider.notifier).updateUserModel(userModel);
         // ログインしないとセッション更新されない
         return await login(loginId: userModel.loginId, loginPassword: userModel.loginPassword);
-      }).catchError((e) => throw authExceptionMessage(error: e));
+      }).catchError((e) => exceptionMessage(error: e));
     });
   }
 
@@ -81,8 +74,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
   Future<void> loginPasswordUpdate(
       {required String newLoginPassword, required UserModel userModel}) async {
     await futureGuard(() async {
-      final msg = authExceptionMessage(loginPassword: newLoginPassword);
-      if (msg.isNotEmpty) throw msg;
+      exceptionMessage(loginPassword: newLoginPassword);
 
       return await _account
           .updatePassword(password: newLoginPassword, oldPassword: userModel.loginPassword)
@@ -92,9 +84,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
             .updateUserModel(userModel.copyWith(loginPassword: newLoginPassword));
         // ログインしないとセッション更新されない
         return await login(loginId: userModel.loginId, loginPassword: newLoginPassword);
-      }).catchError(
-        (e) => throw authExceptionMessage(error: e),
-      );
+      }).catchError((e) => exceptionMessage(error: e));
     });
   }
 

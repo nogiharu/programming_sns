@@ -12,7 +12,8 @@ import 'package:programming_sns/core/appwrite_providers.dart';
 //   return stream;
 // });
 
-final realtimeEventProvider2 = AutoDisposeStreamProvider((ref) async* {
+/// 前回の値が保持されてしまうためyieldする
+final realtimeEventProvider = AutoDisposeStreamProvider((ref) async* {
   final stream = ref.watch(appwriteRealtimeProvider).subscribe([
     AppwriteConstants.chatRoomDocmentsChannels,
     AppwriteConstants.messagesDocmentsChannels,
