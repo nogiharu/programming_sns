@@ -53,25 +53,50 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
   /// メッセージ一覧取得
   Future<List<Message>> getMessages({String? id}) async {
-    final messages = await _messageAPI.getMessagesDocumentList(chatRoomId: arg, id: id).then(
-          (docs) => docs.documents
-              .map(
-                (doc) => MessageEX.fromMap(doc.data),
-              )
-              .toList()
-              .reversed
-              .toList(),
-        );
-    // .catchError((e) => exceptionMessage(error: e));
+    final messages =
+        await _messageAPI.getMessagesDocumentList(chatRoomId: arg, id: id).then((docs) {
+      return docs.documents
+          .map(
+            (doc) => MessageEX.fromMap(doc.data),
+          )
+          .toList()
+          .reversed
+          .toList();
+    });
+
+    return messages;
+  }
+
+  /// 最初のメッセージ取得
+  Future<Message> getFirstMessage() async {
+    final messages = await _messageAPI
+        .getFirstMessageDocument(
+          chatRoomId: arg,
+        )
+        .then((docs) => docs.documents.map((doc) => MessageEX.fromMap(doc.data)).first);
 
     return messages;
   }
 
   /// メッセージリストに過去２５件メッセージ追加
   Future<void> addMessages() async {
+    // futureGuard(() async {
+    //   if (state.value != null) {
+    //     if (state.value!.scrollController.hasClients) {
+    //       state.value.scrollController
+    //       throw 'AAA';
+    //       final messageList25Ago = await getMessages(id: '');
+    //       return state.value!..loadMoreData(messageList25Ago);
+    //     }
+    //   }
+    //   // print(state.value!.scrollController.hasClients);
+    //   return state.value!;
+    // });
+
     await update((data) async {
       final initialMessageList = data.initialMessageList;
       final messageList25Ago = await getMessages(id: initialMessageList.first.id);
+      // final messageList25Ago = await getMessages(id: '');
 
       data.loadMoreData(messageList25Ago);
 
@@ -79,3 +104,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     });
   }
 }
+
+// final firstMessageProvider = FutureProvider.family<Message, String>((ref, chatRoomId) async {
+//   return ref.read(chatControllerProvider(chatRoomId).notifier).getFirstMessage();
+// });

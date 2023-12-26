@@ -47,21 +47,18 @@ class ChatRoomNotifier extends AutoDisposeAsyncNotifier<List<ChatRoom>> {
         return await _chatRoomAPI
             .createChatRoomDocument(ChatRoom.instance(ownerId: ownerId, name: name))
             .then((doc) => state.value!);
-        // .catchError((e) => exceptionMessage(error: e));
       },
     );
   }
 
   Future<List<ChatRoom>> getChatRoomList() async {
-    await futureGuard(
+    return await futureGuard(
       () async {
         return await _chatRoomAPI
             .getChatRoomDocumentList()
             .then((docs) => docs.documents.map((doc) => ChatRoom.fromMap(doc.data)).toList());
-        // .catchError((e) => exceptionMessage(error: e));
       },
     );
-
-    return state.value!;
+    // return state.value!;
   }
 }

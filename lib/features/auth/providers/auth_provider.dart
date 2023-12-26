@@ -39,7 +39,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
 
   /// ログイン
   Future<Session> login({required String loginId, required String loginPassword}) async {
-    await futureGuard(() async {
+    return await futureGuard(() async {
       exceptionMessage(loginId: loginId, loginPassword: loginPassword);
       return await _account
           .createEmailSession(
@@ -48,8 +48,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
           )
           .catchError((e) => exceptionMessage(error: e));
     });
-
-    return state.value!;
+    // return state.value!;
   }
 
   /// アカウント登録
@@ -71,8 +70,10 @@ class AuthNotifier extends AsyncNotifier<Session> {
   }
 
   /// パスワード更新
-  Future<void> loginPasswordUpdate(
-      {required String newLoginPassword, required UserModel userModel}) async {
+  Future<void> loginPasswordUpdate({
+    required String newLoginPassword,
+    required UserModel userModel,
+  }) async {
     await futureGuard(() async {
       exceptionMessage(loginPassword: newLoginPassword);
 

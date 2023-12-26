@@ -43,7 +43,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   ChatController chatController2 = ChatController(
     initialMessageList: [],
-    scrollController: ScrollController()..addListener(() async {}),
+    scrollController: ScrollController(),
     chatUsers: [],
   );
 
@@ -51,24 +51,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     initializeDateFormatting("ja");
 
-    // ref.listen(
-    //   realtimeEventProvider,
-    //   (previous, next) {
-    //     final data = next.value;
-    //     if (data == null) return;
+    ref.listen(
+      realtimeEventProvider,
+      (previous, next) {
+        final data = next.value;
+        if (data == null) return;
 
-    //     final isMessageCreateEvent =
-    //         data.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.create') &&
-    //             data.payload.containsValue(widget.chatRoomId);
+        final isMessageCreateEvent =
+            data.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.create') &&
+                data.payload.containsValue(widget.chatRoomId);
 
-    //     /// メッセージ作成イベント
-    //     if (isMessageCreateEvent) {
-    //       debugPrint('MESSAGE_CREATE!');
-    //       final message = MessageEX.fromMap(data.payload);
-    //       chatController2.addMessage(message);
-    //     }
-    //   },
-    // );
+        /// メッセージ作成イベント
+        if (isMessageCreateEvent) {
+          debugPrint('MESSAGE_CREATE!');
+          final message = MessageEX.fromMap(data.payload);
+          chatController2.addMessage(message);
+        }
+      },
+    );
 
     return Scaffold(
         appBar: AppBar(title: Text(widget.label)),
@@ -101,12 +101,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     chatUsers: chatUserList,
                   );
 
-                  chatController2.initialMessageList = messageList;
-                  chatController2.chatUsers = chatUserList;
-
                   return getChatview(
                     currentChatUser: currentChatUser,
-                    chatController: chatController2,
+                    chatController: chatController,
                   );
                 },
               );
@@ -156,12 +153,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
         if (isFirst) return;
 
-        ref.watch(firstChatMessageProvider(widget.chatRoomId));
-
         final messageList25Ago = await ref
             .read(chatMessageListProvider(widget.chatRoomId).notifier)
-            .getMessageList(id: messageList.first.id);
-        chatController.loadMoreData(messageList25Ago);
+            .getMessageList2(id: messageList.first.id);
+
         // chatController2.initialMessageList.insertAll(0, messageList25Ago);
       },
 

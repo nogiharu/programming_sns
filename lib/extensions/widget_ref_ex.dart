@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/common/error_dialog.dart';
-import 'package:programming_sns/common/loading.dart';
 import 'package:programming_sns/routes/router.dart';
 
 /// スナックバー表示用のGlobalKey
@@ -12,6 +11,7 @@ final scaffoldMessengerKeyProvider = Provider(
 extension WidgetRefEX on WidgetRef {
   /// - asyncValueProvider AsyncValueを返すプロバイダー
   /// - complete 取得完了後のコールバック
+  /// - isBackgroundColorNone 背景色を透明にするか
   /// - loading ローディング中に出したいやつ
   Widget watchEX<T>(
     ProviderListenable<AsyncValue<T>> asyncValueProvider, {
@@ -22,12 +22,13 @@ extension WidgetRefEX on WidgetRef {
     return watch(asyncValueProvider).when(
       data: complete,
       error: (e, _) {
-        /// 画面の描画が始まったタイミングで状態の変更をする。
+        debugPrint('エラーで〜す');
+        // 画面の描画が始まったタイミングで状態の変更をする。
         WidgetsBinding.instance.addPostFrameCallback(
           (_) => showDialog<void>(
             barrierColor: isBackgroundColorNone ? Colors.transparent : null,
             context: read(rootNavigatorKeyProvider).currentContext!,
-            builder: (_) => ErrorDialog(error: e.toString()),
+            builder: (_) => ErrorDialog(error: e),
           ),
         );
         // TODO ここがダサい

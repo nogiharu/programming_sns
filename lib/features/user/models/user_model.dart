@@ -136,7 +136,7 @@ class UserModel {
   }) {
     return UserModel(
       id: id ?? 'ユーザーがいません！',
-      name: name ?? 'ユーザーがいません！',
+      name: name ?? '名前はまだない',
       profilePhoto:
           "https://raw.githubusercontent.com/SimformSolutionsPvtLtd/flutter_showcaseview/master/example/assets/simform.png",
       createdAt: DateTime.now(),

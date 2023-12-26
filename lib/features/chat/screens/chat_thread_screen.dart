@@ -35,28 +35,28 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
         title: const Text('チャットスレッド'),
       ),
       body: ref.watchEX(userModelProvider, complete: (userModel) {
-        return RefreshIndicator(
-          onRefresh: () async {
-            await Future.delayed(
-              const Duration(seconds: 3),
-            );
-          },
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextButton(
-                  onPressed: () => createThreadBottomSheet(userId: userModel.id),
-                  child: const Text('スレを立てる'),
-                ),
-                ref.watchEX(
+        return Column(
+          children: [
+            TextButton(
+              onPressed: () => createThreadBottomSheet(userId: userModel.id),
+              child: const Text('スレを立てる'),
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await Future.delayed(
+                    const Duration(seconds: 3),
+                  );
+                },
+                child: ref.watchEX(
                   chatRoomProvider,
                   isBackgroundColorNone: ref.watch(chatRoomProvider).hasError,
                   complete: (chatRoom) {
                     return ListView.builder(
                       itemCount: chatRoom.length,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
+                        final isOwner = chatRoom[index].ownerId == userModel.id;
+
                         return GestureDetector(
                           onTap: () {
                             // ルームID追加
@@ -65,6 +65,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                                     userModel..chatRoomIds?.add(chatRoom[index].id!),
                                   );
                             }
+
                             // CHAT画面に遷移
                             context.goNamed(ChatScreen.path, extra: {
                               'label': chatRoom[index].name,
@@ -74,6 +75,12 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                           child: Card(
                             child: ListTile(
                               title: Text(chatRoom[index].name),
+                              subtitle: isOwner
+                                  ? Text(
+                                      userModel.name,
+                                      style: const TextStyle(color: Colors.amber),
+                                    )
+                                  : null,
                             ),
                           ),
                         );
@@ -81,9 +88,9 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                     );
                   },
                 ),
-              ],
-            ),
-          ),
+              ),
+            )
+          ],
         );
       }),
     );

@@ -1,9 +1,4 @@
-import 'dart:convert';
-
-import 'package:appwrite/appwrite.dart';
 import 'package:chatview/chatview.dart';
-import 'package:flutter/foundation.dart';
-import 'package:programming_sns/extensions/extensions.dart';
 
 class ChatRoom {
   String? id;

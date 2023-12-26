@@ -33,7 +33,6 @@ final router = Provider((ref) {
       ShellRoute(
         navigatorKey: ref.read(shellNavigatorKeyProvider),
         builder: (context, state, child) {
-          print(Theme.of(context).primaryColor);
           return ScaffoldWithNavbar(
             bottomItems: bottomItems,
             child: child,
@@ -50,9 +49,6 @@ final router = Provider((ref) {
                 ref: ref,
               );
             },
-            // builder: (context, state) {
-            //   return const ChatThreadScreen();
-            // },
             routes: [
               GoRoute(
                 path: ChatScreen.path,
@@ -77,9 +73,6 @@ final router = Provider((ref) {
                 ref: ref,
               );
             },
-            // builder: (context, state) {
-            //   return const ScreenB();
-            // },
             routes: [
               GoRoute(
                 path: DetailsScreen.path,
@@ -102,9 +95,6 @@ final router = Provider((ref) {
                 ref: ref,
               );
             },
-            // builder: (context, state) {
-            //   return const HomeScreen();
-            // },
             routes: [
               GoRoute(
                 path: LoginScreen.path,
