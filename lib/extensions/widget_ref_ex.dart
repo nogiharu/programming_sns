@@ -18,6 +18,7 @@ extension WidgetRefEX on WidgetRef {
     required Widget Function(T) complete,
     bool isBackgroundColorNone = false,
     Widget? loading,
+    Widget? error,
   }) {
     return watch(asyncValueProvider).when(
       data: complete,
@@ -31,6 +32,7 @@ extension WidgetRefEX on WidgetRef {
             builder: (_) => ErrorDialog(error: e),
           ),
         );
+        if (error != null) return error;
         // TODO ここがダサい
         return Container();
       },

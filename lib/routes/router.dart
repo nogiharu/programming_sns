@@ -6,6 +6,7 @@ import 'package:programming_sns/features/auth/screens/login_credentials_update_s
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen2.dart';
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/user/screens/home_screen.dart';
 
@@ -79,6 +80,17 @@ final router = Provider((ref) {
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
                   return const DetailsScreen(label: 'B');
+                },
+              ),
+              GoRoute(
+                path: ChatScreen2.path,
+                name: ChatScreen2.path,
+                parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+                builder: (context, state) {
+                  return const ChatScreen2(
+                    label: 'AAAA',
+                    chatRoomId: '658624a57c74937e4ec7',
+                  );
                 },
               ),
             ],

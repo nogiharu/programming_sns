@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:appwrite/appwrite.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api.dart';
@@ -23,24 +24,7 @@ class ChatMessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Messag
 
   /// メッセージ一覧取得
   Future<List<Message>> getMessageList({String? id}) async {
-    return futureGuard(() async {
-      return await _messageAPI.getMessagesDocumentList(chatRoomId: arg, id: id).then((docs) {
-        if (id != null) {
-          throw 'AAA';
-        }
-        return docs.documents
-            .map(
-              (doc) => MessageEX.fromMap(doc.data),
-            )
-            .toList()
-            .reversed
-            .toList();
-      });
-    });
     return await _messageAPI.getMessagesDocumentList(chatRoomId: arg, id: id).then((docs) {
-      if (id != null) {
-        throw 'AAA';
-      }
       return docs.documents
           .map(
             (doc) => MessageEX.fromMap(doc.data),
@@ -49,17 +33,6 @@ class ChatMessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Messag
           .reversed
           .toList();
     });
-  }
-
-  /// メッセージ一覧取得
-  Future<List<Message>> getMessageList2({required String id}) async {
-    final messageList25Ago = await getMessageList(id: id);
-    return messageList25Ago;
-    // return await futureGuard(() async {
-    //   final messageList25Ago = await getMessageList(id: id);
-    //   // return state.value!..insertAll(0, messageList25Ago);
-    //   return messageList25Ago;
-    // });
   }
 
   /// 最初のメッセージ取得
@@ -73,18 +46,7 @@ class ChatMessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Messag
     return messages;
   }
 
-  // void addMessage(RealtimeMessage event) {
-  //   update((data) {
-  //     return data..add(MessageEX.fromMap(event.payload));
-  //   });
-  // }
-
-  // Future<List<Message>> addMessageList() async {
-  //   return await update((data) async {
-  //     final messageList25Ago = await getMessages(id: data.first.id);
-  //     data.insertAll(0, messageList25Ago);
-
-  //     return data;
-  //   });
-  // }
+  void addMessage(RealtimeMessage event) {
+    update((data) => data..add(MessageEX.fromMap(event.payload)));
+  }
 }

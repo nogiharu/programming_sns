@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen2.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
 class ScreenA extends ConsumerWidget {
@@ -79,6 +80,12 @@ class _ScreenRefreshState extends ConsumerState<ScreenB> {
         body: ref.watchEX(
           userModelProvider,
           complete: (p0) {
+            return ElevatedButton(
+              onPressed: () {
+                context.goNamed(ChatScreen2.path, extra: {});
+              },
+              child: const Text('text'),
+            );
             return RefreshIndicator(
               onRefresh: () async {
                 // setState(() {});

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:appwrite/appwrite.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
@@ -16,5 +17,20 @@ class ChatUserListNotifier extends AutoDisposeFamilyAsyncNotifier<List<ChatUser>
     return (await ref.read(userModelProvider.notifier).getUserModelList())
         .map((userModel) => UserModel.toChatUser(userModel))
         .toList();
+  }
+
+  void chatUserUpdate(RealtimeMessage event) {
+    final user = UserModel.fromMap(event.payload);
+    final chatUser = UserModel.toChatUser(user);
+    update((data) {
+      final index = data.indexWhere((e) => e.id == chatUser.id);
+      return data..[index] = chatUser;
+    });
+  }
+
+  void chatUserCreate(RealtimeMessage event) {
+    final user = UserModel.fromMap(event.payload);
+    final chatUser = UserModel.toChatUser(user);
+    update((data) => data..add(chatUser));
   }
 }
