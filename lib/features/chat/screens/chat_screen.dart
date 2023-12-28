@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api.dart';
+import 'package:programming_sns/common/error_dialog.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event.dart';
@@ -10,6 +11,7 @@ import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/routes/router.dart';
 import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -53,7 +55,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             /// CHAT
             return ref.watchEX(
               chatControllerProvider(widget.chatRoomId),
-              loading: Container(),
               complete: (chatController) {
                 /// EVENT
                 ref.watch(chatMessageEventProvider(widget.chatRoomId));
@@ -70,17 +71,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   loadingWidget: const SizedBox(height: 0),
 
                   /// ページネーション
-                  loadMoreData: () async {
-                    await ref
-                        .read(chatControllerProvider(widget.chatRoomId).notifier)
-                        .addMessages();
-                    final a = ref
-                        .watch(chatControllerProvider(widget.chatRoomId))
-                        .value!
-                        .initialMessageList;
-
-                    print(a.length);
-                  },
+                  loadMoreData: loadMoreData,
 
                   /// チャットの状態
                   chatViewState: ChatViewState.hasMessages,
@@ -199,5 +190,29 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       chatController.initialMessageList =
           await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
     }
+  }
+
+  Future<void> loadMoreData() async {
+    final chatController = ref.watch(chatControllerProvider(widget.chatRoomId)).value;
+    if (chatController == null && chatController!.initialMessageList.isEmpty) return;
+
+    final firstMessage = ref.watch(firstChatMessageProvider(widget.chatRoomId)).value;
+
+    final isFirst = chatController.initialMessageList.first.createdAt == firstMessage?.createdAt;
+
+    if (isFirst) return;
+
+    final messageList25Ago = await ref
+        .read(chatControllerProvider(widget.chatRoomId).notifier)
+        .getMessages(id: chatController.initialMessageList.first.id)
+        .catchError((e) async {
+      chatController.scrollController
+          .jumpTo(chatController.scrollController.position.minScrollExtent);
+      return await showDialog(
+        context: ref.read(rootNavigatorKeyProvider).currentContext!,
+        builder: (_) => ErrorDialog(error: e),
+      );
+    });
+    chatController.loadMoreData(messageList25Ago);
   }
 }

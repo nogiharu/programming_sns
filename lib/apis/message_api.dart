@@ -17,13 +17,20 @@ class MessageAPI {
   final Databases _db;
   MessageAPI({required Databases db}) : _db = db;
 
-  // Future<Document> getUserDocument(String id) async {
-  //   return await _db.getDocument(
-  //     databaseId: AppwriteConstants.databaseId,
-  //     collectionId: AppwriteConstants.usersCollection,
-  //     documentId: id,
-  //   );
-  // }
+  Future<DocumentList> getFirstMessageDocument({
+    required String chatRoomId,
+    bool isCatch = true,
+  }) async {
+    return await _db.listDocuments(
+      databaseId: AppwriteConstants.databaseId,
+      collectionId: AppwriteConstants.messagesCollection,
+      queries: [
+        Query.equal('chatRoomId', chatRoomId),
+        Query.orderAsc('createdAt'),
+        Query.limit(1),
+      ],
+    ).catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+  }
 
   Future<Document> createMessageDocument(Message message, {bool isCatch = true}) async {
     return await _db

@@ -9,6 +9,10 @@ import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 
+final firstChatMessageProvider = FutureProviderFamily<Message, String>((ref, chatRoomId) async {
+  return ref.read(chatControllerProvider(chatRoomId).notifier).getFirstMessage();
+});
+
 final chatControllerProvider =
     AutoDisposeAsyncNotifierProviderFamily<ChatControllerNotifier, ChatController, String>(
         ChatControllerNotifier.new);
@@ -63,6 +67,17 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
               .toList(),
         );
     // .catchError((e) => exceptionMessage(error: e));
+
+    return messages;
+  }
+
+  /// 最初のメッセージ取得
+  Future<Message> getFirstMessage() async {
+    final messages = await _messageAPI
+        .getFirstMessageDocument(
+          chatRoomId: arg,
+        )
+        .then((docs) => docs.documents.map((doc) => MessageEX.fromMap(doc.data)).first);
 
     return messages;
   }
