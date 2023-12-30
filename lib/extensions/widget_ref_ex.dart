@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/common/error_dialog.dart';
-import 'package:programming_sns/common/loading.dart';
 import 'package:programming_sns/routes/router.dart';
 
 /// スナックバー表示用のGlobalKey
