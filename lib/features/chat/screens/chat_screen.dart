@@ -4,14 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api.dart';
 import 'package:programming_sns/common/error_dialog.dart';
-import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/extensions/extensions.dart';
-import 'package:programming_sns/features/chat/providers/bak/chat_message_list_provider.dart';
-import 'package:programming_sns/features/chat/providers/bak/chat_user_list.dart';
-// import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
+import 'package:programming_sns/features/chat/providers/chat_message_list_provider.dart';
+import 'package:programming_sns/features/chat/providers/chat_user_list.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
-import 'package:programming_sns/features/event/realtime_event_provider.dart';
 import 'package:programming_sns/features/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
@@ -62,10 +59,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           complete: (currentUserModel) {
             final ChatUser currentChatUser = UserModel.toChatUser(currentUserModel);
 
-            /// CHATUSER
+            /// CHAT_USER
             return ref.watchEX(chatUserListProvider(widget.chatRoomId), complete: (chatUserList) {
-              /// CHAT
-
+              /// CHAT_MESSAGE
               return ref.watchEX(
                 chatMessageListProvider(widget.chatRoomId),
                 complete: (messageList) {
@@ -85,50 +81,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
 
                     /// ページネーション
-                    loadMoreData: () async {
-                      final messageList = chatController.initialMessageList;
-
-                      if (messageList.isEmpty) return;
-                      final firstMessage =
-                          ref.watch(firstChatMessageProvider(widget.chatRoomId)).value;
-
-                      final isFirst = messageList.first.createdAt == firstMessage?.createdAt;
-
-                      if (isFirst) return;
-
-                      ref.watch(firstChatMessageProvider(widget.chatRoomId));
-
-                      final messageList25Ago = await ref
-                          .read(chatMessageListProvider(widget.chatRoomId).notifier)
-                          .getMessageList(id: messageList.first.id)
-                          .catchError((e) async {
-                        chatController.scrollController
-                            .jumpTo(chatController.scrollController.position.minScrollExtent);
-                        return await showDialog(
-                          context: ref.read(rootNavigatorKeyProvider).currentContext!,
-                          builder: (_) => ErrorDialog(error: e),
-                        );
-                      });
-                      print(messageList25Ago);
-                      chatController.loadMoreData(messageList25Ago);
-                    },
+                    loadMoreData: loadMoreData,
 
                     /// チャットの状態
                     chatViewState: ChatViewState.hasMessages,
-                    // appBar: AppBar(
-                    //   title: Text(widget.label),
-                    // ),
 
                     /// TODO chat全体背景
                     chatBackgroundConfig: const ChatBackgroundConfiguration(
-                      // messageTimeIconColor: theme.messageTimeIconColor,
-                      // messageTimeTextStyle: TextStyle(color: theme.messageTimeTextColor),
-                      // defaultGroupSeparatorConfig: DefaultGroupSeparatorConfiguration(
-                      //   textStyle: TextStyle(
-                      //     color: theme.chatHeaderColor,
-                      //     fontSize: 17,
-                      //   ),
-                      // ),
                       backgroundColor: ThemeColor.weak, // 背景色(chat全体背景)
                     ),
 
@@ -225,11 +184,28 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       chatRoomId: widget.chatRoomId,
     );
     await ref.read(messageAPIProvider).createMessageDocument(msg);
+  }
 
-    // final chatController = ref.watch(chatControllerProvider(widget.chatRoomId)).value;
-    // if (chatController != null && chatController.initialMessageList.length > 100) {
-    //   chatController.initialMessageList =
-    //       await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
-    // }
+  Future<void> loadMoreData() async {
+    if (chatController.initialMessageList.isEmpty) return;
+    final firstMessage = ref.watch(firstChatMessageProvider(widget.chatRoomId)).value;
+
+    final isFirst = chatController.initialMessageList.first.createdAt == firstMessage?.createdAt;
+
+    if (isFirst) return;
+
+    final messageList25Ago = await ref
+        .read(chatMessageListProvider(widget.chatRoomId).notifier)
+        .getMessageList(id: chatController.initialMessageList.first.id)
+        .catchError((e) async {
+      chatController.scrollController
+          .jumpTo(chatController.scrollController.position.minScrollExtent);
+      return await showDialog(
+        context: ref.read(rootNavigatorKeyProvider).currentContext!,
+        builder: (_) => ErrorDialog(error: e),
+      );
+    });
+
+    chatController.loadMoreData(messageList25Ago);
   }
 }

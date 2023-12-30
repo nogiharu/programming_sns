@@ -35,6 +35,10 @@ class ChatMessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Messag
     });
   }
 
+  Future<List<Message>> resetState() async {
+    return await update((data) async => await getMessageList());
+  }
+
   /// 最初のメッセージ取得
   Future<Message> getFirstMessage() async {
     final messages = await _messageAPI
