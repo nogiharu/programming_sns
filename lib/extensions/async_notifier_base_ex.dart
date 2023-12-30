@@ -5,7 +5,7 @@ import 'package:riverpod/src/async_notifier.dart';
 
 extension AsyncNotifierBaseEX<T> on AsyncNotifierBase<T> {
   /// state更新の際にエラーだった場合AysncValue.errorから戻す
-  Future<void> futureGuard(Future<T> Function() futureFunction) async {
+  Future<T> futureGuard(Future<T> Function() futureFunction) async {
     final prevState = state.copyWithPrevious(state);
     state = AsyncLoading<T>();
 
@@ -15,5 +15,6 @@ extension AsyncNotifierBaseEX<T> on AsyncNotifierBase<T> {
       // いきなり「state = prevState」をするとwatchEXのダイアログが出ないため,awaitしたら同期するためしない
       Future.delayed(const Duration(milliseconds: 500), () => state = prevState);
     }
+    return state.value!;
   }
 }
