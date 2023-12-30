@@ -33,7 +33,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   }
 
   /// ユーザー取得
-  /// errorCodeを取りたいためキャッチしない
+  /// errorCodeを取りたいためfalse
   Future<UserModel> _getUserModel(String id) async {
     final doc = await _userAPI.getUserDocument(id, isCatch: false);
     return UserModel.fromMap(doc.data);
@@ -56,20 +56,6 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
       },
     );
   }
-
-  /// AUTHからパスワードを取れないため、ユーザーズコレクションにパスワードを保存
-  // Future<void> updateAuthUserModel({required String loginId, required String loginPassword}) async {
-  //   await update((userModel) async {
-  //     final doc = await _userAPI.updateUserDocument(
-  //       userModel.copyWith(
-  //         loginId: loginId,
-  //         loginPassword: loginPassword,
-  //         isAnonymous: false,
-  //       ),
-  //     );
-  //     return UserModel.fromMap(doc.data);
-  //   });
-  // }
 
   /// ユーザー一覧取得
   Future<List<UserModel>> getUserModelList({String? chatRoomId}) async {
