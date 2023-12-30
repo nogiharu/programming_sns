@@ -75,20 +75,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
                   /// チャットの状態
                   chatViewState: ChatViewState.hasMessages,
-                  // appBar: AppBar(
-                  //   title: Text(widget.label),
-                  // ),
 
                   /// TODO chat全体背景
                   chatBackgroundConfig: const ChatBackgroundConfiguration(
-                    // messageTimeIconColor: theme.messageTimeIconColor,
-                    // messageTimeTextStyle: TextStyle(color: theme.messageTimeTextColor),
-                    // defaultGroupSeparatorConfig: DefaultGroupSeparatorConfiguration(
-                    //   textStyle: TextStyle(
-                    //     color: theme.chatHeaderColor,
-                    //     fontSize: 17,
-                    //   ),
-                    // ),
                     backgroundColor: ThemeColor.weak, // 背景色(chat全体背景)
                   ),
 

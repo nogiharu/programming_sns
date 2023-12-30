@@ -8,43 +8,43 @@ import 'package:programming_sns/features/event/realtime_event_provider.dart';
 /// ホットリロードしたら例外が出るため、再立ち上げする
 /// chatControllerのscrollControllerの例外が出るため外だし
 final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, chatRoomId) {
-  final stream = ref.watch(realtimeEventProvider);
+  ref.listen(realtimeEventProvider, (previous, next) {
+    next.whenOrNull(
+      data: (data) {
+        final chatController = ref.watch(chatControllerProvider(chatRoomId)).value;
+        if (chatController == null) return;
 
-  stream.whenOrNull(
-    data: (data) {
-      final chatController = ref.watch(chatControllerProvider(chatRoomId)).value;
-      if (chatController == null) return;
+        final isUserCreateEvent =
+            data.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.create') &&
+                data.payload.containsValue(chatRoomId);
 
-      final isUserCreateEvent =
-          data.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.create') &&
-              data.payload.containsValue(chatRoomId);
+        final isUserUpdateEvent =
+            data.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.update') &&
+                data.payload.containsValue(chatRoomId);
 
-      final isUserUpdateEvent =
-          data.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.update') &&
-              data.payload.containsValue(chatRoomId);
+        final isMessageCreateEvent =
+            data.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.create') &&
+                data.payload.containsValue(chatRoomId);
 
-      final isMessageCreateEvent =
-          data.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.create') &&
-              data.payload.containsValue(chatRoomId);
+        /// ユーザー作成イベント
+        if (isUserCreateEvent) {
+          debugPrint('USER_CREATE!');
+          ref.read(chatControllerProvider(chatRoomId).notifier).chatUserCreate(data);
+        }
 
-      /// ユーザー作成イベント
-      if (isUserCreateEvent) {
-        debugPrint('USER_CREATE!');
-        ref.read(chatControllerProvider(chatRoomId).notifier).chatUserCreate(data);
-      }
+        /// ユーザー更新イベント
+        if (isUserUpdateEvent) {
+          debugPrint('USER_UPDATE!');
+          ref.read(chatControllerProvider(chatRoomId).notifier).chatUserUpdate(data);
+        }
 
-      /// ユーザー更新イベント
-      if (isUserUpdateEvent) {
-        debugPrint('USER_UPDATE!');
-        ref.read(chatControllerProvider(chatRoomId).notifier).chatUserUpdate(data);
-      }
-
-      /// メッセージ作成イベント
-      if (isMessageCreateEvent) {
-        debugPrint('MESSAGE_CREATE!');
-        final message = MessageEX.fromMap(data.payload);
-        chatController.addMessage(message);
-      }
-    },
-  );
+        /// メッセージ作成イベント
+        if (isMessageCreateEvent) {
+          debugPrint('MESSAGE_CREATE!');
+          final message = MessageEX.fromMap(data.payload);
+          chatController.addMessage(message);
+        }
+      },
+    );
+  });
 });
