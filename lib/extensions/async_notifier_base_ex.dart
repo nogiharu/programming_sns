@@ -12,7 +12,7 @@ extension AsyncNotifierBaseEX<T> on AsyncNotifierBase<T> {
     state = await AsyncValue.guard<T>(futureFunction);
 
     if (state.hasError) {
-      // いきなり「state = prevState」をするとwatchEXのダイアログが出ないため,awaitしたら同期するためしない
+      // いきなり「state = prevState」をするとwatchEXのダイアログが出ないため,awaitしたら同期して状態が戻るためしない
       Future.delayed(const Duration(milliseconds: 300), () => state = prevState);
     }
     return state.value!;
