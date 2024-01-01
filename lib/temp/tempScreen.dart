@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen2.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
 class ScreenA extends ConsumerWidget {
@@ -57,45 +58,20 @@ class ScreenB extends ConsumerStatefulWidget {
 class _ScreenRefreshState extends ConsumerState<ScreenB> {
   @override
   Widget build(BuildContext context) {
-    final a = [
-      Container(
-        color: Colors.amber,
-        // width: 100,
-        height: 100,
-      ),
-      Container(
-        color: Colors.black,
-        // width: 100,
-        height: 100,
-      ),
-      Container(
-        color: Colors.blue,
-        // width: 100,
-        height: 100,
-      ),
-    ];
     return Scaffold(
         appBar: AppBar(title: const Text('text')),
         body: ref.watchEX(
           userModelProvider,
           complete: (p0) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                // setState(() {});
-                return await Future.delayed(
-                  const Duration(seconds: 3),
-                );
-              },
-              child: ListView.builder(
-                itemCount: a.length,
-                itemBuilder: (context, index) {
-                  return a[index];
-                },
-              ),
+            return Center(
+              child: ElevatedButton(
+                  onPressed: () {
+                    context.goNamed(ChatScreen2.path, extra: {});
+                  },
+                  child: const Text('text')),
             );
           },
         ));
-    return Container();
   }
 }
 
