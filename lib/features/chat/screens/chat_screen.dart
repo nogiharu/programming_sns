@@ -2,16 +2,15 @@ import 'package:chatview/chatview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:programming_sns/apis/message_api.dart';
-import 'package:programming_sns/common/error_dialog.dart';
+import 'package:programming_sns/apis/chat_room_api.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event.dart';
+import 'package:programming_sns/features/chat/providers/chat_room_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
-import 'package:programming_sns/routes/router.dart';
 import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -161,8 +160,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
+    final chatController = ref.watch(chatControllerProvider(widget.chatRoomId)).value;
     final user = ref.watch(userModelProvider).value;
-    if (user == null) return;
+    if (user == null || chatController == null) return;
     final msg = Message(
       // id: ID.unique(),
       createdAt: DateTime.now(),
@@ -172,10 +172,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
       chatRoomId: widget.chatRoomId,
     );
-    await ref.read(messageAPIProvider).createMessageDocument(msg);
 
-    final chatController = ref.watch(chatControllerProvider(widget.chatRoomId)).value;
-    if (chatController != null && chatController.initialMessageList.length > 100) {
+    await ref.read(chatControllerProvider(widget.chatRoomId).notifier).createMessage(msg);
+
+    final chatRoom = ref.read(chatRoomProvider.notifier).getChatRoom(widget.chatRoomId);
+    ref
+        .read(chatRoomAPIProvider)
+        .updateChatRoomDocument(chatRoom.copyWith(updatedAt: DateTime.now()));
+
+    if (chatController.initialMessageList.length > 100) {
       chatController.initialMessageList =
           await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
     }
@@ -193,15 +198,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     final messageList25Ago = await ref
         .read(chatControllerProvider(widget.chatRoomId).notifier)
-        .getMessages(id: chatController.initialMessageList.first.id)
-        .catchError((e) async {
-      chatController.scrollController
-          .jumpTo(chatController.scrollController.position.minScrollExtent);
-      return await showDialog(
-        context: ref.read(rootNavigatorKeyProvider).currentContext!,
-        builder: (_) => ErrorDialog(error: e),
-      );
-    });
+        .getMessages(id: chatController.initialMessageList.first.id);
+
     chatController.loadMoreData(messageList25Ago);
   }
 }

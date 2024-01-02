@@ -46,4 +46,16 @@ class ChatRoomAPI {
       queries: [Query.orderDesc('updatedAt')],
     ).catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
   }
+
+  /// チャットルーム更新
+  Future<Document> updateChatRoomDocument(ChatRoom chatRoom, {bool isCatch = true}) async {
+    return await _db
+        .updateDocument(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.chatRoomCollection,
+          documentId: chatRoom.id!,
+          data: chatRoom.toMap(),
+        )
+        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+  }
 }
