@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/extensions/extensions.dart';
+import 'package:programming_sns/features/chat/widgets/chat_send_form.dart';
 import 'package:programming_sns/features/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
@@ -25,8 +26,9 @@ class ChatScreen2 extends ConsumerWidget {
       body: ref.watchEX(
         userModelProvider,
         complete: (currentUser) {
-          return const Column(
-            children: [],
+          return const Align(
+            alignment: Alignment.bottomCenter,
+            child: ChatSendForm(),
           );
         },
       ),
