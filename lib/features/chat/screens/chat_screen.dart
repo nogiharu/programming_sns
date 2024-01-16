@@ -14,6 +14,7 @@ import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:programming_sns/utils/markdown/markdown_builder.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final String label;
@@ -34,9 +35,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   AppTheme theme = LightTheme();
   bool isDarkTheme = false;
 
-  bool showReaction = true;
+  late ChatController _chatController;
 
-  bool isCurrentScreen = true;
+  late ChatUser _currentChatUser;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +50,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         body: ref.watchEX(
           userModelProvider,
           complete: (currentUserModel) {
-            final ChatUser currentChatUser = UserModel.toChatUser(currentUserModel);
+            _currentChatUser = UserModel.toChatUser(currentUserModel);
 
             /// CHAT
             return ref.watchEX(
@@ -58,16 +59,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 /// EVENT
                 ref.watch(chatMessageEventProvider(widget.chatRoomId));
 
+                _chatController = chatController;
                 return ChatView(
-                  currentUser: currentChatUser,
-                  chatController: chatController,
+                  currentUser: _currentChatUser,
+                  chatController: _chatController,
                   onSendTap: onSendTap,
                   featureActiveConfig: const FeatureActiveConfig(
                     enableSwipeToReply: !kIsWeb, // TODO
                     enableSwipeToSeeTime: false,
                     enablePagination: true, // ページネーション
                   ),
-                  loadingWidget: const SizedBox(height: 0),
+                  // loadingWidget: const SizedBox(height: 0),
 
                   /// ページネーション
                   loadMoreData: loadMoreData,
@@ -94,9 +96,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     // textFieldBackgroundColor: Colors.grey.shade100, // 背景色
                     closeIconColor: theme.closeIconColor,
                     textFieldConfig: TextFieldConfiguration(
+                      padding: EdgeInsets.zero,
+                      borderRadius: BorderRadius.zero,
                       maxLines: 100, // 入力文字の行
                       contentPadding: const EdgeInsets.all(10),
-                      hintText: '文字入れてね', // TODO ヒント
+                      hintText: '文字入れてね(*^_^*)', // TODO ヒント
                       compositionThresholdTime: const Duration(seconds: 5),
                       textStyle: TextStyle(
                         color: theme.textFieldTextColor,
@@ -107,7 +111,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   chatBubbleConfig: ChatBubbleConfiguration(
                     onDoubleTap: (message) {
                       setState(() {
-                        showReaction = !showReaction;
+                        // showReaction = !showReaction;
                       });
                     },
                     // TODO わからん
@@ -119,14 +123,31 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ),
 
                   messageConfig: MessageConfiguration(
-                    customMessageBuilder: (p0) {
+                    customMessageBuilder: (message) {
                       return ChatCard(
-                        currentUser: currentChatUser,
-                        showReaction: showReaction,
-                        chatController: chatController,
-                        message: p0,
+                        currentUser: _currentChatUser,
+                        chatController: _chatController,
+                        message: message,
                       );
                     },
+                    // 画像 TODO
+                    imageMessageConfig: ImageMessageConfiguration(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      height: kIsWeb ? 200 : null,
+                      width: kIsWeb ? 200 : null,
+                      shareIconConfig: ShareIconConfiguration(
+                        defaultIconBackgroundColor: theme.shareIconBackgroundColor,
+                        defaultIconColor: theme.shareIconColor,
+                        onPressed: (p0) {
+                          // TODO アイコンたっぷ
+                        },
+                      ),
+                      onTap: (url) {
+                        // TODO 画像たっぷ
+                        print(url);
+                        print('ああ');
+                      },
+                    ),
                   ),
                   profileCircleConfig: const ProfileCircleConfiguration(
                     profileImageUrl: Data.profileImage,
@@ -160,14 +181,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
-    final chatController = ref.watch(chatControllerProvider(widget.chatRoomId)).value;
-    final user = ref.watch(userModelProvider).value;
-    if (user == null || chatController == null) return;
     final msg = Message(
-      // id: ID.unique(),
       createdAt: DateTime.now(),
       message: message,
-      sendBy: user.id,
+      sendBy: _currentChatUser.id,
       replyMessage: replyMessage,
       messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
       chatRoomId: widget.chatRoomId,
@@ -180,26 +197,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         .read(chatRoomAPIProvider)
         .updateChatRoomDocument(chatRoom.copyWith(updatedAt: DateTime.now()));
 
-    if (chatController.initialMessageList.length > 100) {
-      chatController.initialMessageList =
+    if (_chatController.initialMessageList.length > 100) {
+      _chatController.initialMessageList =
           await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
     }
   }
 
   Future<void> loadMoreData() async {
-    final chatController = ref.watch(chatControllerProvider(widget.chatRoomId)).value;
-    if (chatController == null && chatController!.initialMessageList.isEmpty) return;
+    if (_chatController.initialMessageList.isEmpty) return;
 
     final firstMessage = ref.watch(firstChatMessageProvider(widget.chatRoomId)).value;
 
-    final isFirst = chatController.initialMessageList.first.createdAt == firstMessage?.createdAt;
+    final isFirst = _chatController.initialMessageList.first.createdAt == firstMessage?.createdAt;
 
     if (isFirst) return;
 
     final messageList25Ago = await ref
         .read(chatControllerProvider(widget.chatRoomId).notifier)
-        .getMessages(id: chatController.initialMessageList.first.id);
+        .getMessages(id: _chatController.initialMessageList.first.id);
 
-    chatController.loadMoreData(messageList25Ago);
+    _chatController.loadMoreData(messageList25Ago);
   }
 }

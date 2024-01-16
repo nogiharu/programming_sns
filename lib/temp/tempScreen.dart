@@ -1,9 +1,17 @@
+import 'package:chatview/markdown/code_wrapper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:any_link_preview/any_link_preview.dart';
+// import 'package:markdown/markdown.dart' as md;
+// import 'package:programming_sns/utils/markdown/custom_pre_builder.dart';
+import 'package:markdown_widget/markdown_widget.dart';
+import 'package:programming_sns/utils/markdown/code_wrapper.dart';
 
 class ScreenA extends ConsumerWidget {
   const ScreenA({super.key});
@@ -50,52 +58,123 @@ class ScreenB extends ConsumerStatefulWidget {
     'icon': Icon(Icons.business),
     'index': 1,
   };
+
+  final String text3 = '''
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:markdown_widget/markdown_widget.dart';
+
+class MarkdownPage extends StatelessWidget {
+  final String data;
+
+  MarkdownPage(this.data);
+
+  @override
+  Widget build(BuildContext context) => Scaffold(body: buildMarkdown());
+
+  Widget buildMarkdown() => MarkdownWidget(data: data);
+}
+```
+
+''';
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ScreenRefreshState();
 }
 
 class _ScreenRefreshState extends ConsumerState<ScreenB> {
+  Widget buildMarkdown(BuildContext context) {
+    final isDark = Theme.of(context).brightness != Brightness.dark;
+    final config = isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig;
+    codeWrapper(child, text, language) => CodeWrapperWidget(child, text, language);
+    return MarkdownBlock(
+      data: widget.text3,
+      config: isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final a = [
-      Container(
-        color: Colors.amber,
-        // width: 100,
-        height: 100,
-      ),
-      Container(
-        color: Colors.black,
-        // width: 100,
-        height: 100,
-      ),
-      Container(
-        color: Colors.blue,
-        // width: 100,
-        height: 100,
-      ),
-    ];
-    return Scaffold(
-        appBar: AppBar(title: const Text('text')),
-        body: ref.watchEX(
-          userModelProvider,
-          complete: (p0) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                // setState(() {});
-                return await Future.delayed(
-                  const Duration(seconds: 3),
-                );
-              },
-              child: ListView.builder(
-                itemCount: a.length,
-                itemBuilder: (context, index) {
-                  return a[index];
-                },
+    String text1 = '''
+Markdown is the **best**!
+
+* It has lists.
+* It has [links](https://dart.dev).
+* It has...
+  ```dart
+  void sourceCode() {}
+  ```
+* ...and _so much more_...
+
+''';
+
+    String text2 = '''
+```dart
+class ChatRoomScreen extends ConsumerWidget {
+  const ChatRoomScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref.watchEX(
+      userModelProvider,
+      complete: (userModel) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('text'),
+          ),
+          body: ListView.builder(
+            itemBuilder: (context, index) {
+              const ListTile();
+              return null;
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+```
+
+
+
+''';
+
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Any Link Preview'),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              const MarkdownBlock(
+                  data:
+                      'aaa https://www.youtube.com/watch?v=DDajl7kgiNY&list=PLT0aFqMLFiVUTdjjz84MgLJurDB417Vrx&index=25 aa'),
+              MarkdownBlock(
+                data: text2,
+                config: MarkdownConfig(configs: [
+                  // font
+                  const PreConfig(
+                    textStyle: TextStyle(fontSize: 10),
+                    styleNotMatched: TextStyle(fontSize: 10),
+                  ),
+                ]),
               ),
-            );
-          },
-        ));
-    return Container();
+              MarkdownBlock(data: text1, config: MarkdownConfig.defaultConfig.copy(configs: [])),
+              MarkdownBlock(
+                data: text2,
+                config: MarkdownConfig.darkConfig.copy(
+                  configs: [
+                    PreConfig.darkConfig
+                        .copy(styleNotMatched: const TextStyle(color: Colors.white, fontSize: 5))
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:programming_sns/core/utils.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_provider.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen2.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
 class ChatThreadScreen extends ConsumerStatefulWidget {

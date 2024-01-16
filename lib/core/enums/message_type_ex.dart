@@ -3,11 +3,11 @@ import 'package:chatview/chatview.dart';
 extension ConvertMessageType on String {
   MessageType messageTypeToEnum() {
     switch (this) {
-      case 'text':
+      case 'MessageType.text':
         return MessageType.text;
-      case 'image':
+      case 'MessageType.image':
         return MessageType.image;
-      case 'custom':
+      case 'MessageType.custom':
         return MessageType.custom;
       default:
         return MessageType.custom;

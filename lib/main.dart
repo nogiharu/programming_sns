@@ -4,9 +4,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/theme/theme_color.dart';
 import 'package:programming_sns/routes/router.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 late Box box;
 Future<void> main() async {
+  usePathUrlStrategy(); // # delete
   await Hive.initFlutter();
   box = await Hive.openBox('users');
   runApp(
@@ -48,6 +50,8 @@ class Main extends ConsumerWidget {
         ),
         // テキストフィールドの縦棒
         textSelectionTheme: const TextSelectionThemeData(cursorColor: ThemeColor.main),
+        // インジケータ
+        progressIndicatorTheme: const ProgressIndicatorThemeData(color: ThemeColor.main),
       ),
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(

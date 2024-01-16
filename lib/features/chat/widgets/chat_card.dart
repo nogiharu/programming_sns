@@ -1,198 +1,119 @@
 import 'package:chatview/chatview.dart';
+import 'package:chatview/markdown/markdown_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:programming_sns/utils/markdown/custom_pre_builder.dart';
+import 'package:programming_sns/features/chat/widgets/reaction_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:any_link_preview/any_link_preview.dart';
-import "package:collection/collection.dart";
+// import 'package:programming_sns/utils/markdown/markdown_builder.dart';
 
-class ChatCard extends ConsumerWidget {
+class ChatCard extends StatefulWidget {
   const ChatCard({
     super.key,
     required this.currentUser,
-    required this.showReaction,
     required this.message,
     required this.chatController,
   });
 
   final ChatUser currentUser;
-  final bool showReaction;
   final ChatController chatController;
   final Message message;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // TODO カスタムバブル
-    final markdownRegex = RegExp(r'(\*{1,2}|_{1,2}|`{1,2}|~{1,2}|#{1,6})');
+  State<ChatCard> createState() => _ChatCardState();
+}
 
-    RegExp regExp = RegExp(r"(http|www)[^\s]+[\w]");
-    List<String?> urls = regExp.allMatches(message.message).map((match) => match.group(0)).toList();
+class _ChatCardState extends State<ChatCard> {
+  bool isShowReaction = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final urlRegExp = RegExp(
+      r"(^|\s+)(http[s]?:\/\/[^\s]+)",
+      caseSensitive: false, // 大文字小文字を区別しない
+    );
+
+    final urlMatches = urlRegExp.allMatches(widget.message.message).map((match) {
+      return match.group(2);
+    }).toList();
 
     double webWidth = MediaQuery.of(context).size.width;
-    return SelectionArea(
-      child: Column(
-        crossAxisAlignment:
-            message.sendBy == currentUser.id ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+
+    final isSendByCurrentUser = widget.message.sendBy == widget.currentUser.id;
+
+    // 時間
+    final timeWidget = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: Text(
+        DateFormat.Hm('ja').format(widget.message.createdAt),
+      ),
+    );
+
+    return GestureDetector(
+      onDoubleTap: () => setState(() => isShowReaction = !isShowReaction),
+      child: Wrap(
+        direction: Axis.horizontal,
+        alignment: isSendByCurrentUser ? WrapAlignment.end : WrapAlignment.start,
+        crossAxisAlignment: WrapCrossAlignment.end,
         children: [
-          Wrap(
-            direction: Axis.horizontal,
-            alignment: message.sendBy == currentUser.id ? WrapAlignment.end : WrapAlignment.start,
-            crossAxisAlignment: WrapCrossAlignment.end,
-            children: [
-              if (message.sendBy == currentUser.id)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Text(
-                    DateFormat.Hm('ja').format(message.createdAt),
-                  ),
-                ),
-              Container(
-                padding: const EdgeInsets.all(5),
-                constraints: BoxConstraints(
-                  maxWidth: kIsWeb ? webWidth / 1.5 : 250,
-                  minWidth: 55,
-                ),
-                decoration: BoxDecoration(
-                  color: message.sendBy == currentUser.id
-                      ? Colors.amber.shade300
-                      : Colors.grey.shade100,
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(20),
-                    topRight: const Radius.circular(20),
-                    bottomLeft:
-                        message.sendBy == currentUser.id ? const Radius.circular(20) : Radius.zero,
-                    bottomRight:
-                        message.sendBy == currentUser.id ? Radius.zero : const Radius.circular(20),
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      offset: Offset(1, 5),
-                      color: Colors.grey,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                width: markdownRegex.hasMatch(message.message)
-                    ? message.message.length.toDouble() * 22
-                    : null,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (markdownRegex.hasMatch(message.message))
-                      Markdown(
-                        builders: {
-                          'pre': CustomPreBuilder(),
-                        },
-                        styleSheet: MarkdownStyleSheet(
-                          textScaleFactor: kIsWeb ? 1.4 : null,
-                        ),
-                        padding: const EdgeInsets.all(5),
-                        selectable: true,
-                        data: message.message,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(), // スクロール
-                      )
-                    else
-                      Container(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Text(
-                          message.message,
-                          style: kIsWeb ? const TextStyle(fontSize: 18) : null,
-                        ),
-                      ),
-                    if (urls.isNotEmpty)
-                      ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: message.sendBy == currentUser.id
-                              ? const Radius.circular(20)
-                              : Radius.zero,
-                          bottomRight: message.sendBy == currentUser.id
-                              ? Radius.zero
-                              : const Radius.circular(20),
-                        ),
-                        child: AnyLinkPreview(
-                          link: urls[0]!,
-                          borderRadius: 0,
-                          backgroundColor: Colors.white,
-                        ),
-                      ),
-                  ],
-                ),
+          if (isSendByCurrentUser)
+            // 時間
+            timeWidget,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            constraints: BoxConstraints(
+              maxWidth: kIsWeb ? webWidth / 1.5 : 250,
+              minWidth: 55,
+            ),
+            decoration: BoxDecoration(
+              color: isSendByCurrentUser ? Colors.amber.shade300 : Colors.white,
+              borderRadius: const BorderRadius.all(Radius.circular(20)).copyWith(
+                bottomLeft: isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
+                bottomRight: !isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
               ),
-              if (message.sendBy != currentUser.id)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Text(
-                    DateFormat.Hm('ja').format(message.createdAt),
-                  ),
+              boxShadow: const [
+                BoxShadow(
+                  offset: Offset(1, 5),
+                  color: Colors.grey,
+                  blurRadius: 5,
                 ),
-            ],
-          ),
-          if (message.reaction.reactions.isNotEmpty && showReaction)
-            Align(
-              alignment:
-                  message.sendBy == currentUser.id ? Alignment.bottomRight : Alignment.bottomLeft,
-              child: Container(
-                width: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  color: Colors.grey.shade300,
-                ),
-                padding: const EdgeInsets.all(5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: message.reaction.reactions.toSet().map((e) {
-                    final reactionMap = groupBy(message.reaction.reactions, (p0) => p0).map(
-                      (key, value) => MapEntry(
-                        key,
-                        value.length > 1 ? '$key${value.length}' : key,
-                      ),
-                    );
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: InkWell(
-                        mouseCursor: SystemMouseCursors.click,
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return Container(
-                                height: 500,
-                                width: double.infinity,
-                                color: Colors.grey.shade200,
-                                child: ListView.builder(
-                                  itemCount: message.reaction.reactions.length,
-                                  itemBuilder: (context, index) {
-                                    return Card(
-                                      child: ListTile(
-                                        leading: CircleAvatar(
-                                          backgroundImage: NetworkImage(chatController
-                                              .getUserFromId(message.reaction.reactedUserIds[index])
-                                              .profilePhoto!),
-                                        ),
-                                        title: Text(
-                                          chatController
-                                              .getUserFromId(message.reaction.reactedUserIds[index])
-                                              .name,
-                                        ),
-                                        trailing: Text(message.reaction.reactions[index]),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                          );
-                        }, // なぜかカーソルポインタが変化しないため無視。
-                        child: IgnorePointer(
-                          child: Text(reactionMap[e]!),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Markdown
+                MarkdownBuilder(message: widget.message.message),
+
+                // リンクプレビュー
+                if (!kIsWeb && urlMatches.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
+                      bottomRight: !isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
+                    ),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: AnyLinkPreview(
+                        link: urlMatches.first!,
+                        borderRadius: 0,
+                        errorWidget: Container(
+                          color: Colors.grey[200],
+                          child: const Center(child: Text('エラーが発生しました(´；ω；`)')),
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (!isSendByCurrentUser) timeWidget,
+          if (widget.message.reaction.reactions.isNotEmpty && isShowReaction)
+            Align(
+              alignment: isSendByCurrentUser ? Alignment.bottomRight : Alignment.bottomLeft,
+              child: ReactionWidget(
+                reaction: widget.message.reaction,
+                chatController: widget.chatController,
               ),
             ),
         ],
