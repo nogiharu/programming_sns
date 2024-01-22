@@ -6,8 +6,13 @@ import 'package:markdown_widget/widget/all.dart';
 
 class MarkdownBuilder extends StatelessWidget {
   final String message;
+  final Color? pTextColor;
 
-  const MarkdownBuilder({super.key, required this.message});
+  const MarkdownBuilder({
+    super.key,
+    required this.message,
+    this.pTextColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +42,14 @@ class MarkdownBuilder extends StatelessWidget {
             wrapper: (child, code, language) => CodeWrapperWidget(child, code, language),
           );
 
-    final linkConfig = const LinkConfig()..style.copyWith(fontSize: kIsWeb ? null : 10);
+    final pConfig = PConfig(textStyle: TextStyle(color: pTextColor, fontSize: kIsWeb ? 16 : null));
 
     return MarkdownBlock(
       data: replacedMessage,
-      config: markdownConfig.copy(configs: [preConfig, linkConfig]),
+      config: markdownConfig.copy(configs: [
+        preConfig,
+        pConfig,
+      ]),
     );
   }
 }

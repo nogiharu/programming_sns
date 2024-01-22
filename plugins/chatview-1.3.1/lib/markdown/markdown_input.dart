@@ -1,4 +1,5 @@
 import 'package:chatview/markdown/markdown_builder.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MarkdownInput extends StatefulWidget {
@@ -40,93 +41,60 @@ class _MarkdownInputState extends State<MarkdownInput> {
         Container(
           width: double.infinity,
           color: Colors.grey.shade200,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                // 入力、プレビュー、リセット
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // 入力、プレビュー、リセット
+              Row(
+                children: [
+                  textButtonWidget(
+                    text: '入力',
+                    onPressed: () {
+                      if (!isInput) setState(() => isInput = true);
+                    },
+                    color: isInput ? Colors.white : null,
+                  ),
+                  textButtonWidget(
+                    text: 'プレビュー',
+                    onPressed: () {
+                      if (isInput && widget.textEditingController.text.isNotEmpty) {
+                        setState(() => isInput = false);
+                      }
+                    },
+                    color: !isInput ? Colors.white : null,
+                  ),
+                  textButtonWidget(
+                    text: 'リセット',
+                    onPressed: () {
+                      widget.textEditingController.text = '';
+                    },
+                  ),
+                ],
+              ),
+
+              if (isInput)
+                // アイコン一覧
                 Row(
                   children: [
-                    Container(
-                      color: isInput ? Colors.white : null,
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: TextButton(
-                        child: const Text(
-                          '入力',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
-                        ),
-                        onPressed: () {
-                          if (!isInput) setState(() => isInput = true);
-                        },
-                      ),
-                    ),
-                    Container(
-                      color: !isInput ? Colors.white : null,
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: TextButton(
-                        child: const Text(
-                          'プレビュー',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
-                        ),
-                        onPressed: () {
-                          if (isInput && widget.textEditingController.text.isNotEmpty) {
-                            setState(() => isInput = false);
-                          }
-                        },
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: TextButton(
-                        child: const Text(
-                          'リセット',
-                          style: TextStyle(color: Colors.black, fontSize: 13),
-                        ),
-                        onPressed: () {
-                          widget.textEditingController.text = '';
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                // const Expanded(child: SizedBox()),
-                if (isInput)
-                  // アイコン一覧
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => widget.textEditingController.text += '`java`',
-                        icon: const Icon(Icons.code),
-                      ),
-                      IconButton(
-                        onPressed: () => widget.textEditingController.text += '''
+                    iconButtonWidget(iconData: Icons.code, markdownText: '`java`'),
+                    iconButtonWidget(
+                      iconData: Icons.source,
+                      markdownText: '''
 ```java
 throw new NullPointerException("Hello, World");
 ```
 ''',
-                        icon: const Icon(Icons.source),
-                      ),
-                      IconButton(
-                        onPressed: () => widget.textEditingController.text += '- 箇条書き',
-                        icon: const Icon(Icons.format_list_bulleted),
-                      ),
-                      IconButton(
-                        onPressed: () => widget.textEditingController.text += '### 見出し',
-                        icon: const Icon(Icons.h_mobiledata),
-                      ),
-                      IconButton(
-                        onPressed: () => widget.textEditingController.text += '**太字**',
-                        icon: const Icon(Icons.format_bold),
-                      ),
-                      IconButton(
-                        onPressed: () =>
-                            widget.textEditingController.text += '[文字](https://www.google.com)',
-                        icon: const Icon(Icons.link),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
+                    ),
+                    iconButtonWidget(iconData: Icons.format_list_bulleted, markdownText: '- 箇条書き'),
+                    iconButtonWidget(iconData: Icons.h_mobiledata, markdownText: '### 見出し'),
+                    iconButtonWidget(iconData: Icons.format_bold, markdownText: '**太字**'),
+                    iconButtonWidget(
+                      iconData: Icons.link,
+                      markdownText: '[文字](https://www.google.com)',
+                    ),
+                  ],
+                ),
+            ],
           ),
         ),
         if (isInput)
@@ -137,6 +105,41 @@ throw new NullPointerException("Hello, World");
             child: MarkdownBuilder(message: widget.textEditingController.text),
           ),
       ],
+    );
+  }
+
+  Widget textButtonWidget({required String text, required VoidCallback onPressed, Color? color}) {
+    return Container(
+      color: color,
+      padding: kIsWeb ? const EdgeInsets.symmetric(vertical: 5) : null,
+      child: TextButton(
+        style: kIsWeb
+            ? null
+            : TextButton.styleFrom(
+                padding: const EdgeInsets.all(5),
+                minimumSize: const Size(0, 0),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+        onPressed: onPressed,
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.black, fontSize: 13),
+        ),
+      ),
+    );
+  }
+
+  Widget iconButtonWidget({required IconData iconData, required String markdownText}) {
+    return IconButton(
+      style: kIsWeb
+          ? null
+          : IconButton.styleFrom(
+              padding: const EdgeInsets.only(right: 5),
+              minimumSize: const Size(0, 0),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+      onPressed: () => widget.textEditingController.text += markdownText,
+      icon: Icon(iconData),
     );
   }
 }

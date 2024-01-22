@@ -1,4 +1,5 @@
 import 'package:chatview/chatview.dart';
+import 'package:chatview/markdown/markdown_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -97,6 +98,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     closeIconColor: theme.closeIconColor,
                     textFieldConfig: TextFieldConfiguration(
                       padding: EdgeInsets.zero,
+                      // margin: EdgeInsets.zero,
                       borderRadius: BorderRadius.zero,
                       maxLines: 100, // 入力文字の行
                       contentPadding: const EdgeInsets.all(10),
@@ -105,6 +107,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       textStyle: TextStyle(
                         color: theme.textFieldTextColor,
                       ),
+                      textCapitalization: TextCapitalization.none, // フォーマットしない
                     ),
                   ),
                   // TODO わからん
@@ -154,10 +157,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ),
 
                   repliedMessageConfig: const RepliedMessageConfiguration(
+                    // repliedMessageWidgetBuilder: (replyMessage) {
+                    //   // print(replyMessage.message);
+                    //   // return MarkdownBuilder(message: replyMessage!.message);
+                    //   return const Text('text');
+                    // },
                     backgroundColor: ThemeColor.strong,
                     verticalBarColor: ThemeColor.strong,
                     repliedMsgAutoScrollConfig: RepliedMsgAutoScrollConfig(
                       enableHighlightRepliedMsg: true,
+                      enableScrollToRepliedMsg: true, // リプライタップ時のスクロール
                       highlightColor: ThemeColor.weak,
                       highlightScale: 1.1,
                     ),
@@ -181,6 +190,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
+    if (message.trim().isEmpty) return;
     final msg = Message(
       createdAt: DateTime.now(),
       message: message,

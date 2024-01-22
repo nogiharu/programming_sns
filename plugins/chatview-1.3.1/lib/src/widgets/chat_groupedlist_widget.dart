@@ -29,6 +29,8 @@ import 'package:grouped_list/grouped_list.dart';
 import 'chat_bubble_widget.dart';
 import 'chat_group_header.dart';
 
+import 'package:collection/collection.dart';
+
 class ChatGroupedListWidget extends StatefulWidget {
   const ChatGroupedListWidget({
     Key? key,
@@ -47,6 +49,7 @@ class ChatGroupedListWidget extends StatefulWidget {
     this.swipeToReplyConfig,
     this.repliedMessageConfig,
     this.typeIndicatorConfig,
+    this.loadMoreData, // 追加変更
   }) : super(key: key);
 
   /// Allow user to swipe to see time while reaction pop is not open.
@@ -92,14 +95,15 @@ class ChatGroupedListWidget extends StatefulWidget {
   /// swipe whole chat.
   final bool isEnableSwipeToSeeTime;
 
+  final VoidCallBackWithFuture? loadMoreData;
+
   @override
   State<ChatGroupedListWidget> createState() => _ChatGroupedListWidgetState();
 }
 
 class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
     with TickerProviderStateMixin {
-  ChatBackgroundConfiguration get chatBackgroundConfig =>
-      widget.chatBackgroundConfig;
+  ChatBackgroundConfiguration get chatBackgroundConfig => widget.chatBackgroundConfig;
 
   bool get showPopUp => widget.showPopUp;
 
@@ -110,8 +114,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
 
   ChatBubbleConfiguration? get chatBubbleConfig => widget.chatBubbleConfig;
 
-  ProfileCircleConfiguration? get profileCircleConfig =>
-      widget.profileCircleConfig;
+  ProfileCircleConfiguration? get profileCircleConfig => widget.profileCircleConfig;
   AnimationController? _animationController;
   Animation<Offset>? _slideAnimation;
 
@@ -163,7 +166,8 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       reverse: true,
       // When reaction popup is being appeared at that user should not scroll.
       physics: showPopUp ? const NeverScrollableScrollPhysics() : null,
-      padding: EdgeInsets.only(bottom: showTypingIndicator ? 50 : 0),
+      padding: EdgeInsets.only(bottom: showTypingIndicator ? 50 : 15), // 追加変更
+      // padding: EdgeInsets.only(bottom: showTypingIndicator ? 50 : 0), // 追加変更
       controller: widget.scrollController,
       child: Column(
         children: [
@@ -196,13 +200,11 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                   profilePic: profileCircleConfig?.profileImageUrl,
                 )
               : ValueListenableBuilder(
-                  valueListenable: ChatViewInheritedWidget.of(context)!
-                      .chatController
-                      .typingIndicatorNotifier,
+                  valueListenable:
+                      ChatViewInheritedWidget.of(context)!.chatController.typingIndicatorNotifier,
                   builder: (context, value, child) => TypingIndicator(
                         typeIndicatorConfig: widget.typeIndicatorConfig,
-                        chatBubbleConfig:
-                            chatBubbleConfig?.inComingChatBubbleConfig,
+                        chatBubbleConfig: chatBubbleConfig?.inComingChatBubbleConfig,
                         showIndicator: value,
                         profilePic: profileCircleConfig?.profileImageUrl,
                       )),
@@ -217,7 +219,14 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
 
   Future<void> _onReplyTap(String id, List<Message>? messages) async {
     // Finds the replied message if exists
-    final repliedMessages = messages?.firstWhere((message) => id == message.id);
+    final repliedMessages = messages?.firstWhereOrNull((message) => id == message.id); // 追加変更
+    // final repliedMessages = messages?.firstWhere((message) => id == message.id);
+
+    // TODO 2回押さないとできない 追加変更
+    if (repliedMessages == null && widget.loadMoreData != null) {
+      await widget.loadMoreData!();
+      await _onReplyTap(id, messages);
+    } else
 
     // Scrolls to replied message and highlights
     if (repliedMessages != null && repliedMessages.key.currentState != null) {
@@ -225,21 +234,17 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
         repliedMessages.key.currentState!.context,
         // This value will make widget to be in center when auto scrolled.
         alignment: 0.5,
-        curve: widget.repliedMessageConfig?.repliedMsgAutoScrollConfig
-                .highlightScrollCurve ??
+        curve: widget.repliedMessageConfig?.repliedMsgAutoScrollConfig.highlightScrollCurve ??
             Curves.easeIn,
-        duration: widget.repliedMessageConfig?.repliedMsgAutoScrollConfig
-                .highlightDuration ??
+        duration: widget.repliedMessageConfig?.repliedMsgAutoScrollConfig.highlightDuration ??
             const Duration(milliseconds: 300),
       );
-      if (widget.repliedMessageConfig?.repliedMsgAutoScrollConfig
-              .enableHighlightRepliedMsg ??
+      if (widget.repliedMessageConfig?.repliedMsgAutoScrollConfig.enableHighlightRepliedMsg ??
           false) {
         _replyId.value = id;
 
         Future.delayed(
-          widget.repliedMessageConfig?.repliedMsgAutoScrollConfig
-                  .highlightDuration ??
+          widget.repliedMessageConfig?.repliedMsgAutoScrollConfig.highlightDuration ??
               const Duration(milliseconds: 300),
           () {
             _replyId.value = null;
@@ -261,9 +266,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       ),
     );
 
-    details.delta.dx > 1
-        ? _animationController?.reverse()
-        : _animationController?.forward();
+    details.delta.dx > 1 ? _animationController?.reverse() : _animationController?.forward();
   }
 
   @override
@@ -291,10 +294,9 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                     featureActiveConfig?.enableChatSeparator ?? false
                         ? _GroupSeparatorBuilder(
                             separator: separator,
-                            defaultGroupSeparatorConfig: chatBackgroundConfig
-                                .defaultGroupSeparatorConfig,
-                            groupSeparatorBuilder:
-                                chatBackgroundConfig.groupSeparatorBuilder,
+                            defaultGroupSeparatorConfig:
+                                chatBackgroundConfig.defaultGroupSeparatorConfig,
+                            groupSeparatorBuilder: chatBackgroundConfig.groupSeparatorBuilder,
                           )
                         : const SizedBox.shrink(),
                 indexedItemBuilder: (context, message, index) {
@@ -303,10 +305,8 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                     builder: (context, state, child) {
                       return ChatBubbleWidget(
                         key: message.key,
-                        messageTimeTextStyle:
-                            chatBackgroundConfig.messageTimeTextStyle,
-                        messageTimeIconColor:
-                            chatBackgroundConfig.messageTimeIconColor,
+                        messageTimeTextStyle: chatBackgroundConfig.messageTimeTextStyle,
+                        messageTimeIconColor: chatBackgroundConfig.messageTimeIconColor,
                         message: message,
                         messageConfig: widget.messageConfig,
                         chatBubbleConfig: chatBubbleConfig,
@@ -314,17 +314,14 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                         swipeToReplyConfig: widget.swipeToReplyConfig,
                         repliedMessageConfig: widget.repliedMessageConfig,
                         slideAnimation: _slideAnimation,
-                        onLongPress: (yCoordinate, xCoordinate) =>
-                            widget.onChatBubbleLongPress(
+                        onLongPress: (yCoordinate, xCoordinate) => widget.onChatBubbleLongPress(
                           yCoordinate,
                           xCoordinate,
                           message,
                         ),
                         onSwipe: widget.assignReplyMessage,
                         shouldHighlight: state == message.id,
-                        onReplyTap: widget
-                                    .repliedMessageConfig
-                                    ?.repliedMsgAutoScrollConfig
+                        onReplyTap: widget.repliedMessageConfig?.repliedMsgAutoScrollConfig
                                     .enableScrollToRepliedMsg ??
                                 false
                             ? (replyId) => _onReplyTap(replyId, snapshot.data)
@@ -335,8 +332,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                 },
               )
             : Center(
-                child: chatBackgroundConfig.loadingWidget ??
-                    const CircularProgressIndicator(),
+                child: chatBackgroundConfig.loadingWidget ?? const CircularProgressIndicator(),
               );
       },
     );
