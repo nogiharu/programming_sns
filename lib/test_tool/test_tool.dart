@@ -7,6 +7,7 @@ import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:any_link_preview/any_link_preview.dart';
 
 class TestToolcreen extends ConsumerWidget {
   const TestToolcreen({super.key});
@@ -21,7 +22,8 @@ class TestToolcreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
             children: [
-              Text(data.name),
+              Container(
+                  color: Colors.amber, padding: const EdgeInsets.all(5), child: Text(data.name)),
               // Text(ref.watch(authProvider).value?.email ?? 'ない'),
               TextButton(
                 onPressed: () async {
@@ -95,7 +97,7 @@ class TestToolcreen extends ConsumerWidget {
                       messageType: MessageType.custom,
                     );
 
-                    await ref.read(messageAPIProvider).createMessageDocument(msg);
+                    // await ref.read(messageAPIProvider).createMessageDocument(msg);
 
                     print(a);
                   });
@@ -116,6 +118,36 @@ class TestToolcreen extends ConsumerWidget {
               const SizedBox(
                 height: 10,
               ),
+              ElevatedButton(
+                onPressed: () async {
+                  // await Future.forEach(messageList, (e) async {
+                  //   print(e['\$id']);
+                  //   await ref.read(messageAPIProvider).deleteMessageDocument(e['\$id']);
+                  // });
+                },
+                child: const Text('メッセージタイプ'),
+              ),
+              AnyLinkPreview(
+                link:
+                    'https://www.youtube.com/watch?v=xjmZ8nRhOF0&list=PLT0aFqMLFiVUTdjjz84MgLJurDB417Vrx&index=6',
+                removeElevation: true,
+                // proxyUrl: linkPreviewConfig?.proxyUrl,
+                // onTap: _onLinkTap,
+                placeholderWidget: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  width: double.infinity,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1,
+                      // color: linkPreviewConfig?.loadingColor,
+                    ),
+                  ),
+                ),
+                // backgroundColor: linkPreviewConfig?.backgroundColor ?? Colors.grey.shade200,
+                // borderRadius: linkPreviewConfig?.borderRadius,
+                // bodyStyle: linkPreviewConfig?.bodyStyle ?? const TextStyle(color: Colors.black),
+                // titleStyle: linkPreviewConfig?.titleStyle,
+              )
             ],
           ),
         );

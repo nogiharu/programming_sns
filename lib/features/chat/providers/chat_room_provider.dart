@@ -53,7 +53,7 @@ class ChatRoomNotifier extends AutoDisposeAsyncNotifier<List<ChatRoom>> {
   }
 
   Future<List<ChatRoom>> getChatRoomList() async {
-    return await futureGuard(
+    await futureGuard(
       () async {
         return await _chatRoomAPI
             .getChatRoomDocumentList()
@@ -61,5 +61,11 @@ class ChatRoomNotifier extends AutoDisposeAsyncNotifier<List<ChatRoom>> {
         // .catchError((e) => exceptionMessage(error: e));
       },
     );
+
+    return state.value!;
+  }
+
+  ChatRoom getChatRoom(String chatRoomId) {
+    return state.value!.firstWhere((e) => e.id == chatRoomId);
   }
 }

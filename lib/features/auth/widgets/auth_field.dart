@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
-class AuthField extends StatelessWidget {
+class AuthField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final String labelText;
@@ -16,14 +15,31 @@ class AuthField extends StatelessWidget {
   });
 
   @override
+  State<AuthField> createState() => _AuthFieldState();
+}
+
+class _AuthFieldState extends State<AuthField> {
+  bool isObscureText = false;
+
+  @override
   Widget build(BuildContext context) {
+    bool isPassword = widget.labelText.contains('パスワー');
+
     return TextFormField(
       // validator: validator,
-      controller: controller,
+      controller: widget.controller,
+      obscureText: isPassword && isObscureText,
       decoration: InputDecoration(
+        // アイコン
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(isObscureText ? Icons.visibility_off : Icons.visibility),
+                onPressed: () => setState(() => isObscureText = !isObscureText),
+              )
+            : null,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         label: Text(
-          labelText,
+          widget.labelText,
           style: const TextStyle(fontSize: 20),
         ),
         focusedBorder: OutlineInputBorder(
@@ -40,7 +56,7 @@ class AuthField extends StatelessWidget {
           ),
         ),
         contentPadding: const EdgeInsets.all(22),
-        hintText: hintText,
+        hintText: widget.hintText,
         hintStyle: TextStyle(fontSize: 15, color: Colors.grey.shade500),
       ),
     );

@@ -7,8 +7,10 @@ class AppwriteConstants {
   static const String usersCollection = '652bbad062129307289e';
   static const String chatRoomCollection = '652db5fe9905218ab7f6';
 
-  // static String imageUrl(String imageId) =>
-  //     '$endPoint/storage/buckets/$imagesBucket/files/$imageId/view?project=$projectId&mode=admin';
+  static const String imagesBucket = '65ada7b0d8ff019e2d32';
+
+  static String imageUrl(String imageId) =>
+      '$endPoint/storage/buckets/$imagesBucket/files/$imageId/view?project=$projectId&mode=admin';
 
   static const messagesDocmentsChannels =
       'databases.${AppwriteConstants.databaseId}.collections.${AppwriteConstants.messagesCollection}.documents';

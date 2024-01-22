@@ -5,9 +5,11 @@ import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api.dart';
+import 'package:programming_sns/common/error_dialog.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/routes/router.dart';
 
 final firstChatMessageProvider = FutureProviderFamily<Message, String>((ref, chatRoomId) async {
   return ref.read(chatControllerProvider(chatRoomId).notifier).getFirstMessage();
@@ -56,8 +58,11 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
   }
 
   /// メッセージ一覧取得
+  /// FIXME state更新できない（futureGuard使えない）
   Future<List<Message>> getMessages({String? id}) async {
-    final messages = await _messageAPI.getMessagesDocumentList(chatRoomId: arg, id: id).then(
+    final messages = await _messageAPI
+        .getMessagesDocumentList(chatRoomId: arg, id: id)
+        .then(
           (docs) => docs.documents
               .map(
                 (doc) => MessageEX.fromMap(doc.data),
@@ -65,10 +70,28 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
               .toList()
               .reversed
               .toList(),
-        );
-    // .catchError((e) => exceptionMessage(error: e));
+        )
+        .catchError((e) async {
+      state.value!.scrollController.jumpTo(state.value!.scrollController.position.minScrollExtent);
+      return await showDialog(
+        context: ref.read(rootNavigatorKeyProvider).currentContext!,
+        builder: (_) => ErrorDialog(error: e),
+      );
+    });
 
     return messages;
+  }
+
+  /// メッセージ作成
+  /// FIXME state更新できない（futureGuard使えない）
+  Future<void> createMessage(Message message) async {
+    await ref.read(messageAPIProvider).createMessageDocument(message).catchError((e) async {
+      state.value!.scrollController.jumpTo(state.value!.scrollController.position.minScrollExtent);
+      return await showDialog(
+        context: ref.read(rootNavigatorKeyProvider).currentContext!,
+        builder: (_) => ErrorDialog(error: e),
+      );
+    });
   }
 
   /// 最初のメッセージ取得

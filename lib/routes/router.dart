@@ -6,6 +6,7 @@ import 'package:programming_sns/features/auth/screens/login_credentials_update_s
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen2.dart';
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/user/screens/home_screen.dart';
 
@@ -59,6 +60,12 @@ final router = Provider((ref) {
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
                   final map = state.extra as Map<String, dynamic>;
+                  if (map['chatRoomId'] == '65a3515964f0ea2d5df0') {
+                    return ChatScreen2(
+                      label: map['label'],
+                      chatRoomId: map['chatRoomId'],
+                    );
+                  }
                   return ChatScreen(
                     label: map['label'],
                     chatRoomId: map['chatRoomId'],

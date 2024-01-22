@@ -112,8 +112,7 @@ class ChatListWidget extends StatefulWidget {
   State<ChatListWidget> createState() => _ChatListWidgetState();
 }
 
-class _ChatListWidgetState extends State<ChatListWidget>
-    with SingleTickerProviderStateMixin {
+class _ChatListWidgetState extends State<ChatListWidget> with SingleTickerProviderStateMixin {
   final ValueNotifier<bool> _isNextPageLoading = ValueNotifier<bool>(false);
   ValueNotifier<bool> showPopUp = ValueNotifier(false);
   final GlobalKey<ReactionPopupState> _reactionPopupKey = GlobalKey();
@@ -126,8 +125,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
   bool get showTypingIndicator => widget.showTypingIndicator;
 
-  ChatBackgroundConfiguration get chatBackgroundConfig =>
-      widget.chatBackgroundConfig;
+  ChatBackgroundConfiguration get chatBackgroundConfig => widget.chatBackgroundConfig;
 
   FeatureActiveConfig? featureActiveConfig;
   ChatUser? currentUser;
@@ -167,13 +165,11 @@ class _ChatListWidgetState extends State<ChatListWidget>
         ValueListenableBuilder<bool>(
           valueListenable: _isNextPageLoading,
           builder: (_, isNextPageLoading, child) {
-            if (isNextPageLoading &&
-                (featureActiveConfig?.enablePagination ?? false)) {
+            if (isNextPageLoading && (featureActiveConfig?.enablePagination ?? false)) {
               return SizedBox(
                 height: Scaffold.of(context).appBarMaxHeight,
                 child: Center(
-                  child:
-                      widget.loadingWidget ?? const CircularProgressIndicator(),
+                  child: widget.loadingWidget ?? const CircularProgressIndicator(),
                 ),
               );
             } else {
@@ -191,8 +187,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
                     showPopUp: showPopupValue,
                     showTypingIndicator: showTypingIndicator,
                     scrollController: scrollController,
-                    isEnableSwipeToSeeTime:
-                        featureActiveConfig?.enableSwipeToSeeTime ?? true,
+                    isEnableSwipeToSeeTime: featureActiveConfig?.enableSwipeToSeeTime ?? true,
                     chatBackgroundConfig: widget.chatBackgroundConfig,
                     assignReplyMessage: widget.assignReplyMessage,
                     replyMessage: widget.replyMessage,
@@ -207,9 +202,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
                         _reactionPopupKey.currentState?.refreshWidget(
                           message: message,
                           xCoordinate: xCoordinate,
-                          yCoordinate: yCoordinate < 0
-                              ? -(yCoordinate) - 5
-                              : yCoordinate,
+                          yCoordinate: yCoordinate < 0 ? -(yCoordinate) - 5 : yCoordinate,
                         );
                         showPopUp.value = true;
                       }
@@ -221,6 +214,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
                       }
                     },
                     onChatListTap: _onChatListTap,
+                    loadMoreData: widget.loadMoreData, // 追加変更
                   ),
                   if (featureActiveConfig?.enableReactionPopup ?? false)
                     ReactionPopup(
@@ -240,12 +234,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
   void _pagination() {
     if (widget.loadMoreData == null || widget.isLastPage == true) return;
-    if ((scrollController.position.pixels ==
-            scrollController.position.maxScrollExtent) &&
+    if ((scrollController.position.pixels == scrollController.position.maxScrollExtent) &&
         !_isNextPageLoading.value) {
       _isNextPageLoading.value = true;
-      widget.loadMoreData!()
-          .whenComplete(() => _isNextPageLoading.value = false);
+      widget.loadMoreData!().whenComplete(() => _isNextPageLoading.value = false);
     }
   }
 
