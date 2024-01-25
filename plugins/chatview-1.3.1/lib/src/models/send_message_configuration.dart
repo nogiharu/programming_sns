@@ -189,7 +189,8 @@ class ImagePickerConfiguration {
 
   /// Callback when image is picked from camera or gallery,
   ///  we can perform our task on image like adding crop options and return new image path
-  final Future<String?> Function(String? path)? onImagePicked;
+  final Future<String?> Function(XFile? xFile)? onImagePicked; // 追加変更
+  // final Future<String?> Function(String? path)? onImagePicked;
 
   const ImagePickerConfiguration({
     this.maxWidth,

@@ -291,9 +291,11 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
         imageQuality: config?.imageQuality,
         preferredCameraDevice: config?.preferredCameraDevice ?? CameraDevice.rear,
       );
+
       String? imagePath = image?.path;
       if (config?.onImagePicked != null) {
-        String? updatedImagePath = await config?.onImagePicked!(imagePath);
+        String? updatedImagePath = await config?.onImagePicked!(image); //追加変更
+        // String? updatedImagePath = await config?.onImagePicked!(imagePath);
         if (updatedImagePath != null) imagePath = updatedImagePath;
       }
       widget.onImageSelected(imagePath ?? '', '');

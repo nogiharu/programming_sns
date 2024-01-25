@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/chat_room_api.dart';
+import 'package:programming_sns/apis/storage_api.dart';
+import 'package:programming_sns/common/error_dialog.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event.dart';
@@ -12,6 +14,7 @@ import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/routes/router.dart';
 import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -86,8 +89,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   /// (送信フォーム)
                   sendMessageConfig: SendMessageConfiguration(
                     allowRecordingVoice: false, // ボイスなし
-                    imagePickerIconsConfig: const ImagePickerIconsConfiguration(
-                      cameraImagePickerIcon: SizedBox(), // カメラなし
+                    enableCameraImagePicker: false, // カメラなし
+                    imagePickerConfiguration: ImagePickerConfiguration(
+                      // 画像送信
+                      onImagePicked: (xFile) async {
+                        String? imagePath = xFile?.path;
+                        if (xFile != null) {
+                          imagePath =
+                              await ref.read(storageAPIProvider).uploadImage(xFile).catchError(
+                                    (e) async => await showDialog(
+                                      context: ref.read(rootNavigatorKeyProvider).currentContext!,
+                                      builder: (_) => ErrorDialog(error: e),
+                                    ),
+                                  );
+                        }
+                        return imagePath;
+                      },
                     ),
                     replyMessageColor: Colors.black, // リプライメッセージの色(送信フォーム)
                     defaultSendButtonColor: ThemeColor.main, // 送信ボタン(送信フォーム)

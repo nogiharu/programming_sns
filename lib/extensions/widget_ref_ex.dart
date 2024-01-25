@@ -10,7 +10,8 @@ final scaffoldMessengerKeyProvider = Provider(
 
 extension WidgetRefEX on WidgetRef {
   /// - asyncValueProvider AsyncValueを返すプロバイダー
-  /// - complete 取得完了後のコールバック
+  /// - complete 取得完了後のコールバック(data)
+  /// - isBackgroundColorNone エラーダイアログ表示時の背景色を透明にするか
   /// - loading ローディング中に出したいやつ
   Widget watchEX<T>(
     ProviderListenable<AsyncValue<T>> asyncValueProvider, {
@@ -21,7 +22,8 @@ extension WidgetRefEX on WidgetRef {
     return watch(asyncValueProvider).when(
       data: complete,
       error: (e, _) {
-        /// 画面の描画が始まったタイミングで状態の変更をする。
+        debugPrint('エラーです');
+        // 画面の描画が終わったタイミングで状態の変更をする。（描画前に出すとエラーが出る）
         WidgetsBinding.instance.addPostFrameCallback(
           (_) => showDialog<void>(
             barrierColor: isBackgroundColorNone ? Colors.transparent : null,
@@ -30,7 +32,7 @@ extension WidgetRefEX on WidgetRef {
           ),
         );
         // TODO ここがダサい
-        return Container();
+        return const SizedBox.shrink();
       },
       loading: () {
         debugPrint('ローディング');
