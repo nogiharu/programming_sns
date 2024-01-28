@@ -160,6 +160,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         defaultIconColor: theme.shareIconColor,
                         onPressed: (p0) {
                           // TODO アイコンたっぷ
+                          print(p0);
+                          print('いい');
                         },
                       ),
                       onTap: (url) {

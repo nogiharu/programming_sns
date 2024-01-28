@@ -28,7 +28,7 @@ extension WidgetRefEX on WidgetRef {
           (_) => showDialog<void>(
             barrierColor: isBackgroundColorNone ? Colors.transparent : null,
             context: read(rootNavigatorKeyProvider).currentContext!,
-            builder: (_) => ErrorDialog(error: e.toString()),
+            builder: (_) => ErrorDialog(error: e),
           ),
         );
         // TODO ここがダサい
