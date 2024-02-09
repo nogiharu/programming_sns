@@ -43,9 +43,11 @@ dependencies:
   flutter_native_splash: ^2.3.2
   chatview:
    path: ./plugins/chatview-1.3.1
-  appwrite: ^11.0.0
+  appwrite: ^11.0.1
   go_router: ^12.1.3
   markdown_widget: ^2.3.2+3
+  file_saver: ^0.1.1
+  image_gallery_saver: ^2.0.3
 
 dev_dependencies:
   flutter_test:

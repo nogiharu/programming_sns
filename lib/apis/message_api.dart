@@ -51,12 +51,8 @@ class MessageAPI {
       Query.limit(25),
     ];
 
-    /// idより前を取得
-    if (id != null) {
-      queries.add(Query.cursorAfter(id));
-      // queries.add(Query.cursorBefore(id));
-      // queries.add(Query.limit(100));
-    }
+    // idより前を取得
+    if (id != null) queries.add(Query.cursorAfter(id));
 
     return await _db
         .listDocuments(

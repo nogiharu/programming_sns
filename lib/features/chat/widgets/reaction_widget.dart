@@ -2,6 +2,7 @@ import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 import "package:collection/collection.dart";
 
+/// TODO safariだとバグる
 class ReactionWidget extends StatelessWidget {
   final Reaction reaction;
   final ChatController chatController;

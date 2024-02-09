@@ -158,7 +158,8 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                         leftPadding,
                                         leftPadding,
                                         leftPadding,
-                                        30,
+                                        // 30,
+                                        9, // 30 -> 9 に追加変更
                                       ),
                                       child: Container(
                                         margin: const EdgeInsets.only(bottom: 2),

@@ -7,7 +7,7 @@ import 'package:programming_sns/features/chat/providers/chat_controller_provider
 import 'package:programming_sns/features/chat/providers/chat_message_event.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
-import 'package:programming_sns/features/chat/widgets/chat_card2.dart';
+import 'package:programming_sns/temp/chat_card2.dart';
 
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';

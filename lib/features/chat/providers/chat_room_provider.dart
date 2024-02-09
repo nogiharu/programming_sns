@@ -16,7 +16,7 @@ class ChatRoomNotifier extends AutoDisposeAsyncNotifier<List<ChatRoom>> {
   @override
   FutureOr<List<ChatRoom>> build() async {
     // chatRoomEvent();
-    ref.watch(realtimeEventProvider);
+    // ref.watch(realtimeEventProvider); // TODO 他ユーザもローディングされる
     return await getChatRoomList();
   }
 

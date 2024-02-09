@@ -28,10 +28,13 @@ class PackageStrings {
   static const String repliedToYou = "あなたにリプライ";
   // static const String repliedBy = "Replied by"; 変更
   static const String repliedBy = "リプライ";
-  static const String more = "More";
+  // static const String more = "More";　変更
+  static const String more = "閉じる";
   static const String unsend = "Unsend";
-  static const String reply = "Reply";
-  static const String replyTo = "Replying to";
+  // static const String reply = "Reply"; 変更
+  static const String reply = "リプライ";
+  // static const String replyTo = "Replying to";
+  static const String replyTo = "リプライ";
   static const String message = "Message";
   static const String reactionPopupTitle = "Tap and hold to multiply your reaction";
   static const String photo = "Photo";

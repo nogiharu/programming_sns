@@ -304,7 +304,7 @@ class _ChatListWidgetState extends State<ChatListWidget> with SingleTickerProvid
   @override
   void dispose() {
     chatController.messageStreamController.close();
-    scrollController.dispose();
+    // scrollController.dispose(); // 追加変更　コメントにする
     _isNextPageLoading.dispose();
     showPopUp.dispose();
     super.dispose();

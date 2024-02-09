@@ -3,9 +3,12 @@ import 'package:chatview/markdown/markdown_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:programming_sns/apis/chat_room_api.dart';
 import 'package:programming_sns/apis/storage_api.dart';
 import 'package:programming_sns/common/error_dialog.dart';
+import 'package:programming_sns/constants/appwrite_constants.dart';
+import 'package:programming_sns/core/utils.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event.dart';
@@ -19,6 +22,7 @@ import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:programming_sns/utils/markdown/markdown_builder.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final String label;
@@ -92,19 +96,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     enableCameraImagePicker: false, // カメラなし
                     imagePickerConfiguration: ImagePickerConfiguration(
                       // 画像送信
-                      onImagePicked: (xFile) async {
-                        String? imagePath = xFile?.path;
-                        if (xFile != null) {
-                          imagePath =
-                              await ref.read(storageAPIProvider).uploadImage(xFile).catchError(
-                                    (e) async => await showDialog(
-                                      context: ref.read(rootNavigatorKeyProvider).currentContext!,
-                                      builder: (_) => ErrorDialog(error: e),
-                                    ),
-                                  );
-                        }
-                        return imagePath;
-                      },
+                      onImagePicked: uploadImage,
                     ),
                     replyMessageColor: Colors.black, // リプライメッセージの色(送信フォーム)
                     defaultSendButtonColor: ThemeColor.main, // 送信ボタン(送信フォーム)
@@ -130,6 +122,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   // TODO わからん
                   chatBubbleConfig: ChatBubbleConfiguration(
                     onDoubleTap: (message) {
+                      // これ入れないとハートになる　ChatBubbleWidget → 337行目
                       setState(() {
                         // showReaction = !showReaction;
                       });
@@ -158,17 +151,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       shareIconConfig: ShareIconConfiguration(
                         defaultIconBackgroundColor: theme.shareIconBackgroundColor,
                         defaultIconColor: theme.shareIconColor,
-                        onPressed: (p0) {
-                          // TODO アイコンたっぷ
-                          print(p0);
-                          print('いい');
-                        },
+                        onPressed: downloadImage,
                       ),
-                      onTap: (url) {
-                        // TODO 画像たっぷ
-                        print(url);
-                        print('ああ');
-                      },
+                      onTap: previewImage,
                     ),
                   ),
                   profileCircleConfig: const ProfileCircleConfiguration(
@@ -208,6 +193,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ));
   }
 
+  /// 送信
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
     if (message.trim().isEmpty) return;
     final msg = Message(
@@ -219,19 +205,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       chatRoomId: widget.chatRoomId,
     );
 
+    // メッセージ送信
     await ref.read(chatControllerProvider(widget.chatRoomId).notifier).createMessage(msg);
 
+    // チャットルーム取得
     final chatRoom = ref.read(chatRoomProvider.notifier).getChatRoom(widget.chatRoomId);
+    // チャットルームの日付更新
     ref
         .read(chatRoomAPIProvider)
         .updateChatRoomDocument(chatRoom.copyWith(updatedAt: DateTime.now()));
 
+    // スクロールが100件超えていたら25件にリセット
     if (_chatController.initialMessageList.length > 100) {
       _chatController.initialMessageList =
           await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
     }
   }
 
+  /// ページング
   Future<void> loadMoreData() async {
     if (_chatController.initialMessageList.isEmpty) return;
 
@@ -246,5 +237,63 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         .getMessages(id: _chatController.initialMessageList.first.id);
 
     _chatController.loadMoreData(messageList25Ago);
+  }
+
+  /// 画像ダウンロード
+  Future<void> downloadImage(String url) async {
+    final isSaved = await ref
+        .read(storageAPIProvider)
+        .downloadImage(url, AppwriteConstants.messageImagesBucket)
+        .catchError(ref.read(showDialogProvider));
+
+    if (isSaved) ref.read(snackBarProvider('${kIsWeb ? 'ダウンロード' : '写真'}に保存完了したよ(*^_^*)'));
+  }
+
+  /// 画像アップロード
+  Future<String?> uploadImage(XFile? xFile) async {
+    String? imagePath = xFile?.path;
+    if (xFile != null) {
+      imagePath = await ref
+          .read(storageAPIProvider)
+          .uploadImage(
+            xFile,
+            AppwriteConstants.messageImagesBucket,
+          )
+          .catchError(ref.read(showDialogProvider));
+    }
+    return imagePath;
+  }
+
+  /// 画像プレビュー
+  Future<void> previewImage(String url) async {
+    final uint8List = await ref
+        .read(storageAPIProvider)
+        .previewImgae(
+          url,
+          AppwriteConstants.messageImagesBucket,
+        )
+        .catchError(ref.read(showDialogProvider));
+
+    await showDialog(
+      barrierDismissible: true,
+      context: ref.read(rootNavigatorKeyProvider).currentContext!,
+      builder: (context) {
+        return GestureDetector(
+          onTap: () => context.pop(),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              InteractiveViewer(
+                minScale: 0.1,
+                maxScale: 5,
+                child: Image.memory(
+                  uint8List,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

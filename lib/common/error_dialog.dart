@@ -12,15 +12,17 @@ class ErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('エラー'),
-      content: Text(error.toString()),
-      actions: [
-        TextButton(
-          onPressed: () => context.pop(),
-          child: const Text('OK'),
-        ),
-      ],
+    return SelectionArea(
+      child: AlertDialog(
+        title: const Text('エラー'),
+        content: Text(error.toString()),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
     );
   }
 }

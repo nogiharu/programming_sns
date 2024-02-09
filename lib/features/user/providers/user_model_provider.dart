@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:programming_sns/apis/storage_api.dart';
 import 'package:programming_sns/apis/user_api.dart';
 import 'package:programming_sns/exceptions/exception_message.dart';
 import 'package:programming_sns/extensions/extensions.dart';
@@ -64,4 +65,12 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
 
     return userModelList;
   }
+
+  // Future<void> testError() async {
+  //   await futureGuard(() async {
+  //     await ref.read(storageAPIProvider).downloadImage('', '');
+  //     print('AAA');
+  //     return state.value!;
+  //   });
+  // }
 }

@@ -6,7 +6,7 @@ import 'package:programming_sns/features/auth/screens/login_credentials_update_s
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
-import 'package:programming_sns/features/chat/screens/chat_screen2.dart';
+import 'package:programming_sns/temp/chat_screen2.dart';
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/user/screens/home_screen.dart';
 

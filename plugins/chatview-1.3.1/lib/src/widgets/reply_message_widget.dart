@@ -137,9 +137,15 @@ class ReplyMessageWidget extends StatelessWidget {
                                           ),
                                       ],
                                     )
-                                  : MarkdownBuilder(
-                                      message: replyMessage,
-                                      pTextColor: Colors.white,
+                                  : Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        if (replyBySender) Text(messagedUser!.name),
+                                        MarkdownBuilder(
+                                          message: replyMessage,
+                                          pTextColor: Colors.white,
+                                        ),
+                                      ],
                                     ),
                               // 上記に追加変更
                               // Text(

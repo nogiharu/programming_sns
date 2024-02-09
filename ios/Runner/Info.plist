@@ -55,6 +55,10 @@
 		<key>NSMicrophoneUsageDescription</key>
 		<string>Main</string>
 		<!-- image_picker  追加だよ -->
+		<!-- image_gallery_saver  追加だよ -->
+		<key>NSPhotoLibraryAddUsageDescription</key>
+    	<string>ライブラリに保存するよ(*^^*)</string>
+		<!-- image_gallery_saver  追加だよ -->
 		<key>UIStatusBarHidden</key>
 		<true/>
 	</dict>

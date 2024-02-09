@@ -26,6 +26,8 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
             data.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.create') &&
                 data.payload.containsValue(chatRoomId);
 
+        print('呼ばれた:$isMessageCreateEvent');
+
         /// ユーザー作成イベント
         if (isUserCreateEvent) {
           debugPrint('USER_CREATE!');

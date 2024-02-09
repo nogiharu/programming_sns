@@ -5,9 +5,9 @@ import 'package:riverpod/src/async_notifier.dart';
 
 extension AsyncNotifierBaseEX<T> on AsyncNotifierBase<T> {
   /// state更新の際にエラーだった場合、stateがAysncErrorのままになるため戻す
-  Future<T> futureGuard(Future<T> Function() futureFunction) async {
+  Future<T> futureGuard(Future<T> Function() futureFunction, {bool isLoading = true}) async {
     final prevState = state.copyWithPrevious(state);
-    state = AsyncLoading<T>();
+    if (isLoading) state = AsyncLoading<T>();
 
     state = await AsyncValue.guard<T>(futureFunction);
 

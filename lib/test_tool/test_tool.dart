@@ -2,7 +2,9 @@ import 'package:chatview/chatview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:programming_sns/apis/message_api.dart';
+import 'package:programming_sns/apis/storage_api.dart';
 import 'package:programming_sns/apis/user_api.dart';
+import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
@@ -120,34 +122,10 @@ class TestToolcreen extends ConsumerWidget {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  // await Future.forEach(messageList, (e) async {
-                  //   print(e['\$id']);
-                  //   await ref.read(messageAPIProvider).deleteMessageDocument(e['\$id']);
-                  // });
+                  // await ref.read(userModelProvider.notifier).testError();
                 },
-                child: const Text('メッセージタイプ'),
+                child: const Text('IMAGE'),
               ),
-              AnyLinkPreview(
-                link:
-                    'https://www.youtube.com/watch?v=xjmZ8nRhOF0&list=PLT0aFqMLFiVUTdjjz84MgLJurDB417Vrx&index=6',
-                removeElevation: true,
-                // proxyUrl: linkPreviewConfig?.proxyUrl,
-                // onTap: _onLinkTap,
-                placeholderWidget: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.25,
-                  width: double.infinity,
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 1,
-                      // color: linkPreviewConfig?.loadingColor,
-                    ),
-                  ),
-                ),
-                // backgroundColor: linkPreviewConfig?.backgroundColor ?? Colors.grey.shade200,
-                // borderRadius: linkPreviewConfig?.borderRadius,
-                // bodyStyle: linkPreviewConfig?.bodyStyle ?? const TextStyle(color: Colors.black),
-                // titleStyle: linkPreviewConfig?.titleStyle,
-              )
             ],
           ),
         );
