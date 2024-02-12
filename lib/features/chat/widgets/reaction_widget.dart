@@ -16,14 +16,13 @@ class ReactionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50),
         color: Colors.grey.shade300,
       ),
       padding: const EdgeInsets.all(5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Wrap(
+        alignment: WrapAlignment.center,
         children: reaction.reactions.toSet().map((e) {
           final reactionMap = groupBy(reaction.reactions, (data) => data).map(
             (key, value) => MapEntry(
@@ -50,6 +49,10 @@ class ReactionWidget extends StatelessWidget {
   void _showReactionBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+      ),
+      constraints: const BoxConstraints.expand(width: double.infinity),
       builder: (context) {
         return Container(
           height: 500,

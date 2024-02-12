@@ -4,8 +4,8 @@ import 'package:chatview/chatview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/exceptions/exception_message.dart';
-import 'package:programming_sns/extensions/extensions.dart';
+import 'package:programming_sns/features/chat/models/message_ex.dart';
+import 'package:programming_sns/utils/exception_message.dart';
 
 final messageAPIProvider = Provider(
   (ref) => MessageAPI(
@@ -38,6 +38,17 @@ class MessageAPI {
           databaseId: AppwriteConstants.databaseId,
           collectionId: AppwriteConstants.messagesCollection,
           documentId: ID.unique(),
+          data: message.toMap(),
+        )
+        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+  }
+
+  Future<Document> updateMessageDocument(Message message, {bool isCatch = true}) async {
+    return await _db
+        .updateDocument(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.messagesCollection,
+          documentId: message.id,
           data: message.toMap(),
         )
         .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);

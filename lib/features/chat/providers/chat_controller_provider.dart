@@ -6,9 +6,9 @@ import 'package:appwrite/appwrite.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:programming_sns/apis/message_api.dart';
-import 'package:programming_sns/core/utils.dart';
-import 'package:programming_sns/extensions/extensions.dart';
+import 'package:programming_sns/apis/message_api_provider.dart';
+import 'package:programming_sns/features/chat/models/message_ex.dart';
+import 'package:programming_sns/utils/utils.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 
@@ -36,7 +36,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     );
   }
 
-  void chatUserUpdate(RealtimeMessage event) {
+  void updateChatUser(RealtimeMessage event) {
     final user = UserModel.fromMap(event.payload);
     final chatUser = UserModel.toChatUser(user);
     update((data) {
@@ -45,10 +45,18 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     });
   }
 
-  void chatUserCreate(RealtimeMessage event) {
+  void createChatUser(RealtimeMessage event) {
     final user = UserModel.fromMap(event.payload);
     final chatUser = UserModel.toChatUser(user);
     update((data) => data..chatUsers.add(chatUser));
+  }
+
+  void updateMessage(RealtimeMessage event) {
+    final message = MessageEX.fromMap(event.payload);
+    update((data) {
+      final index = data.initialMessageList.indexWhere((e) => e.id == message.id);
+      return data..initialMessageList[index] = message;
+    });
   }
 
   /// ユーザーリスト取得し、チャットユーザーリストに変換

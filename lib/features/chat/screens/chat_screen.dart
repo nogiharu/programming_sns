@@ -4,24 +4,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/apis/chat_room_api.dart';
-import 'package:programming_sns/apis/storage_api.dart';
-import 'package:programming_sns/common/error_dialog.dart';
+import 'package:programming_sns/apis/chat_room_api_provider.dart';
+import 'package:programming_sns/apis/message_api_provider.dart';
+import 'package:programming_sns/apis/storage_api_provider.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
-import 'package:programming_sns/core/utils.dart';
-import 'package:programming_sns/extensions/extensions.dart';
+import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/utils/utils.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
-import 'package:programming_sns/features/chat/providers/chat_message_event.dart';
+import 'package:programming_sns/features/chat/providers/chat_message_event_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
-import 'package:programming_sns/features/theme/theme_color.dart';
+import 'package:programming_sns/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:programming_sns/routes/router.dart';
 import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:programming_sns/utils/markdown/markdown_builder.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
@@ -88,6 +87,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   /// TODO chat全体背景
                   chatBackgroundConfig: const ChatBackgroundConfiguration(
                     backgroundColor: ThemeColor.weak, // 背景色(chat全体背景)
+                    // height: 500,
+                    // width: 300,
                   ),
 
                   /// (送信フォーム)
@@ -156,8 +157,29 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       onTap: previewImage,
                     ),
                   ),
-                  profileCircleConfig: const ProfileCircleConfiguration(
+                  profileCircleConfig: ProfileCircleConfiguration(
                     profileImageUrl: Data.profileImage,
+                    onAvatarTap: (p0) {
+                      print(p0); // プロフィール画像タップ
+                    },
+                  ),
+                  reactionPopupConfig: ReactionPopupConfiguration(
+                    userReactionCallback: (message, emoji) async {
+                      await ref
+                          .read(messageAPIProvider)
+                          .updateMessageDocument(message)
+                          .catchError(ref.read(showDialogProvider));
+                      print(message);
+                      print(emoji);
+                    },
+                  ),
+                  replyPopupConfig: ReplyPopupConfiguration(
+                    onUnsendTap: (message) async {
+                      print(message);
+                    },
+                    onMoreTap: () async {
+                      print('あああ');
+                    },
                   ),
 
                   repliedMessageConfig: const RepliedMessageConfiguration(

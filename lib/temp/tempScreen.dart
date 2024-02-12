@@ -11,7 +11,7 @@ import 'package:any_link_preview/any_link_preview.dart';
 // import 'package:markdown/markdown.dart' as md;
 // import 'package:programming_sns/utils/markdown/custom_pre_builder.dart';
 import 'package:markdown_widget/markdown_widget.dart';
-import 'package:programming_sns/utils/markdown/code_wrapper.dart';
+// import 'package:programming_sns/utils/markdown/code_wrapper.dart';
 
 class ScreenA extends ConsumerWidget {
   const ScreenA({super.key});

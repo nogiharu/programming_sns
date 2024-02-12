@@ -9,6 +9,7 @@ import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/temp/chat_screen2.dart';
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/user/screens/home_screen.dart';
+import 'package:programming_sns/temp/chat_screen3.dart';
 
 import 'package:programming_sns/temp/tempScreen.dart';
 
@@ -60,11 +61,8 @@ final router = Provider((ref) {
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
                   final map = state.extra as Map<String, dynamic>;
-                  if (map['chatRoomId'] == '65a3515964f0ea2d5df0') {
-                    return ChatScreen2(
-                      label: map['label'],
-                      chatRoomId: map['chatRoomId'],
-                    );
+                  if (map['chatRoomId'] == '65c962068df47e2dddab') {
+                    return const ChatScreen3();
                   }
                   return ChatScreen(
                     label: map['label'],

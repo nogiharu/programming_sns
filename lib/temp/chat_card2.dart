@@ -2,7 +2,7 @@ import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:programming_sns/utils/markdown/custom_pre_builder.dart';
+// import 'package:programming_sns/utils/markdown/custom_pre_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:any_link_preview/any_link_preview.dart';

@@ -1,11 +1,10 @@
 import 'package:chatview/chatview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:programming_sns/apis/message_api.dart';
-import 'package:programming_sns/apis/storage_api.dart';
-import 'package:programming_sns/apis/user_api.dart';
+import 'package:programming_sns/apis/message_api_provider.dart';
+import 'package:programming_sns/apis/storage_api_provider.dart';
+import 'package:programming_sns/apis/user_api_provider.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
-import 'package:programming_sns/extensions/extensions.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';

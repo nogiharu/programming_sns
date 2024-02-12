@@ -1,11 +1,10 @@
 import 'dart:async';
+import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:programming_sns/apis/chat_room_api.dart';
-import 'package:programming_sns/constants/appwrite_constants.dart';
-import 'package:programming_sns/extensions/extensions.dart';
+import 'package:programming_sns/apis/chat_room_api_provider.dart';
+import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
 import 'package:programming_sns/features/chat/models/chat_room.dart';
-import 'package:programming_sns/features/event/realtime_event_provider.dart';
 
 final chatRoomProvider =
     AutoDisposeAsyncNotifierProvider<ChatRoomNotifier, List<ChatRoom>>(ChatRoomNotifier.new);
@@ -20,24 +19,11 @@ class ChatRoomNotifier extends AutoDisposeAsyncNotifier<List<ChatRoom>> {
     return await getChatRoomList();
   }
 
-  void chatRoomEvent() {
-    final stream = ref.watch(realtimeEventProvider);
-    stream.whenOrNull(
-      data: (event) {
-        final isChatRoomCreateEvent =
-            event.events.contains('${AppwriteConstants.chatRoomDocmentsChannels}.*.create');
-        final isChatRoomUpdateEvent =
-            event.events.contains('${AppwriteConstants.chatRoomDocmentsChannels}.*.update');
-
-        // 作成イベント
-        if (isChatRoomCreateEvent) {
-          debugPrint('CHAT_ROOM_CREATE!');
-          update((data) {
-            return data..insert(0, ChatRoom.fromMap(event.payload));
-          });
-        }
-      },
-    );
+  void createChatRoomEvent(RealtimeMessage event) {
+    debugPrint('CHAT_ROOM_CREATE!');
+    update((data) {
+      return data..insert(0, ChatRoom.fromMap(event.payload));
+    });
   }
 
   Future<void> createChatRoom({required String ownerId, required String name}) async {

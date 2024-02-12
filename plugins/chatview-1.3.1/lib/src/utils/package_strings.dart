@@ -30,7 +30,8 @@ class PackageStrings {
   static const String repliedBy = "リプライ";
   // static const String more = "More";　変更
   static const String more = "閉じる";
-  static const String unsend = "Unsend";
+  // static const String unsend = "Unsend"; 変更
+  static const String unsend = "編集";
   // static const String reply = "Reply"; 変更
   static const String reply = "リプライ";
   // static const String replyTo = "Replying to";

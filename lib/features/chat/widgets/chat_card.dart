@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:any_link_preview/any_link_preview.dart';
 // import 'package:programming_sns/utils/markdown/markdown_builder.dart';
 
+import 'package:chatview/src/widgets/reaction_widget.dart' as chatview;
+
 class ChatCard extends StatefulWidget {
   const ChatCard({
     super.key,
@@ -49,77 +51,80 @@ class _ChatCardState extends State<ChatCard> {
       ),
     );
 
-    return
-        // GestureDetector(
-        //   onDoubleTap: () => setState(() => isShowReaction = !isShowReaction),
-        //   child:
-        Wrap(
-      direction: Axis.horizontal,
-      alignment: isSendByCurrentUser ? WrapAlignment.end : WrapAlignment.start,
-      crossAxisAlignment: WrapCrossAlignment.end,
-      children: [
-        if (isSendByCurrentUser)
-          // 時間
-          timeWidget,
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          constraints: BoxConstraints(
-            maxWidth: kIsWeb ? webWidth / 1.5 : 250,
-            minWidth: 55,
-          ),
-          decoration: BoxDecoration(
-            color: isSendByCurrentUser ? Colors.amber.shade300 : Colors.white,
-            borderRadius: const BorderRadius.all(Radius.circular(20)).copyWith(
-              bottomLeft: isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
-              bottomRight: !isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
+    return GestureDetector(
+      onDoubleTap: () => setState(() => isShowReaction = !isShowReaction),
+      child: Wrap(
+        direction: Axis.horizontal,
+        alignment: isSendByCurrentUser ? WrapAlignment.end : WrapAlignment.start,
+        crossAxisAlignment: WrapCrossAlignment.end,
+        children: [
+          if (isSendByCurrentUser)
+            // 時間
+            timeWidget,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            constraints: BoxConstraints(
+              maxWidth: kIsWeb ? webWidth / 1.5 : 250,
+              minWidth: 55,
             ),
-            boxShadow: const [
-              BoxShadow(
-                offset: Offset(1, 5),
-                color: Colors.grey,
-                blurRadius: 5,
+            decoration: BoxDecoration(
+              color: isSendByCurrentUser ? Colors.amber.shade300 : Colors.white,
+              borderRadius: const BorderRadius.all(Radius.circular(20)).copyWith(
+                bottomLeft: isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
+                bottomRight: !isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
               ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Markdown
-              MarkdownBuilder(message: widget.message.message),
+              boxShadow: const [
+                BoxShadow(
+                  offset: Offset(1, 5),
+                  color: Colors.grey,
+                  blurRadius: 5,
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Markdown
+                MarkdownBuilder(message: widget.message.message),
 
-              // リンクプレビュー
-              if (!kIsWeb && urlMatches.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
-                    bottomRight: !isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
-                  ),
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    child: AnyLinkPreview(
-                      link: urlMatches.first!,
-                      borderRadius: 0,
-                      errorWidget: Container(
-                        color: Colors.grey[200],
-                        child: const Center(child: Text('エラーが発生しました(´；ω；`)')),
+                // リンクプレビュー
+                if (!kIsWeb && urlMatches.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
+                      bottomRight: !isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
+                    ),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: AnyLinkPreview(
+                        link: urlMatches.first!,
+                        borderRadius: 0,
+                        errorWidget: Container(
+                          color: Colors.grey[200],
+                          child: const Center(child: Text('エラーが発生しました(´；ω；`)')),
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-        ),
-        if (!isSendByCurrentUser) timeWidget,
-        if (widget.message.reaction.reactions.isNotEmpty && isShowReaction)
-          Align(
-            alignment: isSendByCurrentUser ? Alignment.bottomRight : Alignment.bottomLeft,
-            child: ReactionWidget(
-              reaction: widget.message.reaction,
-              chatController: widget.chatController,
+              ],
             ),
           ),
-      ],
+          if (!isSendByCurrentUser) timeWidget,
+          if (widget.message.reaction.reactions.isNotEmpty && isShowReaction)
+            Align(
+              alignment: isSendByCurrentUser ? Alignment.bottomRight : Alignment.bottomLeft,
+              child: ReactionWidget(
+                reaction: widget.message.reaction,
+                chatController: widget.chatController,
+              ),
+              //     chatview.ReactionWidget(
+              //   isMessageBySender: isSendByCurrentUser,
+              //   reaction: widget.message.reaction,
+              //   // messageReactionConfig: messageReactionConfig,
+              // ),
+            ),
+        ],
+      ),
     );
-    // );
   }
 }

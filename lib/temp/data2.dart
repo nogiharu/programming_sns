@@ -169,7 +169,21 @@ if (true) {
       sendBy: '2',
       messageType: MessageType.custom, // TODO
       reaction: Reaction(
-        reactions: ['\u{2764}', '😃', '\u{2764}', '\u{2764}'],
+        reactions: [
+          '😃',
+          '😫',
+          '😎',
+          '😇',
+          '😍',
+          '😘',
+          '😏',
+          '😊',
+          '😳',
+          '😣',
+          '😔',
+          '🏃',
+          '😋',
+        ],
         reactedUserIds: ['2', '4', '3', '1'],
       ),
     ),

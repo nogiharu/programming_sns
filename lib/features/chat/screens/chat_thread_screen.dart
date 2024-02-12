@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/core/utils.dart';
+import 'package:programming_sns/features/chat/providers/chat_room_event_provider.dart';
+import 'package:programming_sns/utils/utils.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_provider.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
@@ -52,6 +53,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                   chatRoomProvider,
                   isBackgroundColorNone: ref.watch(chatRoomProvider).hasError,
                   complete: (chatRoom) {
+                    ref.watch(chatRoomEventProvider);
                     return ListView.builder(
                       itemCount: chatRoom.length,
                       shrinkWrap: true,
@@ -95,6 +97,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
       ),
+      constraints: const BoxConstraints.expand(width: double.infinity, height: 50),
       builder: (context) {
         return TextFormField(
           // maxLines: 20,

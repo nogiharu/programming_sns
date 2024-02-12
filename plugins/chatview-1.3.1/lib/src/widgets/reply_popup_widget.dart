@@ -60,15 +60,12 @@ class ReplyPopupWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle =
-        buttonTextStyle ?? const TextStyle(fontSize: 14, color: Colors.black);
+    final textStyle = buttonTextStyle ?? const TextStyle(fontSize: 14, color: Colors.black);
     final deviceWidth = MediaQuery.of(context).size.width;
     return Container(
       height: deviceWidth > 500 ? deviceWidth * 0.05 : deviceWidth * 0.13,
       decoration: BoxDecoration(
-        border: Border(
-            top: BorderSide(
-                color: topBorderColor ?? Colors.grey.shade400, width: 1)),
+        border: Border(top: BorderSide(color: topBorderColor ?? Colors.grey.shade400, width: 1)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -88,13 +85,14 @@ class ReplyPopupWidget extends StatelessWidget {
                 style: textStyle,
               ),
             ),
-          InkWell(
-            onTap: onMoreTap,
-            child: Text(
-              PackageStrings.more,
-              style: textStyle,
+          if (sendByCurrentUser) // 追加変更
+            InkWell(
+              onTap: onMoreTap,
+              child: Text(
+                PackageStrings.more,
+                style: textStyle,
+              ),
             ),
-          ),
         ],
       ),
     );

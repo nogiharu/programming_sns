@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/exceptions/exception_message.dart';
+import 'package:programming_sns/utils/exception_message.dart';
 import 'package:image_picker/image_picker.dart';
 
 final storageAPIProvider = Provider((ref) {

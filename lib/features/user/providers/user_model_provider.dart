@@ -2,10 +2,9 @@ import 'dart:async';
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:programming_sns/apis/storage_api.dart';
-import 'package:programming_sns/apis/user_api.dart';
-import 'package:programming_sns/exceptions/exception_message.dart';
-import 'package:programming_sns/extensions/extensions.dart';
+import 'package:programming_sns/apis/user_api_provider.dart';
+import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
+import 'package:programming_sns/utils/exception_message.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 

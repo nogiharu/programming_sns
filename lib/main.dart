@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/theme/theme_color.dart';
+import 'package:programming_sns/theme/theme_color.dart';
 import 'package:programming_sns/routes/router.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
