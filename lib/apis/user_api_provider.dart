@@ -53,7 +53,12 @@ class UserAPI {
         .listDocuments(
           databaseId: AppwriteConstants.databaseId,
           collectionId: AppwriteConstants.usersCollection,
-          queries: chatRoomId == null ? [] : [Query.equal('chatRoomIds', chatRoomId)],
+          queries: chatRoomId == null
+              ? []
+              : [
+                  Query.search('chatRoomIds', chatRoomId),
+                  Query.limit(10000),
+                ],
         )
         .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
   }

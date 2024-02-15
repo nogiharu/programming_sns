@@ -54,24 +54,28 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                   isBackgroundColorNone: ref.watch(chatRoomProvider).hasError,
                   complete: (chatRoom) {
                     ref.watch(chatRoomEventProvider);
+
                     return ListView.builder(
                       itemCount: chatRoom.length,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
                         return GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             // ルームID追加
                             if (!userModel.chatRoomIds!.contains(chatRoom[index].id!)) {
-                              ref.read(userModelProvider.notifier).updateUserModel(
+                              await ref.read(userModelProvider.notifier).updateUserModel(
                                     userModel..chatRoomIds?.add(chatRoom[index].id!),
                                   );
                             }
+
                             // CHAT画面に遷移
-                            context.goNamed(ChatScreen.path, extra: {
-                              'label': chatRoom[index].name,
-                              'chatRoomId': chatRoom[index].id,
-                            });
+                            if (context.mounted) {
+                              context.goNamed(ChatScreen.path, extra: {
+                                'label': chatRoom[index].name,
+                                'chatRoomId': chatRoom[index].id,
+                              });
+                            }
                           },
                           child: Card(
                             child: ListTile(

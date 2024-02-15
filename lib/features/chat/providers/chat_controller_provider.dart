@@ -61,7 +61,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
   /// ユーザーリスト取得し、チャットユーザーリストに変換
   Future<List<ChatUser>> getChatUsers() async {
-    return (await ref.read(userModelProvider.notifier).getUserModelList())
+    return (await ref.read(userModelProvider.notifier).getUserModelList(chatRoomId: arg))
         .map((userModel) => UserModel.toChatUser(userModel))
         .toList();
   }
