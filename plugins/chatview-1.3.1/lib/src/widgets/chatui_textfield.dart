@@ -101,10 +101,11 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
         sendMessageConfig?.textFieldConfig?.compositionThresholdTime ?? const Duration(seconds: 1));
     super.initState();
 
-    if (defaultTargetPlatform == TargetPlatform.iOS ||
-        defaultTargetPlatform == TargetPlatform.android) {
-      controller = RecorderController();
-    }
+    // TODO これがあるとiPhoneエミュレータのsafariがバグる
+    // if (defaultTargetPlatform == TargetPlatform.iOS ||
+    //     defaultTargetPlatform == TargetPlatform.android) {
+    //   controller = RecorderController();
+    // }
   }
 
   @override
@@ -163,7 +164,6 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                   Expanded(
                     // TextField -> TextFormField 追加変更
                     child: TextFormField(
-                      autofocus: true, // 追加変更
                       focusNode: widget.focusNode,
                       controller: widget.textEditingController,
                       style: textFieldConfig?.textStyle ?? const TextStyle(color: Colors.white),

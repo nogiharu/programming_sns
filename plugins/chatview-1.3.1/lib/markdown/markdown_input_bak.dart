@@ -111,13 +111,15 @@ throw new NullPointerException("Hello, World");
   Widget textButtonWidget({required String text, required VoidCallback onPressed, Color? color}) {
     return Container(
       color: color,
-      // padding: kIsWeb ? const EdgeInsets.all(0) : null,
+      padding: kIsWeb ? const EdgeInsets.symmetric(vertical: 5) : null,
       child: TextButton(
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.all(5),
-          minimumSize: const Size(0, 0),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
+        style: kIsWeb
+            ? null
+            : TextButton.styleFrom(
+                padding: const EdgeInsets.all(5),
+                minimumSize: const Size(0, 0),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
         onPressed: onPressed,
         child: Text(
           text,
@@ -129,11 +131,17 @@ throw new NullPointerException("Hello, World");
 
   Widget iconButtonWidget({required IconData iconData, required String markdownText}) {
     return IconButton(
-      padding: const EdgeInsets.only(right: 5),
+      // style: kIsWeb
+      //     ? null
+      //     : IconButton.styleFrom(
+      //         padding: const EdgeInsets.only(right: 5),
+      //         minimumSize: const Size(0, 0),
+      //         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      //       ),
+      padding: EdgeInsets.zero,
       constraints: const BoxConstraints(),
       onPressed: () => widget.textEditingController.text += markdownText,
       icon: Icon(iconData),
-      iconSize: 20,
     );
   }
 }

@@ -54,6 +54,7 @@ class ChatView extends StatefulWidget {
     required this.chatViewState,
     ChatViewStateConfiguration? chatViewStateConfig,
     this.featureActiveConfig = const FeatureActiveConfig(),
+    required this.textEditingController, // 追加変更
   })  : chatBackgroundConfig = chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
         chatViewStateConfig = chatViewStateConfig ?? const ChatViewStateConfiguration(),
         super(key: key);
@@ -134,6 +135,9 @@ class ChatView extends StatefulWidget {
 
   /// Provides callback when user tap on chat list.
   final VoidCallBack? onChatListTap;
+
+  /// 追加変更
+  final TextEditingController textEditingController;
 
   @override
   State<ChatView> createState() => _ChatViewState();
@@ -252,6 +256,7 @@ class _ChatViewState extends State<ChatView> with SingleTickerProviderStateMixin
                       onSendTap: _onSendTap,
                       onReplyCallback: (reply) => replyMessage.value = reply,
                       onReplyCloseCallback: () => replyMessage.value = const ReplyMessage(),
+                      textEditingController: widget.textEditingController, // 追加変更
                     ),
                 ],
               ),

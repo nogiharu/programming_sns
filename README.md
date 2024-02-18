@@ -56,3 +56,17 @@ docker run -it --rm \
  
 cd appwrite/
 docker compose exec appwrite migrate
+
+flutter run -d web-server --web-hostname=0.0.0.0 --web-port=1121
+
+flutter run -d web-server --web-port=1121
+
+
+flutter pub cache repair
+
+# fvm
+fvm releases                             
+
+fvm list    
+
+fvm use 3.16.9 

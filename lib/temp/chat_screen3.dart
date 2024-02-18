@@ -64,6 +64,7 @@ class _ChatScreenState extends State<ChatScreen3> {
           lastSeenAgoBuilderVisibility: true,
           receiptsBuilderVisibility: true,
         ),
+        textEditingController: TextEditingController(),
         chatViewState: ChatViewState.hasMessages,
         chatViewStateConfig: ChatViewStateConfiguration(
           loadingWidgetConfig: ChatViewStateWidgetConfiguration(

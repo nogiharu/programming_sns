@@ -48,6 +48,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (ref.read(textEditingControllerProvider)[widget.chatRoomId] == null) {
+      ref.read(textEditingControllerProvider)[widget.chatRoomId] = TextEditingController();
+    }
     initializeDateFormatting("ja");
 
     return Scaffold(
@@ -90,6 +93,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     // height: 500,
                     // width: 300,
                   ),
+                  // 追加
+                  textEditingController:
+                      ref.read(textEditingControllerProvider)[widget.chatRoomId]!,
 
                   /// (送信フォーム)
                   sendMessageConfig: SendMessageConfiguration(
@@ -288,6 +294,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   /// 画像プレビュー
   Future<void> previewImage(String url) async {
+    print(ref.read(textEditingControllerProvider)[widget.chatRoomId]?.text);
     final uint8List = await ref
         .read(storageAPIProvider)
         .previewImgae(

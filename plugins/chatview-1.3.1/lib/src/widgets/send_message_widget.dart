@@ -41,6 +41,7 @@ class SendMessageWidget extends StatefulWidget {
     this.sendMessageBuilder,
     this.onReplyCallback,
     this.onReplyCloseCallback,
+    required this.textEditingController, // 追加変更
   }) : super(key: key);
 
   /// Provides call back when user tap on send button on text field.
@@ -64,12 +65,15 @@ class SendMessageWidget extends StatefulWidget {
   /// Provides controller for accessing few function for running chat.
   final ChatController chatController;
 
+  /// 追加変更
+  final TextEditingController textEditingController;
+
   @override
   State<SendMessageWidget> createState() => SendMessageWidgetState();
 }
 
 class SendMessageWidgetState extends State<SendMessageWidget> {
-  final _textEditingController = TextEditingController();
+  // final widget.textEditingController = TextEditingController();  追加変更 削除
   final ValueNotifier<ReplyMessage> _replyMessage = ValueNotifier(const ReplyMessage());
 
   ReplyMessage get replyMessage => _replyMessage.value;
@@ -231,7 +235,8 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                               ),
                               ChatUITextField(
                                 focusNode: _focusNode,
-                                textEditingController: _textEditingController,
+                                // 追加変更
+                                textEditingController: widget.textEditingController,
                                 onPressed: _onPressed,
                                 sendMessageConfig: widget.sendMessageConfig,
                                 onRecordingComplete: _onRecordingComplete,
@@ -309,14 +314,16 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   }
 
   void _onPressed() {
-    if (_textEditingController.text.isNotEmpty && !_textEditingController.text.startsWith('\n')) {
+    // 追加変更　_textEditingController　→　widget.textEditingController
+    if (widget.textEditingController.text.isNotEmpty &&
+        !widget.textEditingController.text.startsWith('\n')) {
       widget.onSendTap.call(
-        _textEditingController.text.trim(),
+        widget.textEditingController.text.trim(),
         replyMessage,
         MessageType.text,
       );
       _assignRepliedMessage();
-      _textEditingController.clear();
+      widget.textEditingController.clear();
     }
   }
 
@@ -346,11 +353,12 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
           : View.of(context).viewPadding.bottom > 0
               ? bottomPadding2
               : bottomPadding3)
-      : bottomPadding3;
+      // : bottomPadding3; 以下に追加変更
+      : bottomPadding4;
 
   @override
   void dispose() {
-    _textEditingController.dispose();
+    // _textEditingController.dispose();
     _focusNode.dispose();
     _replyMessage.dispose();
     super.dispose();

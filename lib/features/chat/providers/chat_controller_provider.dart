@@ -16,6 +16,10 @@ final firstChatMessageProvider = FutureProviderFamily<Message, String>((ref, cha
   return ref.read(chatControllerProvider(chatRoomId).notifier).getFirstMessage();
 });
 
+final textEditingControllerProvider = Provider<Map<String, TextEditingController>>((ref) {
+  return {};
+});
+
 final chatControllerProvider =
     AutoDisposeAsyncNotifierProviderFamily<ChatControllerNotifier, ChatController, String>(
         ChatControllerNotifier.new);

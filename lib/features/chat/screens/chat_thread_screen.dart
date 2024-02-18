@@ -61,10 +61,10 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
                         return GestureDetector(
-                          onTap: () async {
-                            // ルームID追加
+                          onTap: () {
+                            // ルームID追加 awaitはしない TODO
                             if (!userModel.chatRoomIds!.contains(chatRoom[index].id!)) {
-                              await ref.read(userModelProvider.notifier).updateUserModel(
+                              ref.read(userModelProvider.notifier).updateUserModel(
                                     userModel..chatRoomIds?.add(chatRoom[index].id!),
                                   );
                             }

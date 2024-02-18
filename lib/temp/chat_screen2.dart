@@ -97,6 +97,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen2> {
                 ),
                 onReloadButtonTap: () {},
               ),
+              textEditingController: TextEditingController(),
               appBar: ChatViewAppBar(
                 elevation: theme.elevation,
                 backGroundColor: theme.appBarColor,
