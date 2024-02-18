@@ -57,11 +57,13 @@ docker run -it --rm \
 cd appwrite/
 docker compose exec appwrite migrate
 
+
+# WebServer
 flutter run -d web-server --web-hostname=0.0.0.0 --web-port=1121
 
 flutter run -d web-server --web-port=1121
 
-
+# cache
 flutter pub cache repair
 
 # fvm
