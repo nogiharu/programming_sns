@@ -63,6 +63,8 @@ flutter run -d web-server --web-hostname=0.0.0.0 --web-port=1121
 
 flutter run -d web-server --web-port=1121
 
+flutter run -d web-server  --web-port=1121 --web-renderer=html
+
 # cache
 flutter pub cache repair
 

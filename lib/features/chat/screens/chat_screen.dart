@@ -75,7 +75,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   chatController: _chatController,
                   onSendTap: onSendTap,
                   featureActiveConfig: const FeatureActiveConfig(
-                    enableSwipeToReply: !kIsWeb, // TODO
+                    // enableSwipeToReply: !kIsWeb, // TODO
                     enableSwipeToSeeTime: false,
                     enablePagination: true, // ページネーション
                   ),

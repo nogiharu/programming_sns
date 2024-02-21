@@ -101,7 +101,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
         sendMessageConfig?.textFieldConfig?.compositionThresholdTime ?? const Duration(seconds: 1));
     super.initState();
 
-    // TODO これがあるとiPhoneエミュレータのsafariがバグる
+    // TODO これがあるとiPhoneエミュレータのsafariがバグる  追加変更　削除
     // if (defaultTargetPlatform == TargetPlatform.iOS ||
     //     defaultTargetPlatform == TargetPlatform.android) {
     //   controller = RecorderController();
@@ -113,7 +113,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     debouncer.dispose();
     composingStatus.dispose();
     isRecording.dispose();
-    _inputText.dispose();
+    // _inputText.dispose(); // 追加変更　削除
     super.dispose();
   }
 

@@ -166,7 +166,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       reverse: true,
       // When reaction popup is being appeared at that user should not scroll.
       physics: showPopUp ? const NeverScrollableScrollPhysics() : null,
-      padding: EdgeInsets.only(bottom: showTypingIndicator ? 50 : 15), // 追加変更
+      padding: EdgeInsets.only(bottom: showTypingIndicator ? 50 : 40), // 追加変更
       // padding: EdgeInsets.only(bottom: showTypingIndicator ? 50 : 0), // 追加変更
       controller: widget.scrollController,
       child: Column(

@@ -20,19 +20,19 @@
  * SOFTWARE.
  */
 class PackageStrings {
-  // static const String today = "Today"; 変更
+  // static const String today = "Today"; 追加変更
   static const String today = "今日";
-  // static const String yesterday = "Yesterday";　変更
+  // static const String yesterday = "Yesterday";　追加変更
   static const String yesterday = "昨日";
-  // static const String repliedToYou = "Replied to you";　変更
+  // static const String repliedToYou = "Replied to you";　追加変更
   static const String repliedToYou = "あなたにリプライ";
-  // static const String repliedBy = "Replied by"; 変更
+  // static const String repliedBy = "Replied by"; 追加変更
   static const String repliedBy = "リプライ";
-  // static const String more = "More";　変更
+  // static const String more = "More";　追加変更
   static const String more = "閉じる";
-  // static const String unsend = "Unsend"; 変更
+  // static const String unsend = "Unsend"; 追加変更
   static const String unsend = "編集";
-  // static const String reply = "Reply"; 変更
+  // static const String reply = "Reply"; 追加変更
   static const String reply = "リプライ";
   // static const String replyTo = "Replying to";
   static const String replyTo = "リプライ";

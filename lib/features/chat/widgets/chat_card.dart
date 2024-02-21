@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/markdown_builder.dart';
 import 'package:flutter/material.dart';
@@ -46,11 +48,23 @@ class _ChatCardState extends State<ChatCard> {
     // 時間
     final timeWidget = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: Text(
-        DateFormat.Hm('ja').format(widget.message.createdAt),
+      child: Column(
+        children: [
+          const Tooltip(
+            message: 'ここを長押しするとリアクションできるよ(*^^*)',
+            triggerMode: TooltipTriggerMode.tap,
+            child: Icon(
+              Icons.help_outline_sharp,
+              size: 15,
+            ),
+          ),
+          Text(
+            DateFormat.Hm('ja').format(widget.message.createdAt),
+          ),
+        ],
       ),
     );
-
+// ここを長押しするとリアクションできるよ(*^^*)
     return GestureDetector(
       onDoubleTap: () => setState(() => isShowReaction = !isShowReaction),
       child: Wrap(

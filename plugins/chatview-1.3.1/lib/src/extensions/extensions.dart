@@ -31,7 +31,7 @@ import '../utils/package_strings.dart';
 extension TimeDifference on DateTime {
   String get getDay {
     final DateTime formattedDate = DateFormat(dateFormat).parse(toString());
-    // final DateFormat formatter = DateFormat.yMMMMd(enUS);  変更
+    // final DateFormat formatter = DateFormat.yMMMMd(enUS);  追加変更
     final DateFormat formatter = DateFormat.yMMMMd('ja');
     final differenceInDays = formattedDate.difference(DateTime.now()).inDays;
     if (differenceInDays == 0) {
@@ -48,7 +48,7 @@ extension TimeDifference on DateTime {
     return formatter.format(this);
   }
 
-  // String get getTimeFromDateTime => DateFormat.Hm().format(this); 変更
+  // String get getTimeFromDateTime => DateFormat.Hm().format(this); 追加変更
   String get getTimeFromDateTime => DateFormat.Hm('ja').format(this);
 }
 

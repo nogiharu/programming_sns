@@ -60,10 +60,10 @@ const double textFieldBorderRadius = 27;
 
 applicationDateFormatter(DateTime inputTime) {
   if (DateTime.now().difference(inputTime).inDays <= 3) {
-    // return timeago.format(inputTime); 変更
+    // return timeago.format(inputTime); 追加変更
     return timeago.format(inputTime, locale: 'ja');
   } else {
-    // return DateFormat('dd MMM yyyy').format(inputTime); 変更
+    // return DateFormat('dd MMM yyyy').format(inputTime); 追加変更
     return DateFormat('dd MMM yyyy').format(inputTime);
   }
 }
@@ -82,7 +82,7 @@ Widget lastSeenAgoBuilder(Message message, String formattedDate) {
   return Padding(
     padding: const EdgeInsets.all(2),
     child: Text(
-      // 'Seen ${applicationDateFormatter(message.createdAt)}    ', 変更
+      // 'Seen ${applicationDateFormatter(message.createdAt)}    ', 追加変更
       '${applicationDateFormatter(message.createdAt)}    ',
       style: const TextStyle(color: Colors.grey, fontSize: 12),
     ),

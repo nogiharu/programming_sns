@@ -111,9 +111,10 @@ throw new NullPointerException("Hello, World");
   Widget textButtonWidget({required String text, required VoidCallback onPressed, Color? color}) {
     return Container(
       color: color,
+      padding: const EdgeInsets.all(5),
       child: TextButton(
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 5),
+          padding: EdgeInsets.zero,
           minimumSize: const Size(0, 0),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
