@@ -34,8 +34,9 @@ class PackageStrings {
   static const String unsend = "編集";
   // static const String reply = "Reply"; 追加変更
   static const String reply = "リプライ";
-  // static const String replyTo = "Replying to";
+  // static const String replyTo = "Replying to"; 追加変更
   static const String replyTo = "リプライ";
+  static const String updateTo = "編集"; // 追加変更
   static const String message = "Message";
   static const String reactionPopupTitle = "Tap and hold to multiply your reaction";
   static const String photo = "Photo";

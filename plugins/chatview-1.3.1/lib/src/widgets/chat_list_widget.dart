@@ -272,6 +272,7 @@ class _ChatListWidgetState extends State<ChatListWidget> with SingleTickerProvid
                       _onChatListTap();
                       if (replyPopup?.onUnsendTap != null) {
                         replyPopup?.onUnsendTap!(message);
+                        widget.assignReplyMessage(message); // 追加変更
                       }
                     },
                     onReplyTap: () {

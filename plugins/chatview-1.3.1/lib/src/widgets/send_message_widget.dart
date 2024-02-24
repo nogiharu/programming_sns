@@ -98,7 +98,10 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final replyTitle = "${PackageStrings.replyTo} $_replyTo";
+    final replyTitle = widget.sendMessageConfig!.isSendReplyUpdateMessage! // 追加変更
+        ? PackageStrings.updateTo
+        : // 追加変更
+        "${PackageStrings.replyTo} $_replyTo";
     return widget.sendMessageBuilder != null
         ? Positioned(
             right: 0,
@@ -345,6 +348,9 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   void _onCloseTap() {
     _replyMessage.value = const ReplyMessage();
     if (widget.onReplyCloseCallback != null) widget.onReplyCloseCallback!();
+    if (widget.sendMessageConfig!.isSendReplyUpdateMessage!) {
+      widget.sendMessageConfig!.closeReplyUpdateMessage!();
+    }
   }
 
   double get _bottomPadding => (!kIsWeb && Platform.isIOS)

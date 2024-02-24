@@ -101,6 +101,7 @@ class _ChatCardState extends State<ChatCard> {
 
                 // リンクプレビュー
                 if (!kIsWeb && urlMatches.isNotEmpty)
+                  // if (urlMatches.isNotEmpty) TODO
                   ClipRRect(
                     borderRadius: BorderRadius.only(
                       bottomLeft: isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
@@ -109,6 +110,11 @@ class _ChatCardState extends State<ChatCard> {
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 10),
                       child: AnyLinkPreview(
+                        // proxyUrl: 'https://cors-anywhere.herokuapp.com/',
+                        // headers: const {
+                        //   'Access-Control-Allow-Origin': '*',
+                        //   'Access-Control-Allow-Credentials': 'true'
+                        // },
                         link: urlMatches.first!,
                         borderRadius: 0,
                         errorWidget: Container(
@@ -129,11 +135,6 @@ class _ChatCardState extends State<ChatCard> {
                 reaction: widget.message.reaction,
                 chatController: widget.chatController,
               ),
-              //     chatview.ReactionWidget(
-              //   isMessageBySender: isSendByCurrentUser,
-              //   reaction: widget.message.reaction,
-              //   // messageReactionConfig: messageReactionConfig,
-              // ),
             ),
         ],
       ),

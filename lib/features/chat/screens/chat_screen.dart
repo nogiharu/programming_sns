@@ -53,6 +53,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Message? updateMessage;
 
   @override
+  void didChangeDependencies() {
+    updateMessage = null;
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     _textEditingController ??= TextEditingController();
 
@@ -129,6 +135,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       ),
                       textCapitalization: TextCapitalization.none, // フォーマットしない
                     ),
+                    // 編集フラグ
+                    isSendReplyUpdateMessage: updateMessage != null,
+                    // 編集閉じる
+                    closeReplyUpdateMessage: () {
+                      updateMessage = null;
+                      _textEditingController!.clear();
+                    },
                   ),
                   // TODO わからん
                   chatBubbleConfig: ChatBubbleConfiguration(
@@ -186,11 +199,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     // リアクションポップアップ編集
                     onUnsendTap: (message) {
                       _textEditingController!.text = message.message;
-                      updateMessage = message;
+                      setState(() {
+                        updateMessage = message;
+                      });
                     },
                     // リアクションポップアップ閉じる
                     onMoreTap: () async {
                       print('閉じる');
+                    },
+                    onReplyTap: (message) {
+                      // print(message.reaction);
                     },
                   ),
 
@@ -269,7 +287,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       _chatController.initialMessageList =
           await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
     }
-
     // メッセージ更新リセット
     updateMessage = null;
   }

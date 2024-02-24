@@ -1,6 +1,6 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/opt/homebrew/Caskroom/flutter/3.16.3/flutter"
+export "FLUTTER_ROOT=/Users/harasakiyuuya/fvm/versions/3.19.1"
 export "FLUTTER_APPLICATION_PATH=/Users/harasakiyuuya/Desktop/flutter_traning/myApp/programming_sns/plugins/chatview-1.3.1/example"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=lib/main.dart"
