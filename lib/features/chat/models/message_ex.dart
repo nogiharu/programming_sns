@@ -19,6 +19,7 @@ extension MessageEX on Message {
     result.addAll({'replyMessage': replyMessage.message});
     result.addAll({'status': status.toString()});
     result.addAll({'chatRoomId': chatRoomId});
+    result.addAll({'updatedAt': updatedAt!.millisecondsSinceEpoch});
     return result;
   }
 
@@ -43,6 +44,35 @@ extension MessageEX on Message {
       ),
       status: (map['status'] as String).messageStatusToEnum(),
       chatRoomId: map['chatRoomId'] ?? '',
+      updatedAt: map['updatedAt'] != null // FIXME
+          ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'])
+          : DateTime.now(),
+    );
+  }
+
+  Message copyWith({
+    String? id,
+    String? message,
+    DateTime? createdAt,
+    String? sendBy,
+    ReplyMessage? replyMessage,
+    Reaction? reaction,
+    MessageType? messageType,
+    Duration? voiceMessageDuration,
+    String? chatRoomId,
+    DateTime? updatedAt,
+  }) {
+    return Message(
+      id: id ?? this.id,
+      message: message ?? this.message,
+      createdAt: createdAt ?? this.createdAt,
+      sendBy: sendBy ?? this.sendBy,
+      replyMessage: replyMessage ?? this.replyMessage,
+      reaction: reaction ?? this.reaction,
+      messageType: messageType ?? this.messageType,
+      voiceMessageDuration: voiceMessageDuration ?? this.voiceMessageDuration,
+      chatRoomId: chatRoomId ?? this.chatRoomId,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }

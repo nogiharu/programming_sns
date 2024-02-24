@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/markdown_builder.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:any_link_preview/any_link_preview.dart';
 // import 'package:programming_sns/utils/markdown/markdown_builder.dart';
 
-import 'package:chatview/src/widgets/reaction_widget.dart' as chatview;
+// import 'package:chatview/src/widgets/reaction_widget.dart' as chatview;
 
 class ChatCard extends StatefulWidget {
   const ChatCard({
@@ -64,7 +62,7 @@ class _ChatCardState extends State<ChatCard> {
         ],
       ),
     );
-// ここを長押しするとリアクションできるよ(*^^*)
+
     return GestureDetector(
       onDoubleTap: () => setState(() => isShowReaction = !isShowReaction),
       child: Wrap(

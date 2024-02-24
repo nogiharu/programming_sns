@@ -138,7 +138,7 @@ throw new NullPointerException("Hello, World");
       constraints: const BoxConstraints(), // webしか効かない
       onPressed: () => widget.textEditingController.text += markdownText,
       icon: Icon(iconData),
-      iconSize: kIsWeb ? null : 20,
+      iconSize: 20,
     );
   }
 }

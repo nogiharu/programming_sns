@@ -9,6 +9,7 @@ import 'package:programming_sns/apis/message_api_provider.dart';
 import 'package:programming_sns/apis/storage_api_provider.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/utils/utils.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event_provider.dart';
@@ -46,11 +47,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   late ChatUser _currentChatUser;
 
+  late TextEditingController? _textEditingController =
+      ref.read(textEditingControllerProvider)[widget.chatRoomId];
+
+  Message? updateMessage;
+
   @override
   Widget build(BuildContext context) {
-    if (ref.read(textEditingControllerProvider)[widget.chatRoomId] == null) {
-      ref.read(textEditingControllerProvider)[widget.chatRoomId] = TextEditingController();
-    }
+    _textEditingController ??= TextEditingController();
+
     initializeDateFormatting("ja");
 
     return Scaffold(
@@ -94,8 +99,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     // width: 300,
                   ),
                   // 追加
-                  textEditingController:
-                      ref.read(textEditingControllerProvider)[widget.chatRoomId]!,
+                  textEditingController: _textEditingController!,
 
                   /// (送信フォーム)
                   sendMessageConfig: SendMessageConfiguration(
@@ -170,21 +174,23 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     },
                   ),
                   reactionPopupConfig: ReactionPopupConfiguration(
+                    // 絵文字リアクション
                     userReactionCallback: (message, emoji) async {
                       await ref
                           .read(messageAPIProvider)
                           .updateMessageDocument(message)
                           .catchError(ref.read(showDialogProvider));
-                      print(message);
-                      print(emoji);
                     },
                   ),
                   replyPopupConfig: ReplyPopupConfiguration(
-                    onUnsendTap: (message) async {
-                      print(message);
+                    // リアクションポップアップ編集
+                    onUnsendTap: (message) {
+                      _textEditingController!.text = message.message;
+                      updateMessage = message;
                     },
+                    // リアクションポップアップ閉じる
                     onMoreTap: () async {
-                      print('あああ');
+                      print('閉じる');
                     },
                   ),
 
@@ -221,33 +227,51 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ));
   }
 
-  /// 送信
+  /// 送信 or 更新
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
     if (message.trim().isEmpty) return;
-    final msg = Message(
-      createdAt: DateTime.now(),
-      message: message,
-      sendBy: _currentChatUser.id,
-      replyMessage: replyMessage,
-      messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
-      chatRoomId: widget.chatRoomId,
-    );
 
-    // メッセージ送信
-    await ref.read(chatControllerProvider(widget.chatRoomId).notifier).createMessage(msg);
+    if (updateMessage == null) {
+      // メッセージ送信
+      final msg = Message(
+        createdAt: DateTime.now(),
+        message: message,
+        sendBy: _currentChatUser.id,
+        replyMessage: replyMessage,
+        messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
+        chatRoomId: widget.chatRoomId,
+        updatedAt: DateTime.now(),
+      );
+      // メッセージ送信
+      await ref.read(chatControllerProvider(widget.chatRoomId).notifier).createMessage(msg);
 
-    // チャットルーム取得
-    final chatRoom = ref.read(chatRoomProvider.notifier).getChatRoom(widget.chatRoomId);
-    // チャットルームの日付更新
-    ref
-        .read(chatRoomAPIProvider)
-        .updateChatRoomDocument(chatRoom.copyWith(updatedAt: DateTime.now()));
+      // このチャットルーム取得
+      final chatRoom = ref.read(chatRoomProvider.notifier).getChatRoom(widget.chatRoomId);
+      // チャットルームの日付更新　awaitはしない
+      ref
+          .read(chatRoomAPIProvider)
+          .updateChatRoomDocument(chatRoom.copyWith(updatedAt: DateTime.now()));
+    } else {
+      // メッセージ更新 前回のメッセージ違うなら更新
+      if (updateMessage?.message != message) {
+        await ref
+            .read(messageAPIProvider)
+            .updateMessageDocument(updateMessage!.copyWith(
+              message: message,
+              updatedAt: DateTime.now(),
+            ))
+            .catchError(ref.read(showDialogProvider));
+      }
+    }
 
     // スクロールが100件超えていたら25件にリセット
     if (_chatController.initialMessageList.length > 100) {
       _chatController.initialMessageList =
           await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
     }
+
+    // メッセージ更新リセット
+    updateMessage = null;
   }
 
   /// ページング
@@ -294,7 +318,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   /// 画像プレビュー
   Future<void> previewImage(String url) async {
-    print(ref.read(textEditingControllerProvider)[widget.chatRoomId]?.text);
     final uint8List = await ref
         .read(storageAPIProvider)
         .previewImgae(
