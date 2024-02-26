@@ -14,31 +14,24 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
         final chatController = ref.watch(chatControllerProvider(chatRoomId)).value;
         if (chatController == null) return;
 
-        final isUserCreateEvent =
-            data.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.create') &&
-                data.payload.containsValue(chatRoomId);
-
+        /// ユーザー更新イベント
         final isUserUpdateEvent =
             data.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.update') &&
-                data.payload.containsValue(chatRoomId);
+                (data.payload['chatRoomIds'] as List<dynamic>).contains(chatRoomId);
 
+        /// メッセージ作成イベント
         final isMessageCreateEvent =
             data.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.create') &&
                 data.payload.containsValue(chatRoomId);
 
+        /// メッセージ更新イベント
         final isMessageUpdateEvent =
             data.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.update') &&
                 data.payload.containsValue(chatRoomId);
 
-        /// ユーザー作成イベント
-        if (isUserCreateEvent) {
-          debugPrint('USER_CREATE!');
-          ref.read(chatControllerProvider(chatRoomId).notifier).createChatUser(data);
-        }
-
         /// ユーザー更新イベント
         if (isUserUpdateEvent) {
-          debugPrint('USER_UPDATE!');
+          debugPrint('CHAT_USER_UPDATE!');
           ref.read(chatControllerProvider(chatRoomId).notifier).updateChatUser(data);
         }
 

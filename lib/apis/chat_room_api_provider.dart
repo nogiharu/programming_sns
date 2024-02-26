@@ -43,7 +43,10 @@ class ChatRoomAPI {
     return await _db.listDocuments(
       databaseId: AppwriteConstants.databaseId,
       collectionId: AppwriteConstants.chatRoomCollection,
-      queries: [Query.orderDesc('updatedAt')],
+      queries: [
+        Query.orderDesc('updatedAt'),
+        Query.limit(10000), // FIXME
+      ],
     ).catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
   }
 

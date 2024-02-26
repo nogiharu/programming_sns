@@ -29,16 +29,24 @@ class TestToolcreen extends ConsumerWidget {
               TextButton(
                 onPressed: () async {
                   String name;
-                  if (data.name == '田島') {
+                  if (data.name == 'ポッポ') {
                     name = '山田';
                   } else if (data.name == '山田') {
                     name = 'チコリータ';
-                  } else {
+                  } else if (data.name == 'チコリータ') {
                     name = '田島';
+                  } else if (data.name == '田島') {
+                    name = '佐々木';
+                  } else if (data.name == '佐々木') {
+                    name = 'ユウジ';
+                  } else if (data.name == 'ユウジ') {
+                    name = 'オリジン弁当';
+                  } else {
+                    name = 'ポッポ';
                   }
 
                   data = data.copyWith(name: name);
-                  print(data);
+
                   final aa = await ref.read(userModelProvider.notifier).updateUserModel(data);
                   // final aaa = await ref.read(userModelProvider.notifier).getUserModelList();
                   // print(aaa);

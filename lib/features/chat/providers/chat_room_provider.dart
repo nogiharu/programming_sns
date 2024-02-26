@@ -19,10 +19,19 @@ class ChatRoomNotifier extends AutoDisposeAsyncNotifier<List<ChatRoom>> {
     return await getChatRoomList();
   }
 
+  /// 作成イベント
   void createChatRoomEvent(RealtimeMessage event) {
-    debugPrint('CHAT_ROOM_CREATE!');
+    update((data) => data..insert(0, ChatRoom.fromMap(event.payload)));
+  }
+
+  /// 更新されたら一番上にソート
+  void updateChatRoomEvent(RealtimeMessage event) {
     update((data) {
-      return data..insert(0, ChatRoom.fromMap(event.payload));
+      final chatRoom = ChatRoom.fromMap(event.payload);
+      final index = data.indexWhere((e) => e.id == chatRoom.id);
+      return data
+        ..removeAt(index)
+        ..insert(0, chatRoom);
     });
   }
 
@@ -33,7 +42,6 @@ class ChatRoomNotifier extends AutoDisposeAsyncNotifier<List<ChatRoom>> {
         return await _chatRoomAPI
             .createChatRoomDocument(ChatRoom.instance(ownerId: ownerId, name: name))
             .then((doc) => state.value!);
-        // .catchError((e) => exceptionMessage(error: e));
       },
     );
   }
@@ -44,7 +52,6 @@ class ChatRoomNotifier extends AutoDisposeAsyncNotifier<List<ChatRoom>> {
         return await _chatRoomAPI
             .getChatRoomDocumentList()
             .then((docs) => docs.documents.map((doc) => ChatRoom.fromMap(doc.data)).toList());
-        // .catchError((e) => exceptionMessage(error: e));
       },
     );
 

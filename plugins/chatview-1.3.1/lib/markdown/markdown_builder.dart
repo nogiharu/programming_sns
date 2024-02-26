@@ -42,7 +42,9 @@ class MarkdownBuilder extends StatelessWidget {
             wrapper: (child, code, language) => CodeWrapperWidget(child, code, language),
           );
 
-    final pConfig = PConfig(textStyle: TextStyle(color: pTextColor, fontSize: kIsWeb ? 16 : null));
+    double? mobileFontSize; // FIXME共通化したい
+    if (kIsWeb) mobileFontSize = MediaQuery.of(context).size.width < 400 ? 13 : 16;
+    final pConfig = PConfig(textStyle: TextStyle(color: pTextColor, fontSize: mobileFontSize));
 
     return MarkdownBlock(
       data: replacedMessage,

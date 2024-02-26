@@ -43,21 +43,25 @@ class _ChatCardState extends State<ChatCard> {
 
     final isSendByCurrentUser = widget.message.sendBy == widget.currentUser.id;
 
+    double? mobileFontSize; // FIXME共通化したい
+    if (kIsWeb) mobileFontSize = MediaQuery.of(context).size.width < 400 ? 10 : 16;
+
     // 時間
     final timeWidget = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: Column(
         children: [
-          const Tooltip(
+          Tooltip(
             message: 'ここを長押しするとリアクションできるよ(*^^*)',
             triggerMode: TooltipTriggerMode.tap,
             child: Icon(
               Icons.help_outline_sharp,
-              size: 15,
+              size: mobileFontSize,
             ),
           ),
           Text(
             DateFormat.Hm('ja').format(widget.message.createdAt),
+            style: TextStyle(fontSize: mobileFontSize),
           ),
         ],
       ),
@@ -101,7 +105,7 @@ class _ChatCardState extends State<ChatCard> {
 
                 // リンクプレビュー
                 if (!kIsWeb && urlMatches.isNotEmpty)
-                  // if (urlMatches.isNotEmpty) TODO
+                  // if (urlMatches.isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.only(
                       bottomLeft: isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
@@ -110,12 +114,11 @@ class _ChatCardState extends State<ChatCard> {
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 10),
                       child: AnyLinkPreview(
+                        link: urlMatches.first!,
                         // proxyUrl: 'https://cors-anywhere.herokuapp.com/',
                         // headers: const {
-                        //   'Access-Control-Allow-Origin': '*',
-                        //   'Access-Control-Allow-Credentials': 'true'
+                        //   'Access-Control-Allow-Origin': 'https://example.net',
                         // },
-                        link: urlMatches.first!,
                         borderRadius: 0,
                         errorWidget: Container(
                           color: Colors.grey[200],

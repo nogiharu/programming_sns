@@ -14,15 +14,15 @@ final chatRoomEventProvider = AutoDisposeProvider<void>((ref) {
         final isChatRoomUpdateEvent =
             data.events.contains('${AppwriteConstants.chatRoomDocmentsChannels}.*.update');
 
-        /// ユーザー更新イベント
-        // if (isChatRoomUpdateEvent) {
-        //   debugPrint('USER_UPDATE!');
-        //   ref.read(chatControllerProvider(chatRoomId).notifier).chatUserUpdate(data);
-        // }
+        /// チャットルーム作成イベント
+        if (isChatRoomUpdateEvent) {
+          debugPrint('CHAT_ROOM_UPDATE!');
+          ref.read(chatRoomProvider.notifier).updateChatRoomEvent(data);
+        }
 
         /// チャットルーム作成イベント
         if (isChatRoomCreateEvent) {
-          debugPrint('MESSAGE_CREATE!');
+          debugPrint('CHAT_ROOM_CREATE!');
           ref.read(chatRoomProvider.notifier).createChatRoomEvent(data);
         }
       },

@@ -24,12 +24,6 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   final textController = TextEditingController();
 
   @override
-  void dispose() {
-    super.dispose();
-    // textController.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -53,6 +47,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                   chatRoomProvider,
                   isBackgroundColorNone: ref.watch(chatRoomProvider).hasError,
                   complete: (chatRoom) {
+                    // チャットルームイベント
                     ref.watch(chatRoomEventProvider);
 
                     return ListView.builder(
@@ -64,18 +59,24 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                           onTap: () {
                             // ルームID追加 awaitはしない TODO
                             if (!userModel.chatRoomIds!.contains(chatRoom[index].id!)) {
-                              ref.read(userModelProvider.notifier).updateUserModel(
-                                    userModel..chatRoomIds?.add(chatRoom[index].id!),
-                                  );
+                              final updateUserModel = userModel.copyWith(
+                                updatedAt: DateTime.now(),
+                              )..chatRoomIds?.add(chatRoom[index].id!);
+                              // API
+                              ref.read(userModelProvider.notifier).updateUserModel(updateUserModel);
                             }
 
                             // CHAT画面に遷移
-                            if (context.mounted) {
-                              context.goNamed(ChatScreen.path, extra: {
-                                'label': chatRoom[index].name,
-                                'chatRoomId': chatRoom[index].id,
-                              });
-                            }
+                            context.goNamed(ChatScreen.path, extra: {
+                              'label': chatRoom[index].name,
+                              'chatRoomId': chatRoom[index].id,
+                            });
+                            // if (context.mounted) {
+                            //   context.goNamed(ChatScreen.path, extra: {
+                            //     'label': chatRoom[index].name,
+                            //     'chatRoomId': chatRoom[index].id,
+                            //   });
+                            // }
                           },
                           child: Card(
                             child: ListTile(

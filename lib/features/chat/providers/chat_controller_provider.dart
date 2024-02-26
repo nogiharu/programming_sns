@@ -45,14 +45,15 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     final chatUser = UserModel.toChatUser(user);
     update((data) {
       final index = data.chatUsers.indexWhere((e) => e.id == chatUser.id);
-      return data..chatUsers[index] = chatUser;
+      // ユーザがいない場合は追加
+      if (index == -1) {
+        data.chatUsers.add(chatUser);
+      } else {
+        // 更新
+        data.chatUsers[index] = chatUser;
+      }
+      return data;
     });
-  }
-
-  void createChatUser(RealtimeMessage event) {
-    final user = UserModel.fromMap(event.payload);
-    final chatUser = UserModel.toChatUser(user);
-    update((data) => data..chatUsers.add(chatUser));
   }
 
   void updateMessage(RealtimeMessage event) {

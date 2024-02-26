@@ -65,6 +65,8 @@ flutter run -d web-server --web-port=1121
 
 flutter run -d web-server  --web-port=1121 --web-renderer=html
 
+flutter run -d web-server  --web-port=1121 --web-renderer=html --web-browser-flag --disable-web-security
+
 # cache
 flutter pub cache repair
 
