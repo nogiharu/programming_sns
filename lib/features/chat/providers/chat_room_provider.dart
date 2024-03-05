@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:appwrite/appwrite.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/chat_room_api_provider.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';

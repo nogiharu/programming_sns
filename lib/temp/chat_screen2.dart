@@ -9,8 +9,8 @@ import 'package:programming_sns/features/chat/providers/chat_room_provider.dart'
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/temp/chat_card2.dart';
 
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
-import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
+import 'package:programming_sns/features/profile/models/user_model.dart';
 import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';

@@ -189,14 +189,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
-  flutter_parsed_text:
+  flutter_mentions:
     dependency: transitive
     description:
-      name: flutter_parsed_text
-      sha256: "529cf5793b7acdf16ee0f97b158d0d4ba0bf06e7121ef180abe1a5b59e32c1e2"
+      name: flutter_mentions
+      sha256: "86206b70e14a96c195130202f258c5764ef16f406c72613dfadbaea6bc4717d2"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.1"
+    version: "2.0.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -205,6 +205,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.17"
+  flutter_portal:
+    dependency: transitive
+    description:
+      name: flutter_portal
+      sha256: "0e3f9428dbe9f5253b0e65cdc5ce4fa65a1d8cd6ec2a3f3770b46785aa3c57fd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter

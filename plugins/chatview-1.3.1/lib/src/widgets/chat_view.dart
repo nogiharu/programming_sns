@@ -162,10 +162,10 @@ class _ChatViewState extends State<ChatView> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    // setLocaleMessages('en', ReceiptsCustomMessages()); 変更
+    // setLocaleMessages('en', ReceiptsCustomMessages()); 追加変更
     setLocaleMessages('ja', JaMessages());
     // Adds current user in users list.
-    chatController.chatUsers.add(widget.currentUser);
+    // chatController.chatUsers.add(widget.currentUser);　追加変更　削除
   }
 
   @override
@@ -181,6 +181,7 @@ class _ChatViewState extends State<ChatView> with SingleTickerProviderStateMixin
       chatController: chatController,
       featureActiveConfig: featureActiveConfig,
       currentUser: widget.currentUser,
+      textEditingController: widget.textEditingController, // 追加変更
       child: Container(
         height: chatBackgroundConfig.height ?? MediaQuery.of(context).size.height,
         width: chatBackgroundConfig.width ?? MediaQuery.of(context).size.width,
@@ -256,7 +257,6 @@ class _ChatViewState extends State<ChatView> with SingleTickerProviderStateMixin
                       onSendTap: _onSendTap,
                       onReplyCallback: (reply) => replyMessage.value = reply,
                       onReplyCloseCallback: () => replyMessage.value = const ReplyMessage(),
-                      textEditingController: widget.textEditingController, // 追加変更
                     ),
                 ],
               ),

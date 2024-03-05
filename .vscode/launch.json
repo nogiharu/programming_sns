@@ -10,9 +10,9 @@
             "type": "dart",
             "args": [
                 "--web-port",
-                "1121",
-                "--web-renderer",
-                "html",
+                "1122",
+                // "--web-renderer",
+                // "html",
                 // "web-server",
                 // "--web-browser-flag",
                 // "--disable-web-security"

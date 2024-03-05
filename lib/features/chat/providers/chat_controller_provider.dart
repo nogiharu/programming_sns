@@ -8,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api_provider.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
-import 'package:programming_sns/utils/utils.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
-import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/core/utils.dart';
+import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
+import 'package:programming_sns/features/profile/models/user_model.dart';
 
 final firstChatMessageProvider = FutureProviderFamily<Message, String>((ref, chatRoomId) async {
   return ref.read(chatControllerProvider(chatRoomId).notifier).getFirstMessage();

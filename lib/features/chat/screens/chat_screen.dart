@@ -10,14 +10,14 @@ import 'package:programming_sns/apis/storage_api_provider.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
-import 'package:programming_sns/utils/utils.dart';
+import 'package:programming_sns/core/utils.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/theme/theme_color.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
-import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
+import 'package:programming_sns/features/profile/models/user_model.dart';
 import 'package:programming_sns/routes/router.dart';
 import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
@@ -47,23 +47,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   late ChatUser _currentChatUser;
 
-  late TextEditingController? _textEditingController =
+  late final TextEditingController? _textEditingController =
       ref.read(textEditingControllerProvider)[widget.chatRoomId];
 
   Message? updateMessage;
 
   @override
-  void didChangeDependencies() {
-    updateMessage = null;
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
+    initializeDateFormatting("ja");
+    ref.read(textEditingControllerProvider)[widget.chatRoomId] ??= TextEditingController();
   }
 
   @override
   Widget build(BuildContext context) {
-    _textEditingController ??= TextEditingController();
-
-    initializeDateFormatting("ja");
-
     return Scaffold(
         appBar: AppBar(title: Text(widget.label)),
 
@@ -248,6 +245,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   /// 送信 or 更新
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
     if (message.trim().isEmpty) return;
+    // _chatController.mentionChatUsers!.forEach((element) {
+    //   print(element.name);
+    // });
 
     if (updateMessage == null) {
       // メッセージ送信

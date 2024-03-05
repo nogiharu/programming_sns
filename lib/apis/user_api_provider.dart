@@ -3,8 +3,8 @@ import 'package:appwrite/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/utils/exception_message.dart';
-import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/features/profile/models/user_model.dart';
+import 'package:programming_sns/core/utils.dart';
 
 final userAPIProvider = Provider(
   (ref) => UserAPI(

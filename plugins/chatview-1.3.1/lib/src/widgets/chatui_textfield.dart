@@ -164,6 +164,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                   Expanded(
                     // TextField -> TextFormField 追加変更
                     child: TextFormField(
+                      scrollPhysics: const AlwaysScrollableScrollPhysics(), // 追加変更
                       focusNode: widget.focusNode,
                       controller: widget.textEditingController,
                       style: textFieldConfig?.textStyle ?? const TextStyle(color: Colors.white),

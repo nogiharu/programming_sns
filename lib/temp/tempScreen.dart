@@ -4,49 +4,70 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:markdown_widget/config/configs.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
 import 'package:any_link_preview/any_link_preview.dart';
 // import 'package:markdown/markdown.dart' as md;
 // import 'package:programming_sns/utils/markdown/custom_pre_builder.dart';
 import 'package:markdown_widget/markdown_widget.dart';
-// import 'package:programming_sns/utils/markdown/code_wrapper.dart';
 
-class ScreenA extends ConsumerWidget {
-  const ScreenA({super.key});
-  // static const String path = '/a';
-  static const Map<String, dynamic> metaData = {
-    'path': '/a',
-    'label': 'スクリーンA',
-    'icon': Icon(Icons.person),
-    'index': 0,
-  };
+// import 'package:programming_sns/utils/markdown/code_wrapper.dart';
+// AtMarkPGenerator
+class AtMentionParagraphNode extends ElementNode {
+  final String text;
+
+  AtMentionParagraphNode({required this.text});
+
+  /// @で始まり(直後が@で始まっていない)空白以外の文字が1回以上続き[スペースまたは改行の一文字]で終わる
+  /// (?!@)はキャプチャグループだが、否定先読み（つまり除外）なので、match.group(0)で全体をとる
+  // RegExp regex = RegExp(r'@(?!@)\S+[\s\n]');
+  // RegExp regex = RegExp(r'@(?!@)[^\s@]+[\s\n]|[\s\n]$');
+  // RegExp regex = RegExp(r'@(?!@)[^\s@]+(?=[\s\n]|$)|[\s\n]$');
+  /// (行の先頭|)　@で始まり(直後が@で始まっていない)空白以外の文字が1回以上続き[スペースまたは改行の一文字]で終わる
+  RegExp regex = RegExp(r'(^|\s)@(?!@)[^\s@]+(?=[\s\n]|$)');
+
+  List<String> splitText(String input) {
+    List<String> result = [];
+    int currentIndex = 0;
+
+    // 正規表現に一致する部分を順番に処理
+    regex.allMatches(input).forEach((RegExpMatch match) {
+      // マッチの開始位置が現在のインデックスより後ろにあれば、その手前の非マッチ部分をリストに追加
+      final isNoneMatch = currentIndex < match.start;
+      if (isNoneMatch) result.add(input.substring(currentIndex, match.start));
+
+      // マッチした部分をリストに追加
+      result.add(match.group(0)!);
+
+      // 現在のインデックスを更新
+      currentIndex = match.end;
+    });
+
+    // 最後の正規表現のマッチ以降の部分をリストに追加
+    final isLastNoneMatch = currentIndex < input.length;
+    if (isLastNoneMatch) result.add(input.substring(currentIndex));
+
+    return result;
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('text'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text('Screen A'),
-            TextButton(
-              onPressed: () {
-                // context.go('/a/details');
-                context.go('${ScreenA.metaData['path']}/${DetailsScreen.path}');
-                // context.go('${ScreenA.id}/${DetailsScreen.id}');
-                // GoRouter.of(context).go('/a/details');
-              },
-              child: const Text('View B details'),
+  void accept(SpanNode? node) {
+    if (node is TextNode) {
+      final textList = splitText(node.text);
+      print(node.text);
+      print(textList);
+
+      textList.forEach((text) => super.accept(
+            TextNode(
+              text: text,
+              style: TextStyle(color: text.startsWith(regex) ? Colors.blue : null),
             ),
-          ],
-        ),
-      ),
-    );
+          ));
+    } else {
+      super.accept(node);
+    }
   }
 }
 
@@ -138,7 +159,13 @@ class ChatRoomScreen extends ConsumerWidget {
 
 
 ''';
-
+    final controller = TextEditingController();
+    const sports = <String>[
+      'football',
+      'baseball',
+      'tennis',
+      'swimming',
+    ];
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -147,6 +174,33 @@ class ChatRoomScreen extends ConsumerWidget {
         body: SingleChildScrollView(
           child: Column(
             children: [
+              Autocomplete<String>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text == '') {
+                    return const Iterable<String>.empty();
+                  }
+                  return sports.where((String option) {
+                    return option.contains(textEditingValue.text.toLowerCase());
+                  });
+                },
+                onSelected: (String value) {
+                  // Called when an option is selected
+                  print('$valueを選択しました！');
+                  setState(() {
+                    controller.text = value; // Update the text field with the selected value
+                  });
+                },
+              ),
+              const MarkdownBlock(
+                data: '''
+ a@alaa @aaああ sss
+ aaa sss@ @s @pp　@ssss@s @ssss@@aaa @@a　@p @ooo@
+''',
+              ),
+              const SizedBox(
+                height: 10,
+                width: 90,
+              ),
               const MarkdownBlock(
                   data:
                       'aaa https://www.youtube.com/watch?v=DDajl7kgiNY&list=PLT0aFqMLFiVUTdjjz84MgLJurDB417Vrx&index=25 aa'),

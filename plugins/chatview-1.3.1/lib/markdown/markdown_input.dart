@@ -1,4 +1,6 @@
+import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/markdown_builder.dart';
+import 'package:chatview/src/widgets/chat_view_inherited_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -22,6 +24,8 @@ class MarkdownInput extends StatefulWidget {
 class _MarkdownInputState extends State<MarkdownInput> {
   bool isInput = true;
 
+  late List<ChatUser> chatUsers;
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +40,14 @@ class _MarkdownInputState extends State<MarkdownInput> {
 
   @override
   Widget build(BuildContext context) {
+    // コンストラクタのリレーになるため　TODO どうすればいいか
+    final chatController = ChatViewInheritedWidget.of(context)?.chatController;
+    final currentUser = ChatViewInheritedWidget.of(context)?.currentUser;
+
+    chatUsers =
+        chatController?.chatUsers.where((chatUser) => chatUser.id != currentUser?.id).toList() ??
+            [];
+
     return Wrap(
       children: [
         Container(
@@ -76,6 +88,12 @@ class _MarkdownInputState extends State<MarkdownInput> {
                 // アイコン一覧
                 Row(
                   children: [
+                    // FlutterMentions()
+                    iconButtonWidget(
+                      iconData: Icons.alternate_email_sharp,
+                      markdownText: '@',
+                      onPressed: mentionDropdownButton,
+                    ),
                     iconButtonWidget(iconData: Icons.code, markdownText: '`java`'),
                     iconButtonWidget(
                       iconData: Icons.source,
@@ -102,7 +120,13 @@ throw new NullPointerException("Hello, World");
         else
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5).copyWith(right: 10, left: 10),
-            child: MarkdownBuilder(message: widget.textEditingController.text),
+            child: MarkdownBuilder(
+              message: widget.textEditingController.text,
+              mentionNameList: List.generate(
+                chatUsers.length,
+                (index) => chatUsers[index].name,
+              ),
+            ),
           ),
       ],
     );
@@ -127,7 +151,8 @@ throw new NullPointerException("Hello, World");
     );
   }
 
-  Widget iconButtonWidget({required IconData iconData, required String markdownText}) {
+  Widget iconButtonWidget(
+      {required IconData iconData, required String markdownText, VoidCallback? onPressed}) {
     return IconButton(
       // mobileしか効かない
       style: IconButton.styleFrom(
@@ -136,9 +161,39 @@ throw new NullPointerException("Hello, World");
       ),
       padding: const EdgeInsets.only(right: 5), // webしか効かない
       constraints: const BoxConstraints(), // webしか効かない
-      onPressed: () => widget.textEditingController.text += markdownText,
+      onPressed: onPressed ?? () => widget.textEditingController.text += markdownText,
       icon: Icon(iconData),
       iconSize: 20,
     );
+  }
+
+  Future<void> mentionDropdownButton() async {
+    if (chatUsers.isEmpty) return;
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    // TODO 全員できるようにしたい
+    // final menntionNameList = chatUsers.map((e) => e.name).toList()..insert(0, '全員');
+
+    final selectedChatUser = await showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        overlay.size.width, // left,
+        overlay.size.height, // top,
+        0, // right,
+        0, // bottom
+      ),
+      items: List.generate(
+        chatUsers.length,
+        (index) => PopupMenuItem(
+          value: chatUsers[index],
+          child: Text(chatUsers[index].name),
+        ),
+      ),
+    );
+
+    if (selectedChatUser != null) {
+      final text = widget.textEditingController.text;
+      widget.textEditingController.text += '${text.isEmpty ? '' : ' '}@${selectedChatUser.name} \n';
+    }
   }
 }

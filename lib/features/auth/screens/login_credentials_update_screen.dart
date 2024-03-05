@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/utils/utils.dart';
+import 'package:programming_sns/core/utils.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/auth/widgets/auth_field.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
 
 class LoginCredentialsUpdateScreen extends ConsumerStatefulWidget {
   final String label;

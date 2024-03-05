@@ -31,7 +31,6 @@ dependencies:
   audio_waveforms: ^1.0.1
   # For formatting time locale in message receipts
   timeago: ^3.4.0
-  flutter_parsed_text: ^2.2.1 # 追加
   markdown_widget: ^2.3.2+3 # 追加
 
 dev_dependencies:

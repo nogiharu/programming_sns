@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_event_provider.dart';
-import 'package:programming_sns/utils/utils.dart';
+import 'package:programming_sns/core/utils.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_provider.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
 
 class ChatThreadScreen extends ConsumerStatefulWidget {
   const ChatThreadScreen({super.key});

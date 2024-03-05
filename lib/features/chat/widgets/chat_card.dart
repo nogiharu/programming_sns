@@ -44,7 +44,7 @@ class _ChatCardState extends State<ChatCard> {
     final isSendByCurrentUser = widget.message.sendBy == widget.currentUser.id;
 
     double? mobileFontSize; // FIXME共通化したい
-    if (kIsWeb) mobileFontSize = MediaQuery.of(context).size.width < 400 ? 10 : 16;
+    if (kIsWeb) mobileFontSize = MediaQuery.of(context).size.width < 400 ? 10 : 13;
 
     // 時間
     final timeWidget = Padding(
@@ -101,7 +101,13 @@ class _ChatCardState extends State<ChatCard> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Markdown
-                MarkdownBuilder(message: widget.message.message),
+                MarkdownBuilder(
+                  message: widget.message.message,
+                  mentionNameList: List.generate(
+                    widget.chatController.chatUsers.length,
+                    (index) => widget.chatController.chatUsers[index].name,
+                  ),
+                ),
 
                 // リンクプレビュー
                 if (!kIsWeb && urlMatches.isNotEmpty)

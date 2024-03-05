@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
-import '../../../events/realtime_event_provider.dart';
+import '../../../core/realtime_event_provider.dart';
 
 /// ホットリロードしたら例外が出るため、再立ち上げする
 /// chatControllerのscrollControllerの例外が出るため外だし

@@ -25,11 +25,13 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:chatview/chatview.dart';
 import 'package:chatview/src/extensions/extensions.dart';
 import 'package:chatview/src/utils/package_strings.dart';
+import 'package:chatview/src/widgets/chat_view_inherited_widget.dart'; // 追加変更
 import 'package:chatview/src/widgets/chatui_textfield.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../utils/constants/constants.dart';
+import 'package:chatview/markdown/at_mention_paragraph_node.dart'; // 追加変更
 
 class SendMessageWidget extends StatefulWidget {
   const SendMessageWidget({
@@ -41,7 +43,6 @@ class SendMessageWidget extends StatefulWidget {
     this.sendMessageBuilder,
     this.onReplyCallback,
     this.onReplyCloseCallback,
-    required this.textEditingController, // 追加変更
   }) : super(key: key);
 
   /// Provides call back when user tap on send button on text field.
@@ -64,9 +65,6 @@ class SendMessageWidget extends StatefulWidget {
 
   /// Provides controller for accessing few function for running chat.
   final ChatController chatController;
-
-  /// 追加変更
-  final TextEditingController textEditingController;
 
   @override
   State<SendMessageWidget> createState() => SendMessageWidgetState();
@@ -98,6 +96,8 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final textEditingController =
+        ChatViewInheritedWidget.of(context)?.textEditingController; // 追加変更
     final replyTitle = widget.sendMessageConfig!.isSendReplyUpdateMessage! // 追加変更
         ? PackageStrings.updateTo
         : // 追加変更
@@ -238,8 +238,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                               ),
                               ChatUITextField(
                                 focusNode: _focusNode,
-                                // 追加変更
-                                textEditingController: widget.textEditingController,
+                                textEditingController: textEditingController!, // 追加変更
                                 onPressed: _onPressed,
                                 sendMessageConfig: widget.sendMessageConfig,
                                 onRecordingComplete: _onRecordingComplete,
@@ -318,15 +317,27 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   void _onPressed() {
     // 追加変更　_textEditingController　→　widget.textEditingController
-    if (widget.textEditingController.text.isNotEmpty &&
-        !widget.textEditingController.text.startsWith('\n')) {
+    final textEditingController = ChatViewInheritedWidget.of(context)?.textEditingController;
+    if (textEditingController == null) return;
+    if (textEditingController.text.isNotEmpty && !textEditingController.text.startsWith('\n')) {
+      // -----追加変更 START-----
+      final chatUsers =
+          widget.chatController.chatUsers.where((e) => e.id != currentUser?.id).toList();
+      final mentionChatUsers = AtMentionParagraphNode.getMentionChatUsers(
+        text: textEditingController.text,
+        chatUsers: chatUsers,
+      );
+      widget.chatController.mentionChatUsers = mentionChatUsers;
+      // -----追加変更 END-----
+
       widget.onSendTap.call(
-        widget.textEditingController.text.trim(),
+        textEditingController.text.trim(),
         replyMessage,
         MessageType.text,
       );
       _assignRepliedMessage();
-      widget.textEditingController.clear();
+      textEditingController.clear(); // _textEditingController → 追加変更
+      widget.chatController.mentionChatUsers?.clear(); // 追加変更
     }
   }
 

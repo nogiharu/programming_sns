@@ -6,9 +6,9 @@ import 'package:programming_sns/features/auth/screens/login_credentials_update_s
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
-import 'package:programming_sns/temp/chat_screen2.dart';
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
-import 'package:programming_sns/features/user/screens/home_screen.dart';
+import 'package:programming_sns/features/notification/screens/notification_screen.dart';
+import 'package:programming_sns/features/profile/screens/profile_screen.dart';
 import 'package:programming_sns/temp/chat_screen3.dart';
 
 import 'package:programming_sns/temp/tempScreen.dart';
@@ -25,7 +25,8 @@ final router = Provider((ref) {
   final bottomItems = [
     ChatThreadScreen.metaData,
     ScreenB.metaData,
-    HomeScreen.metaData,
+    NotificationScreen.metaData,
+    ProfileScreen.metaData,
   ];
 
   return GoRouter(
@@ -95,13 +96,31 @@ final router = Provider((ref) {
             ],
           ),
 
+          /// 通知
+          GoRoute(
+            path: NotificationScreen.metaData['path'],
+            name: NotificationScreen.metaData['path'],
+            pageBuilder: (context, state) {
+              return _pageAnimation(const NotificationScreen(), state, ref: ref);
+            },
+            routes: const [
+              // GoRoute(
+              //   path: DetailsScreen.path,
+              //   parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+              //   builder: (context, state) {
+              //     return const DetailsScreen(label: 'B');
+              //   },
+              // ),
+            ],
+          ),
+
           /// HOME
           GoRoute(
-            path: HomeScreen.metaData['path'],
-            name: HomeScreen.metaData['path'],
+            path: ProfileScreen.metaData['path'],
+            name: ProfileScreen.metaData['path'],
             pageBuilder: (context, state) {
               return _pageAnimation(
-                const HomeScreen(),
+                const ProfileScreen(),
                 state,
                 ref: ref,
               );
@@ -154,7 +173,7 @@ final router = Provider((ref) {
 
       // ログイン情報更新画面でリロードされたらextraがnullになる
       if (uri.contains(LoginCredentialsUpdateScreen.path) && state.extra == null) {
-        return HomeScreen.metaData['path'];
+        return ProfileScreen.metaData['path'];
       }
       if (uri.contains(ChatScreen.path) && state.extra == null) {
         return ChatThreadScreen.metaData['path'];
