@@ -320,16 +320,6 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     final textEditingController = ChatViewInheritedWidget.of(context)?.textEditingController;
     if (textEditingController == null) return;
     if (textEditingController.text.isNotEmpty && !textEditingController.text.startsWith('\n')) {
-      // -----追加変更 START-----
-      final chatUsers =
-          widget.chatController.chatUsers.where((e) => e.id != currentUser?.id).toList();
-      final mentionChatUsers = AtMentionParagraphNode.getMentionChatUsers(
-        text: textEditingController.text,
-        chatUsers: chatUsers,
-      );
-      widget.chatController.mentionChatUsers = mentionChatUsers;
-      // -----追加変更 END-----
-
       widget.onSendTap.call(
         textEditingController.text.trim(),
         replyMessage,
@@ -337,7 +327,6 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
       );
       _assignRepliedMessage();
       textEditingController.clear(); // _textEditingController → 追加変更
-      widget.chatController.mentionChatUsers?.clear(); // 追加変更
     }
   }
 

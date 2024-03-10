@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/user_api_provider.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
-import 'package:programming_sns/features/profile/models/user_model.dart';
-import 'package:programming_sns/core/utils.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/common/utils.dart';
 
 final userModelProvider =
     AsyncNotifierProvider<UserModelNotifier, UserModel>(UserModelNotifier.new);
@@ -21,9 +21,13 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
     return await _getUserModel(user.userId).catchError((e) async {
       // 存在しないエラー404
       if (e is AppwriteException && e.code == 404) {
+        final userCount = (await getUserModelList()).length.toString();
+        // セッションID＋カウント
+        final userId = user.$id.substring(user.$id.length - 4) + userCount;
         final userModel = UserModel.instance(
           id: user.userId,
-          name: user.userId.substring(15, user.$id.length),
+          name: '名前はまだない',
+          userId: userId,
         );
         debugPrint('ユーザー作成OK!:$userModel');
         return await _createUserModel(userModel);

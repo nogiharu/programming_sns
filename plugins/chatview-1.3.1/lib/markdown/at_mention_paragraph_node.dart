@@ -6,18 +6,19 @@ import 'package:markdown_widget/widget/all.dart';
 class AtMentionParagraphNode extends ElementNode {
   // final String text;
   final PConfig pConfig;
-  final List<String> mentionNameList;
+  final List<String> mentionIdList;
   AtMentionParagraphNode({
     // required this.text,
     required this.pConfig,
-    required this.mentionNameList,
+    required this.mentionIdList,
   });
 
   /// @で始まり(直後が@で始まっていない)空白以外の文字が1回以上続き[スペースまたは改行の一文字]で終わる
 
   /// (行の先頭|空白文字)で始まり、かつ@を含み(直後が@で始まっていない)かつ[空白と@以外の文字]が1回以上続き
   /// ([スペースまたは改行の一文字]|行の末尾)である　※先読みしないと末尾を判定してくれない
-  static RegExp regex = RegExp(r'(^|\s)@(?!@)[^\s@]+(?=[\s\n]|$)');
+  // static RegExp regex = RegExp(r'(^|\s)@(?!@)[^\s@]+(?=[\s\n]|$)');
+  static RegExp regex = RegExp(r'@(?!@)[^\s@]+(?=[\s\n]|$)');
 
   static List<String> splitText(
     String input,
@@ -45,35 +46,24 @@ class AtMentionParagraphNode extends ElementNode {
     return result;
   }
 
-  static List<ChatUser> getMentionChatUsers({
-    required String text,
-    required List<ChatUser> chatUsers,
-  }) {
-    final matchTextList = splitText(text);
-
-    final replaceTextList = matchTextList.map((e) => e.replaceAll('@', '').trim());
-
-    List<ChatUser> result = chatUsers
-        .where((chatUser) => replaceTextList.any((replaceText) => chatUser.name == replaceText))
-        .toList();
-    return result;
-  }
-
   @override
   void accept(SpanNode? node) {
-    if (mentionNameList.isNotEmpty && node is TextNode) {
+    if (mentionIdList.isNotEmpty && node is TextNode) {
       final textList = splitText(node.text);
 
-      // getMentionNameList(node.text);
-
       textList.forEach((text) {
-        final isNameContain =
-            mentionNameList.any((name) => text.replaceAll('@', '').trim() == name) &&
-                text.startsWith(regex);
+        final isIdContain = mentionIdList.any((id) => text.replaceAll('@', '').trim() == id) &&
+            text.startsWith(regex);
+
+        final textStyle = pConfig.textStyle.copyWith(
+          color: isIdContain ? Colors.blue : null,
+          fontSize: isIdContain ? 13 : null,
+        );
+
         super.accept(
           TextNode(
             text: text,
-            style: pConfig.textStyle.copyWith(color: isNameContain ? Colors.blue : null),
+            style: textStyle,
           ),
         );
       });

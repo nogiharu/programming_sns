@@ -5,8 +5,8 @@ import 'package:programming_sns/constants/appwrite_constants.dart';
 final appwriteClientProvider = Provider((ref) {
   final Client client = Client();
   return client
-      .setEndpoint(AppwriteConstants.endPoint)
-      .setProject(AppwriteConstants.projectId)
+      .setEndpoint(AppwriteConstants.kEndPoint)
+      .setProject(AppwriteConstants.kProjectId)
       .setSelfSigned(status: true);
 });
 

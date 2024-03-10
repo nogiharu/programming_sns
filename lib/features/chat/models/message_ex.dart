@@ -1,6 +1,6 @@
 import 'package:chatview/chatview.dart';
-import 'package:programming_sns/core/enums/message_status_ex.dart';
-import 'package:programming_sns/core/enums/message_type_ex.dart';
+import 'package:programming_sns/enums/message_status_ex.dart';
+import 'package:programming_sns/enums/message_type_ex.dart';
 
 extension MessageEX on Message {
   Map<String, dynamic> toMap() {

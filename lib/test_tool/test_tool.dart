@@ -7,7 +7,7 @@ import 'package:programming_sns/apis/user_api_provider.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
-import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
+import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:any_link_preview/any_link_preview.dart';
 
 class TestToolcreen extends ConsumerWidget {
@@ -23,8 +23,19 @@ class TestToolcreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
             children: [
-              Container(
-                  color: Colors.amber, padding: const EdgeInsets.all(5), child: Text(data.name)),
+              Column(
+                children: [
+                  Container(
+                      color: Colors.amber,
+                      padding: const EdgeInsets.all(5),
+                      child: Text(data.name)),
+                  const SizedBox(height: 10),
+                  Container(
+                      color: Colors.amber,
+                      padding: const EdgeInsets.all(5),
+                      child: Text(data.userId)),
+                ],
+              ),
               // Text(ref.watch(authProvider).value?.email ?? 'ない'),
               TextButton(
                 onPressed: () async {
@@ -42,7 +53,7 @@ class TestToolcreen extends ConsumerWidget {
                   } else if (data.name == 'ユウジ') {
                     name = 'オリジン弁当';
                   } else {
-                    name = ' ポッポ2 ';
+                    name = 'ポッポ';
                   }
 
                   data = data.copyWith(name: name);

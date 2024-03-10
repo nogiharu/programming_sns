@@ -27,13 +27,13 @@ final showDialogProvider = Provider((ref) {
   };
 });
 
-exceptionMessage({dynamic error, String? loginId, String? loginPassword}) {
+exceptionMessage({dynamic error, String? userId, String? loginPassword}) {
   //-------------- 認証系 --------------
-  if ((loginId?.isEmpty ?? false) || (loginPassword?.isEmpty ?? false)) {
+  if ((userId?.isEmpty ?? false) || (loginPassword?.isEmpty ?? false)) {
     throw '入力は必須だよ(>_<)';
   }
 
-  if (loginId != null && !RegExp(r'^[a-zA-Z0-9._]+$').hasMatch(loginId)) {
+  if (userId != null && !RegExp(r'^[a-zA-Z0-9._]+$').hasMatch(userId)) {
     throw 'IDに無効な文字が使われてるよ(>_<)';
   }
 

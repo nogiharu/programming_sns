@@ -16,17 +16,17 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
 
         /// ユーザー更新イベント
         final isUserUpdateEvent =
-            data.events.contains('${AppwriteConstants.usersDocumentsChannels}.*.update') &&
+            data.events.contains('${AppwriteConstants.kUsersDocumentsChannels}.*.update') &&
                 (data.payload['chatRoomIds'] as List<dynamic>).contains(chatRoomId);
 
         /// メッセージ作成イベント
         final isMessageCreateEvent =
-            data.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.create') &&
+            data.events.contains('${AppwriteConstants.kMessagesDocmentsChannels}.*.create') &&
                 data.payload.containsValue(chatRoomId);
 
         /// メッセージ更新イベント
         final isMessageUpdateEvent =
-            data.events.contains('${AppwriteConstants.messagesDocmentsChannels}.*.update') &&
+            data.events.contains('${AppwriteConstants.kMessagesDocmentsChannels}.*.update') &&
                 data.payload.containsValue(chatRoomId);
 
         /// ユーザー更新イベント
@@ -40,6 +40,7 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
           debugPrint('MESSAGE_CREATE!');
           final message = MessageEX.fromMap(data.payload);
           chatController.addMessage(message);
+          message.message;
         }
 
         /// メッセージ更新イベント

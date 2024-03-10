@@ -6,7 +6,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:programming_sns/core/utils.dart';
+import 'package:programming_sns/common/utils.dart';
 
 final storageAPIProvider = Provider((ref) {
   return SrorageAPI(storage: ref.watch(appwriteStorageProvider));

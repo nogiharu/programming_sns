@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_event_provider.dart';
-import 'package:programming_sns/core/utils.dart';
+import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/chat/providers/chat_room_provider.dart';
+import 'package:programming_sns/features/chat/providers/chat_room_model_list_provider.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
-import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
+import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
 class ChatThreadScreen extends ConsumerStatefulWidget {
   const ChatThreadScreen({super.key});
@@ -44,8 +44,8 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                   child: const Text('スレを立てる'),
                 ),
                 ref.watchEX(
-                  chatRoomProvider,
-                  isBackgroundColorNone: ref.watch(chatRoomProvider).hasError,
+                  chatRoomModelListProvider,
+                  isBackgroundColorNone: ref.watch(chatRoomModelListProvider).hasError,
                   complete: (chatRoom) {
                     // チャットルームイベント
                     ref.watch(chatRoomEventProvider);
@@ -113,11 +113,11 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
             suffixIcon: IconButton(
               onPressed: () async {
                 await ref
-                    .read(chatRoomProvider.notifier)
+                    .read(chatRoomModelListProvider.notifier)
                     .createChatRoom(ownerId: userId, name: textController.text)
                     .whenComplete(() {
                   // なぜかキャッチされないためwhenComplete使用
-                  if (!ref.watch(chatRoomProvider).hasError) {
+                  if (!ref.watch(chatRoomModelListProvider).hasError) {
                     context.pop();
                     textController.text = '';
                     ref.read(snackBarProvider('作成完了だよ(*^_^*)'));

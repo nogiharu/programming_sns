@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
-import 'package:programming_sns/core/utils.dart';
+import 'package:programming_sns/common/utils.dart';
 
 final messageAPIProvider = Provider(
   (ref) => MessageAPI(
@@ -22,8 +22,8 @@ class MessageAPI {
     bool isCatch = true,
   }) async {
     return await _db.listDocuments(
-      databaseId: AppwriteConstants.databaseId,
-      collectionId: AppwriteConstants.messagesCollection,
+      databaseId: AppwriteConstants.kDatabaseId,
+      collectionId: AppwriteConstants.kMessagesCollection,
       queries: [
         Query.equal('chatRoomId', chatRoomId),
         Query.orderAsc('createdAt'),
@@ -35,8 +35,8 @@ class MessageAPI {
   Future<Document> createMessageDocument(Message message, {bool isCatch = true}) async {
     return await _db
         .createDocument(
-          databaseId: AppwriteConstants.databaseId,
-          collectionId: AppwriteConstants.messagesCollection,
+          databaseId: AppwriteConstants.kDatabaseId,
+          collectionId: AppwriteConstants.kMessagesCollection,
           documentId: ID.unique(),
           data: message.toMap(),
         )
@@ -46,8 +46,8 @@ class MessageAPI {
   Future<Document> updateMessageDocument(Message message, {bool isCatch = true}) async {
     return await _db
         .updateDocument(
-          databaseId: AppwriteConstants.databaseId,
-          collectionId: AppwriteConstants.messagesCollection,
+          databaseId: AppwriteConstants.kDatabaseId,
+          collectionId: AppwriteConstants.kMessagesCollection,
           documentId: message.id,
           data: message.toMap(),
         )
@@ -67,8 +67,8 @@ class MessageAPI {
 
     return await _db
         .listDocuments(
-          databaseId: AppwriteConstants.databaseId,
-          collectionId: AppwriteConstants.messagesCollection,
+          databaseId: AppwriteConstants.kDatabaseId,
+          collectionId: AppwriteConstants.kMessagesCollection,
           queries: queries,
         )
         .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
@@ -77,8 +77,8 @@ class MessageAPI {
   Future<dynamic> deleteMessageDocument(String id, {bool isCatch = true}) async {
     return await _db
         .deleteDocument(
-          databaseId: AppwriteConstants.databaseId,
-          collectionId: AppwriteConstants.messagesCollection,
+          databaseId: AppwriteConstants.kDatabaseId,
+          collectionId: AppwriteConstants.kMessagesCollection,
           documentId: id,
         )
         .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);

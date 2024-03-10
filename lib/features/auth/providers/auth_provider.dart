@@ -7,9 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
 
-import 'package:programming_sns/features/profile/models/user_model.dart';
-import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
-import 'package:programming_sns/core/utils.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:programming_sns/common/utils.dart';
 
 final authProvider = AsyncNotifierProvider<AuthNotifier, Session>(AuthNotifier.new);
 
@@ -40,7 +40,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
   /// ログイン
   Future<Session> login({required String loginId, required String loginPassword}) async {
     return await futureGuard(() async {
-      exceptionMessage(loginId: loginId, loginPassword: loginPassword);
+      exceptionMessage(userId: loginId, loginPassword: loginPassword);
       return await _account
           .createEmailSession(
             email: '$loginId@gmail.com',
@@ -53,17 +53,17 @@ class AuthNotifier extends AsyncNotifier<Session> {
   /// アカウント登録
   Future<void> accountUpdate({required UserModel userModel}) async {
     await futureGuard(() async {
-      exceptionMessage(loginId: userModel.loginId, loginPassword: userModel.loginPassword);
+      exceptionMessage(userId: userModel.userId, loginPassword: userModel.loginPassword);
 
       return await _account
           .updateEmail(
-        email: '${userModel.loginId}@gmail.com',
+        email: '${userModel.userId}@gmail.com',
         password: userModel.loginPassword,
       )
           .then((_) async {
         await ref.read(userModelProvider.notifier).updateUserModel(userModel);
         // ログインしないとセッション更新されない
-        return await login(loginId: userModel.loginId, loginPassword: userModel.loginPassword);
+        return await login(loginId: userModel.userId, loginPassword: userModel.loginPassword);
       }).catchError((e) => exceptionMessage(error: e));
     });
   }
@@ -81,7 +81,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
             .read(userModelProvider.notifier)
             .updateUserModel(userModel.copyWith(loginPassword: newLoginPassword));
         // ログインしないとセッション更新されない
-        return await login(loginId: userModel.loginId, loginPassword: newLoginPassword);
+        return await login(loginId: userModel.userId, loginPassword: newLoginPassword);
       }).catchError((e) => exceptionMessage(error: e));
     });
   }

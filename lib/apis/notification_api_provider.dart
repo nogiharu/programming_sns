@@ -3,61 +3,67 @@ import 'package:appwrite/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/features/chat/models/chat_room_model.dart';
 import 'package:programming_sns/common/utils.dart';
+import 'package:programming_sns/features/notification/models/notification_model.dart';
 
-final chatRoomAPIProvider = Provider(
-  (ref) => ChatRoomAPI(
+final notificationAPIProvider = Provider(
+  (ref) => NotificationAPI(
     db: ref.watch(appwriteDatabaseProvider),
   ),
 );
 
-class ChatRoomAPI {
+class NotificationAPI {
   final Databases _db;
-  ChatRoomAPI({required Databases db}) : _db = db;
+  NotificationAPI({required Databases db}) : _db = db;
 
-  /// チャットルーム作成
-  Future<Document> createChatRoomDocument(ChatRoomModel chatRoom, {bool isCatch = true}) async {
+  /// 作成
+  Future<Document> createNotificationDocument(
+    NotificationModel notificationModel, {
+    bool isCatch = true,
+  }) async {
     return await _db
         .createDocument(
           databaseId: AppwriteConstants.kDatabaseId,
-          collectionId: AppwriteConstants.kChatRoomCollection,
+          collectionId: AppwriteConstants.kNotificationCollection,
           documentId: ID.unique(),
-          data: chatRoom.toMap(),
+          data: notificationModel.toMap(),
         )
         .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
   }
 
-  /// チャットルーム取得
-  Future<Document> getChatRoomDocument(String id, {bool isCatch = true}) async {
+  /// 取得
+  Future<Document> getNotificationDocument(String id, {bool isCatch = true}) async {
     return await _db.getDocument(
       databaseId: AppwriteConstants.kDatabaseId,
-      collectionId: AppwriteConstants.kChatRoomCollection,
+      collectionId: AppwriteConstants.kNotificationCollection,
       documentId: id,
       queries: [],
     ).catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
   }
 
-  /// チャットルームリスト取得
-  Future<DocumentList> getChatRoomDocumentList({bool isCatch = true}) async {
+  /// リスト取得
+  Future<DocumentList> getNotificationDocumentList({bool isCatch = true}) async {
     return await _db.listDocuments(
       databaseId: AppwriteConstants.kDatabaseId,
-      collectionId: AppwriteConstants.kChatRoomCollection,
+      collectionId: AppwriteConstants.kNotificationCollection,
       queries: [
-        Query.orderDesc('updatedAt'),
+        Query.orderDesc('createdAt'),
         Query.limit(10000), // FIXME
       ],
     ).catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
   }
 
-  /// チャットルーム更新
-  Future<Document> updateChatRoomDocument(ChatRoomModel chatRoom, {bool isCatch = true}) async {
+  /// 更新
+  Future<Document> updateNotificationDocument(
+    NotificationModel notificationModel, {
+    bool isCatch = true,
+  }) async {
     return await _db
         .updateDocument(
           databaseId: AppwriteConstants.kDatabaseId,
-          collectionId: AppwriteConstants.kChatRoomCollection,
-          documentId: chatRoom.id!,
-          data: chatRoom.toMap(),
+          collectionId: AppwriteConstants.kNotificationCollection,
+          documentId: notificationModel.id,
+          data: notificationModel.toMap(),
         )
         .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
   }

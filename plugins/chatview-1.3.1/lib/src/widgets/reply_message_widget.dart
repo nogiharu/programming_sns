@@ -144,10 +144,7 @@ class ReplyMessageWidget extends StatelessWidget {
                                         MarkdownBuilder(
                                           message: replyMessage,
                                           pTextColor: Colors.white,
-                                          mentionNameList: List.generate(
-                                            chatController?.chatUsers.length ?? 0,
-                                            (index) => chatController?.chatUsers[index].name ?? '',
-                                          ),
+                                          chatUsers: chatController?.chatUsers,
                                         ),
                                       ],
                                     ),

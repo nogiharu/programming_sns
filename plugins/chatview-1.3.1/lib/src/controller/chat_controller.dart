@@ -56,13 +56,10 @@ class ChatController {
   /// Represents list of chat users
   List<ChatUser> chatUsers;
 
-  List<ChatUser>? mentionChatUsers; // 追加変更
-
   ChatController({
     required this.initialMessageList,
     required this.scrollController,
     required this.chatUsers,
-    this.mentionChatUsers, // 追加変更
   });
 
   /// Represents message stream of chat

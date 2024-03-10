@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/core/utils.dart';
+import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/auth/widgets/auth_field.dart';
-import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
+import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({
@@ -67,7 +67,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       onPressed: () async {
                         await ref.read(authProvider.notifier).accountUpdate(
                               userModel: userModel.copyWith(
-                                loginId: idController.text,
+                                userId: idController.text,
                                 loginPassword: passwordController.text,
                                 isAnonymous: false,
                               ),

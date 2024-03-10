@@ -1,5 +1,5 @@
 import 'package:chatview/chatview.dart';
-import 'package:chatview/markdown/markdown_builder.dart';
+import 'package:chatview/markdown/at_mention_paragraph_node.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,14 +10,14 @@ import 'package:programming_sns/apis/storage_api_provider.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
-import 'package:programming_sns/core/utils.dart';
+import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event_provider.dart';
-import 'package:programming_sns/features/chat/providers/chat_room_provider.dart';
+import 'package:programming_sns/features/chat/providers/chat_room_model_list_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/theme/theme_color.dart';
-import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
-import 'package:programming_sns/features/profile/models/user_model.dart';
+import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:programming_sns/routes/router.dart';
 import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
@@ -245,9 +245,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   /// 送信 or 更新
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
     if (message.trim().isEmpty) return;
-    // _chatController.mentionChatUsers!.forEach((element) {
-    //   print(element.name);
-    // });
 
     if (updateMessage == null) {
       // メッセージ送信
@@ -264,7 +261,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       await ref.read(chatControllerProvider(widget.chatRoomId).notifier).createMessage(msg);
 
       // このチャットルーム取得
-      final chatRoom = ref.read(chatRoomProvider.notifier).getChatRoom(widget.chatRoomId);
+      final chatRoom = ref.read(chatRoomModelListProvider.notifier).getChatRoom(widget.chatRoomId);
       // チャットルームの日付更新　awaitはしない
       ref
           .read(chatRoomAPIProvider)
@@ -281,6 +278,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             .catchError(ref.read(showDialogProvider));
       }
     }
+
+    getMentionChatUsers(message);
 
     // スクロールが100件超えていたら25件にリセット
     if (_chatController.initialMessageList.length > 100) {
@@ -312,7 +311,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Future<void> downloadImage(String url) async {
     final isSaved = await ref
         .read(storageAPIProvider)
-        .downloadImage(url, AppwriteConstants.messageImagesBucket)
+        .downloadImage(url, AppwriteConstants.kMessageImagesBucket)
         .catchError(ref.read(showDialogProvider));
 
     if (isSaved) ref.read(snackBarProvider('${kIsWeb ? 'ダウンロード' : '写真'}に保存完了したよ(*^_^*)'));
@@ -326,7 +325,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           .read(storageAPIProvider)
           .uploadImage(
             xFile,
-            AppwriteConstants.messageImagesBucket,
+            AppwriteConstants.kMessageImagesBucket,
           )
           .catchError(ref.read(showDialogProvider));
     }
@@ -339,7 +338,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         .read(storageAPIProvider)
         .previewImgae(
           url,
-          AppwriteConstants.messageImagesBucket,
+          AppwriteConstants.kMessageImagesBucket,
         )
         .catchError(ref.read(showDialogProvider));
 
@@ -364,5 +363,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         );
       },
     );
+  }
+
+  void getMentionChatUsers(String text) {
+    final textUserIdList = AtMentionParagraphNode.splitText(text)
+        .where((e) => e.startsWith('@'))
+        .map((e) => e.replaceAll('@', '').trim());
+
+    if (textUserIdList.isEmpty) return;
+
+    List<ChatUser> mentionChatUsers = _chatController.chatUsers
+        .where((chatUser) =>
+            textUserIdList.any((id) => chatUser.userId == id && _currentChatUser.userId != id))
+        .toList();
+
+    mentionChatUsers.forEach((element) {
+      print(element.userId);
+    });
   }
 }

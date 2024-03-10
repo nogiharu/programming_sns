@@ -103,10 +103,7 @@ class _ChatCardState extends State<ChatCard> {
                 // Markdown
                 MarkdownBuilder(
                   message: widget.message.message,
-                  mentionNameList: List.generate(
-                    widget.chatController.chatUsers.length,
-                    (index) => widget.chatController.chatUsers[index].name,
-                  ),
+                  chatUsers: widget.chatController.chatUsers,
                 ),
 
                 // リンクプレビュー

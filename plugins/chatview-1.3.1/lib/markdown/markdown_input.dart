@@ -122,10 +122,7 @@ throw new NullPointerException("Hello, World");
             padding: const EdgeInsets.symmetric(vertical: 5).copyWith(right: 10, left: 10),
             child: MarkdownBuilder(
               message: widget.textEditingController.text,
-              mentionNameList: List.generate(
-                chatUsers.length,
-                (index) => chatUsers[index].name,
-              ),
+              chatUsers: chatUsers,
             ),
           ),
       ],
@@ -185,15 +182,28 @@ throw new NullPointerException("Hello, World");
       items: List.generate(
         chatUsers.length,
         (index) => PopupMenuItem(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
           value: chatUsers[index],
-          child: Text(chatUsers[index].name),
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(text: chatUsers[index].name),
+                TextSpan(
+                  text: '@${chatUsers[index].userId}',
+                  style: const TextStyle(color: Colors.blue, fontSize: 13),
+                )
+              ],
+            ),
+          ),
+          // Text(chatUsers[index].name),
         ),
       ),
     );
 
     if (selectedChatUser != null) {
       final text = widget.textEditingController.text;
-      widget.textEditingController.text += '${text.isEmpty ? '' : ' '}@${selectedChatUser.name} \n';
+      final toMentionName = '${selectedChatUser.name}@${selectedChatUser.userId}';
+      widget.textEditingController.text += '${text.isEmpty ? '' : ' '}$toMentionName \n';
     }
   }
 }

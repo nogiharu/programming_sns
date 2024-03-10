@@ -1,3 +1,4 @@
+import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/at_mention_paragraph_node.dart';
 import 'package:chatview/markdown/code_wrapper.dart';
 import 'package:flutter/foundation.dart';
@@ -9,13 +10,13 @@ import 'package:markdown_widget/widget/all.dart';
 class MarkdownBuilder extends StatelessWidget {
   final String message;
   final Color? pTextColor;
-  final List<String>? mentionNameList;
+  final List<ChatUser>? chatUsers;
 
   const MarkdownBuilder({
     super.key,
     required this.message,
     this.pTextColor,
-    this.mentionNameList,
+    this.chatUsers,
   });
 
   @override
@@ -74,7 +75,8 @@ class MarkdownBuilder extends StatelessWidget {
               return AtMentionParagraphNode(
                 // text: e.textContent,
                 pConfig: config.p,
-                mentionNameList: mentionNameList ?? [],
+                mentionIdList:
+                    List.generate(chatUsers!.length, (index) => chatUsers![index].userId!),
               );
             }),
       ]),

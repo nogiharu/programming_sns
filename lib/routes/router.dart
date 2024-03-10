@@ -8,7 +8,7 @@ import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/notification/screens/notification_screen.dart';
-import 'package:programming_sns/features/profile/screens/profile_screen.dart';
+import 'package:programming_sns/features/user/screens/user_screen.dart';
 import 'package:programming_sns/temp/chat_screen3.dart';
 
 import 'package:programming_sns/temp/tempScreen.dart';
@@ -26,7 +26,7 @@ final router = Provider((ref) {
     ChatThreadScreen.metaData,
     ScreenB.metaData,
     NotificationScreen.metaData,
-    ProfileScreen.metaData,
+    UserScreen.metaData,
   ];
 
   return GoRouter(
@@ -116,11 +116,11 @@ final router = Provider((ref) {
 
           /// HOME
           GoRoute(
-            path: ProfileScreen.metaData['path'],
-            name: ProfileScreen.metaData['path'],
+            path: UserScreen.metaData['path'],
+            name: UserScreen.metaData['path'],
             pageBuilder: (context, state) {
               return _pageAnimation(
-                const ProfileScreen(),
+                const UserScreen(),
                 state,
                 ref: ref,
               );
@@ -173,7 +173,7 @@ final router = Provider((ref) {
 
       // ログイン情報更新画面でリロードされたらextraがnullになる
       if (uri.contains(LoginCredentialsUpdateScreen.path) && state.extra == null) {
-        return ProfileScreen.metaData['path'];
+        return UserScreen.metaData['path'];
       }
       if (uri.contains(ChatScreen.path) && state.extra == null) {
         return ChatThreadScreen.metaData['path'];

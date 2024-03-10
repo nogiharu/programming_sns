@@ -29,10 +29,13 @@ class ChatUser {
   /// Provides profile picture URL of user.
   final String? profilePhoto;
 
+  final String? userId; // 追加変更
+
   ChatUser({
     required this.id,
     required this.name,
     this.profilePhoto,
+    this.userId,
   });
 
   factory ChatUser.fromJson(Map<String, dynamic> json) => ChatUser(

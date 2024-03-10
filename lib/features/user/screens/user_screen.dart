@@ -5,11 +5,11 @@ import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
 import 'package:programming_sns/features/auth/screens/login_credentials_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
-import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
+import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/test_tool/test_tool.dart';
 
-class ProfileScreen extends ConsumerWidget {
-  const ProfileScreen({super.key});
+class UserScreen extends ConsumerWidget {
+  const UserScreen({super.key});
 
   static const Map<String, dynamic> metaData = {
     'path': '/profile',

@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:markdown_widget/config/configs.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
-import 'package:programming_sns/features/profile/providers/user_model_provider.dart';
+import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:any_link_preview/any_link_preview.dart';
 // import 'package:markdown/markdown.dart' as md;
 // import 'package:programming_sns/utils/markdown/custom_pre_builder.dart';

@@ -1,6 +1,6 @@
 import 'package:chatview/chatview.dart';
 
-class ChatRoom {
+class ChatRoomModel {
   String? id;
   final String ownerId;
   final String name;
@@ -10,7 +10,7 @@ class ChatRoom {
 
   final DateTime updatedAt;
 
-  ChatRoom({
+  ChatRoomModel({
     this.id,
     required this.ownerId,
     required this.name,
@@ -19,7 +19,7 @@ class ChatRoom {
     required this.updatedAt,
   });
 
-  ChatRoom copyWith({
+  ChatRoomModel copyWith({
     String? id,
     String? ownerId,
     String? name,
@@ -27,7 +27,7 @@ class ChatRoom {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return ChatRoom(
+    return ChatRoomModel(
       id: id ?? this.id,
       ownerId: ownerId ?? this.ownerId,
       name: name ?? this.name,
@@ -50,8 +50,8 @@ class ChatRoom {
     return result;
   }
 
-  factory ChatRoom.fromMap(Map<String, dynamic> map) {
-    return ChatRoom(
+  factory ChatRoomModel.fromMap(Map<String, dynamic> map) {
+    return ChatRoomModel(
       id: map['\$id'],
       ownerId: map['ownerId'] ?? '',
       name: map['name'] ?? '',
@@ -65,14 +65,14 @@ class ChatRoom {
 
   @override
   String toString() {
-    return 'ChatRoom(id: $id, ownerId: $ownerId, name: $name,  $createdAt, updatedAt: $updatedAt )';
+    return 'ChatRoomModel(id: $id, ownerId: $ownerId, name: $name,  $createdAt, updatedAt: $updatedAt )';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is ChatRoom &&
+    return other is ChatRoomModel &&
         other.id == id &&
         other.ownerId == ownerId &&
         other.name == name &&
@@ -87,13 +87,13 @@ class ChatRoom {
     // messages.hashCode;
   }
 
-  factory ChatRoom.instance({
+  factory ChatRoomModel.instance({
     String? ownerId,
     String? name,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) =>
-      ChatRoom(
+      ChatRoomModel(
         ownerId: ownerId ?? '',
         name: name ?? '',
         createdAt: DateTime.now(),
