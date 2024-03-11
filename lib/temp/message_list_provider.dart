@@ -21,46 +21,23 @@ final textEditingControllerProvider = Provider<Map<String, TextEditingController
 });
 
 final chatControllerProvider =
-    AutoDisposeAsyncNotifierProviderFamily<ChatControllerNotifier, ChatController, String>(
-        ChatControllerNotifier.new);
+    AutoDisposeAsyncNotifierProviderFamily<MessageListNotifier, List<Message>, String>(
+  MessageListNotifier.new,
+);
 
-class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatController, String> {
+class MessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Message>, String> {
   MessageAPI get _messageAPI => ref.watch(messageAPIProvider);
 
   @override
-  FutureOr<ChatController> build(arg) async {
-    final initialMessageList = await getMessages();
-
-    final chatUsers = await getChatUsers();
-
-    return ChatController(
-      initialMessageList: initialMessageList,
-      scrollController: ScrollController(),
-      chatUsers: chatUsers,
-    );
+  FutureOr<List<Message>> build(arg) async {
+    return await getMessages();
   }
 
-  void updateChatUserEvent(RealtimeMessage event) {
-    final user = UserModel.fromMap(event.payload);
-    final chatUser = UserModel.toChatUser(user);
-    update((data) {
-      final index = data.chatUsers.indexWhere((e) => e.id == chatUser.id);
-      // ユーザがいない場合は追加
-      if (index == -1) {
-        data.chatUsers.add(chatUser);
-      } else {
-        // 更新
-        data.chatUsers[index] = chatUser;
-      }
-      return data;
-    });
-  }
-
-  void updateMessageEvent(RealtimeMessage event) {
+  void updateMessage(RealtimeMessage event) {
     final message = MessageEX.fromMap(event.payload);
     update((data) {
-      final index = data.initialMessageList.indexWhere((e) => e.id == message.id);
-      return data..initialMessageList[index] = message;
+      final index = data.indexWhere((e) => e.id == message.id);
+      return data..[index] = message;
     });
   }
 
@@ -110,12 +87,15 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     return messages;
   }
 
-  /// メッセージ作成
-  /// FIXME state.valueではない値を返したいためfutureGuard使えない
-  Future<void> updateMessage(Message message) async {
-    await ref
-        .read(messageAPIProvider)
-        .updateMessageDocument(message)
-        .catchError(ref.read(showDialogProvider));
-  }
+  /// メッセージリストに過去２５件メッセージ追加
+  // Future<void> addMessages() async {
+  //   await update((data) async {
+  //     final initialMessageList = data;
+  //     final messageList25Ago = await getMessages(id: data.first.id);
+
+  //     data.loadMoreData(messageList25Ago);
+
+  //     return data;
+  //   });
+  // }
 }

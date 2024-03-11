@@ -47,6 +47,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   late ChatUser _currentChatUser;
 
+  late final ChatControllerNotifier _chatControllerNotifier =
+      ref.read(chatControllerProvider(widget.chatRoomId).notifier);
+
   late final TextEditingController? _textEditingController =
       ref.read(textEditingControllerProvider)[widget.chatRoomId];
 
@@ -258,7 +261,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         updatedAt: DateTime.now(),
       );
       // メッセージ送信
-      await ref.read(chatControllerProvider(widget.chatRoomId).notifier).createMessage(msg);
+      await _chatControllerNotifier.createMessage(msg);
 
       // このチャットルーム取得
       final chatRoom = ref.read(chatRoomModelListProvider.notifier).getChatRoom(widget.chatRoomId);
@@ -269,13 +272,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     } else {
       // メッセージ更新 前回のメッセージ違うなら更新
       if (updateMessage?.message != message) {
-        await ref
-            .read(messageAPIProvider)
-            .updateMessageDocument(updateMessage!.copyWith(
-              message: message,
-              updatedAt: DateTime.now(),
-            ))
-            .catchError(ref.read(showDialogProvider));
+        updateMessage = updateMessage!.copyWith(
+          message: message,
+          updatedAt: DateTime.now(),
+        );
+        await _chatControllerNotifier.updateMessage(updateMessage!);
       }
     }
 
@@ -283,8 +284,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     // スクロールが100件超えていたら25件にリセット
     if (_chatController.initialMessageList.length > 100) {
-      _chatController.initialMessageList =
-          await ref.read(chatControllerProvider(widget.chatRoomId).notifier).getMessages();
+      _chatController.initialMessageList = await _chatControllerNotifier.getMessages();
     }
     // メッセージ更新リセット
     updateMessage = null;
@@ -300,9 +300,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     if (isFirst) return;
 
-    final messageList25Ago = await ref
-        .read(chatControllerProvider(widget.chatRoomId).notifier)
-        .getMessages(id: _chatController.initialMessageList.first.id);
+    final messageList25Ago =
+        await _chatControllerNotifier.getMessages(id: _chatController.initialMessageList.first.id);
 
     _chatController.loadMoreData(messageList25Ago);
   }

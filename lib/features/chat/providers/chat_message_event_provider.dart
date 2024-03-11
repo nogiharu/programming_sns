@@ -32,7 +32,7 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
         /// ユーザー更新イベント
         if (isUserUpdateEvent) {
           debugPrint('CHAT_USER_UPDATE!');
-          ref.read(chatControllerProvider(chatRoomId).notifier).updateChatUser(data);
+          ref.read(chatControllerProvider(chatRoomId).notifier).updateChatUserEvent(data);
         }
 
         /// メッセージ作成イベント
@@ -46,7 +46,7 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
         /// メッセージ更新イベント
         if (isMessageUpdateEvent) {
           debugPrint('MESSAGE_UPDATE!');
-          ref.read(chatControllerProvider(chatRoomId).notifier).updateMessage(data);
+          ref.read(chatControllerProvider(chatRoomId).notifier).updateMessageEvent(data);
         }
       },
     );
