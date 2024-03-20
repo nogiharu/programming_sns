@@ -17,7 +17,7 @@ class SrorageAPI {
   final Storage _storage;
   SrorageAPI({required Storage storage}) : _storage = storage;
 
-  Future<String> uploadImage(XFile xFile, String bucketId, {bool isCatch = true}) async {
+  Future<String> uploadImage(XFile xFile, String bucketId, {bool isDefaultError = false}) async {
     final uint8List = await xFile.readAsBytes().catchError((e) => exceptionMessage(error: e));
 
     return await _storage
@@ -27,11 +27,11 @@ class SrorageAPI {
           file: InputFile.fromBytes(bytes: uint8List, filename: xFile.name),
         )
         .then((uploadImage) => AppwriteConstants.imageUrl(uploadImage.$id))
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
   /// 画像ダウンロード
-  Future<bool> downloadImage(String url, String bucketId, {bool isCatch = true}) async {
+  Future<bool> downloadImage(String url, String bucketId, {bool isDefaultError = false}) async {
     RegExp regex = RegExp(r'/files/([a-zA-Z0-9]+)');
     String? imageId = regex.firstMatch(url)?.group(1);
     if (imageId == null) return false;
@@ -53,16 +53,16 @@ class SrorageAPI {
         isSave = (await ImageGallerySaver.saveImage(uint8List))['isSuccess'] as bool;
       }
       return isSave;
-    }).catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+    }).catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
   /// 画像プレビュー
-  Future<Uint8List> previewImgae(String url, String bucketId, {bool isCatch = true}) async {
+  Future<Uint8List> previewImgae(String url, String bucketId, {bool isDefaultError = false}) async {
     RegExp regex = RegExp(r'/files/([a-zA-Z0-9]+)');
     String? imageId = regex.firstMatch(url)?.group(1);
 
     return await _storage
         .getFilePreview(bucketId: bucketId, fileId: imageId!)
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 }

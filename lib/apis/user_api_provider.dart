@@ -16,60 +16,58 @@ class UserAPI {
   final Databases _db;
   UserAPI({required Databases db}) : _db = db;
 
-  Future<Document> getUserDocument(String id, {bool isCatch = true}) async {
+  Future<Document> getUserDocument(String id, {bool isDefaultError = false}) async {
     return await _db
         .getDocument(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kUsersCollection,
           documentId: id,
         )
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<Document> createUserDocument(UserModel userModel, {bool isCatch = true}) async {
+  Future<Document> createUserDocument(UserModel userModel, {bool isDefaultError = false}) async {
     return await _db
         .createDocument(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kUsersCollection,
-          documentId: userModel.id,
+          documentId: userModel.documentId,
           data: userModel.toMap(),
         )
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<Document> updateUserDocument(UserModel userModel, {bool isCatch = true}) async {
+  Future<Document> updateUserDocument(UserModel userModel, {bool isDefaultError = false}) async {
     return await _db
         .updateDocument(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kUsersCollection,
-          documentId: userModel.id,
+          documentId: userModel.documentId,
           data: userModel.toMap(),
         )
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<DocumentList> getUsersDocumentList({String? chatRoomId, bool isCatch = true}) async {
+  Future<DocumentList> getUsersDocumentList({
+    List<String>? queries,
+    bool isDefaultError = false,
+  }) async {
     return await _db
         .listDocuments(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kUsersCollection,
-          queries: chatRoomId == null
-              ? [Query.limit(100000)]
-              : [
-                  Query.search('chatRoomIds', chatRoomId),
-                  Query.limit(100000),
-                ],
+          queries: queries,
         )
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<Document> deleteUserDocument(UserModel userModel, {bool isCatch = true}) async {
+  Future<dynamic> deleteUserDocument(UserModel userModel, {bool isDefaultError = false}) async {
     return await _db
         .deleteDocument(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kUsersCollection,
-          documentId: userModel.id,
+          documentId: userModel.documentId,
         )
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 }

@@ -50,7 +50,7 @@ docker run -it --rm \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
     --entrypoint="upgrade" \
-    appwrite/appwrite:1.4.5
+    appwrite/appwrite:1.5.3
 
 上やった後に下やる！
  

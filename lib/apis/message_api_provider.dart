@@ -17,22 +17,7 @@ class MessageAPI {
   final Databases _db;
   MessageAPI({required Databases db}) : _db = db;
 
-  Future<DocumentList> getFirstMessageDocument({
-    required String chatRoomId,
-    bool isCatch = true,
-  }) async {
-    return await _db.listDocuments(
-      databaseId: AppwriteConstants.kDatabaseId,
-      collectionId: AppwriteConstants.kMessagesCollection,
-      queries: [
-        Query.equal('chatRoomId', chatRoomId),
-        Query.orderAsc('createdAt'),
-        Query.limit(1),
-      ],
-    ).catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
-  }
-
-  Future<Document> createMessageDocument(Message message, {bool isCatch = true}) async {
+  Future<Document> createMessageDocument(Message message, {bool isDefaultError = false}) async {
     return await _db
         .createDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -40,10 +25,10 @@ class MessageAPI {
           documentId: ID.unique(),
           data: message.toMap(),
         )
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<Document> updateMessageDocument(Message message, {bool isCatch = true}) async {
+  Future<Document> updateMessageDocument(Message message, {bool isDefaultError = false}) async {
     return await _db
         .updateDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -51,36 +36,29 @@ class MessageAPI {
           documentId: message.id,
           data: message.toMap(),
         )
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<DocumentList> getMessagesDocumentList(
-      {required String chatRoomId, String? id, bool isCatch = true}) async {
-    final queries = [
-      Query.orderDesc('createdAt'),
-      Query.equal('chatRoomId', chatRoomId),
-      Query.limit(25),
-    ];
-
-    // idより前を取得
-    if (id != null) queries.add(Query.cursorAfter(id));
-
+  Future<DocumentList> getMessageDocumentList({
+    List<String>? queries,
+    isDefaultError = false,
+  }) async {
     return await _db
         .listDocuments(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kMessagesCollection,
           queries: queries,
         )
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<dynamic> deleteMessageDocument(String id, {bool isCatch = true}) async {
+  Future<dynamic> deleteMessageDocument(String id, {bool isDefaultError = false}) async {
     return await _db
         .deleteDocument(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kMessagesCollection,
           documentId: id,
         )
-        .catchError((e) => isCatch ? exceptionMessage(error: e) : throw e);
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 }

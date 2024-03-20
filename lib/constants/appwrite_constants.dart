@@ -1,25 +1,26 @@
-class AppwriteConstants {
-  static const String kProjectId = '652a84b1428731a3fe13';
-  static const String kDatabaseId = '652a857964373452cc09';
-  // static const String endPoint = 'http://192.168.1.3:80/v1';
-  static const String kEndPoint = 'http://localhost/v1';
-  static const String kMessagesCollection = '652a860839fe40651dba';
-  static const String kUsersCollection = '652bbad062129307289e';
-  static const String kChatRoomCollection = '652db5fe9905218ab7f6';
-  static const String kNotificationCollection = '65e8c9079ca0b6fcea90';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-  static const String kMessageImagesBucket = '65ada7b0d8ff019e2d32';
+class AppwriteConstants {
+  static final String kProjectId = dotenv.env['kProjectId'] ?? '';
+  static final String kDatabaseId = dotenv.env['kDatabaseId'] ?? '';
+  static final String kApiKey = dotenv.env['kApiKey'] ?? '';
+  static final String kEndPoint = dotenv.env['kEndPoint'] ?? '';
+  static final String kMessagesCollection = dotenv.env['kMessagesCollection'] ?? '';
+  static final String kUsersCollection = dotenv.env['kUsersCollection'] ?? '';
+  static final String kChatRoomCollection = dotenv.env['kChatRoomCollection'] ?? '';
+  static final String kNotificationCollection = dotenv.env['kNotificationCollection'] ?? '';
+  static final String kMessageImagesBucket = dotenv.env['kMessageImagesBucket'] ?? '';
 
   static String imageUrl(String imageId) =>
       '$kEndPoint/storage/buckets/$kMessageImagesBucket/files/$imageId/view?project=$kProjectId&mode=admin';
 
-  static const kMessagesDocmentsChannels =
+  static final kMessagesDocmentsChannels =
       'databases.${AppwriteConstants.kDatabaseId}.collections.${AppwriteConstants.kMessagesCollection}.documents';
 
-  static const kUsersDocumentsChannels =
+  static final kUsersDocumentsChannels =
       'databases.${AppwriteConstants.kDatabaseId}.collections.${AppwriteConstants.kUsersCollection}.documents';
 
-  static const kChatRoomDocmentsChannels =
+  static final kChatRoomDocmentsChannels =
       'databases.${AppwriteConstants.kDatabaseId}.collections.${AppwriteConstants.kChatRoomCollection}.documents';
 }
 

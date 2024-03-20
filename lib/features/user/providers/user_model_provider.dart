@@ -18,14 +18,14 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   FutureOr<UserModel> build() async {
     final user = ref.watch(authProvider).value;
     if (user == null) return UserModel.instance();
-    return await _getUserModel(user.userId).catchError((e) async {
+    return await getUserModel(user.userId).catchError((e) async {
       // 存在しないエラー404
       if (e is AppwriteException && e.code == 404) {
         final userCount = (await getUserModelList()).length.toString();
         // セッションID＋カウント
         final userId = user.$id.substring(user.$id.length - 4) + userCount;
         final userModel = UserModel.instance(
-          id: user.userId,
+          documentId: user.userId,
           name: '名前はまだない',
           userId: userId,
         );
@@ -37,9 +37,9 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   }
 
   /// ユーザー取得
-  /// errorCodeを取りたいためfalse
-  Future<UserModel> _getUserModel(String id) async {
-    final doc = await _userAPI.getUserDocument(id, isCatch: false);
+  /// errorCodeを取りたいためtrue
+  Future<UserModel> getUserModel(String documentId) async {
+    final doc = await _userAPI.getUserDocument(documentId, isDefaultError: true);
     return UserModel.fromMap(doc.data);
   }
 
@@ -63,7 +63,13 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
 
   /// ユーザー一覧取得
   Future<List<UserModel>> getUserModelList({String? chatRoomId}) async {
-    final doc = await _userAPI.getUsersDocumentList(chatRoomId: chatRoomId);
+    final queries = [
+      Query.limit(100000),
+      Query.equal('isDeleted', false),
+    ];
+    if (chatRoomId != null) queries.add(Query.contains('chatRoomIds', chatRoomId));
+
+    final doc = await _userAPI.getUsersDocumentList(queries: queries);
     final userModelList = doc.documents.map((doc) => UserModel.fromMap(doc.data)).toList();
 
     return userModelList;

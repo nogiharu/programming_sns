@@ -28,7 +28,7 @@ class ChatRoomModelListNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomMo
   void updateChatRoomEvent(RealtimeMessage event) {
     update((data) {
       final chatRoom = ChatRoomModel.fromMap(event.payload);
-      final index = data.indexWhere((e) => e.id == chatRoom.id);
+      final index = data.indexWhere((e) => e.documentId == chatRoom.documentId);
       return data
         ..removeAt(index)
         ..insert(0, chatRoom);
@@ -47,18 +47,22 @@ class ChatRoomModelListNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomMo
   }
 
   Future<List<ChatRoomModel>> getChatRoomList() async {
-    await futureGuard(
+    final queries = [
+      Query.orderDesc('updatedAt'),
+      Query.limit(10000), // FIXME
+    ];
+    return await futureGuard(
       () async {
         return await _chatRoomAPI
-            .getChatRoomDocumentList()
+            .getChatRoomDocumentList(queries: queries, isDefaultError: true)
             .then((docs) => docs.documents.map((doc) => ChatRoomModel.fromMap(doc.data)).toList());
       },
     );
 
-    return state.value!;
+    // return state.value!;
   }
 
   ChatRoomModel getChatRoom(String chatRoomId) {
-    return state.value!.firstWhere((e) => e.id == chatRoomId);
+    return state.value!.firstWhere((e) => e.documentId == chatRoomId);
   }
 }

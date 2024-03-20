@@ -30,7 +30,8 @@ class MessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Message>, 
 
   @override
   FutureOr<List<Message>> build(arg) async {
-    return await getMessages();
+    // return await getMessages();
+    return [];
   }
 
   void updateMessage(RealtimeMessage event) {
@@ -50,20 +51,20 @@ class MessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Message>, 
 
   /// メッセージ一覧取得
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
-  Future<List<Message>> getMessages({String? id}) async {
-    final messages = await _messageAPI
-        .getMessagesDocumentList(chatRoomId: arg, id: id)
-        .then((docs) => docs.documents
-            .map(
-              (doc) => MessageEX.fromMap(doc.data),
-            )
-            .toList()
-            .reversed
-            .toList())
-        .catchError(ref.read(showDialogProvider));
+  // Future<List<Message>> getMessages({String? id}) async {
+  //   final messages = await _messageAPI
+  //       .getMessagesDocumentList(chatRoomId: arg, id: id)
+  //       .then((docs) => docs.documents
+  //           .map(
+  //             (doc) => MessageEX.fromMap(doc.data),
+  //           )
+  //           .toList()
+  //           .reversed
+  //           .toList())
+  //       .catchError(ref.read(showDialogProvider));
 
-    return messages;
-  }
+  //   return messages;
+  // }
 
   /// メッセージ作成
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
@@ -77,10 +78,13 @@ class MessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Message>, 
   /// 最初のメッセージ取得
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
   Future<Message> getFirstMessage() async {
+    final queries = [
+      Query.equal('chatRoomId', arg),
+      Query.orderAsc('createdAt'),
+      Query.limit(1),
+    ];
     final messages = await _messageAPI
-        .getFirstMessageDocument(
-          chatRoomId: arg,
-        )
+        .getMessageDocumentList(queries: queries)
         .then((docs) => docs.documents.map((doc) => MessageEX.fromMap(doc.data)).first)
         .catchError(ref.read(showDialogProvider));
 

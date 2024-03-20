@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
@@ -8,6 +9,9 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 
 late Box box;
 Future<void> main() async {
+  const envFile = String.fromEnvironment('env');
+  await dotenv.load(fileName: envFile);
+
   usePathUrlStrategy(); // # delete
   await Hive.initFlutter();
   box = await Hive.openBox('users');

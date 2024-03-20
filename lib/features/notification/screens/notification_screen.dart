@@ -14,16 +14,29 @@ class NotificationScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print(ref.watch(notificationModelListProvider).value);
     return Scaffold(
       appBar: AppBar(
         title: const Text('通知'),
       ),
       body: ref.watchEX(
         userModelProvider,
-        complete: (data) {
-          return const Text('text');
-        },
+        complete: (userModel) => ref.watchEX(
+          notificationModelListProvider,
+          complete: (notificationModelList) {
+            return ListView.builder(
+              itemCount: notificationModelList.length,
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    Text(notificationModelList[index].text),
+                    Text(notificationModelList[index].isRead.toString()),
+                    Text(notificationModelList[index].notificationType.toString()),
+                  ],
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

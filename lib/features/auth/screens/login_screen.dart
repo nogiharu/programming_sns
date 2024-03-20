@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:programming_sns/apis/user_api_provider.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/auth/widgets/auth_field.dart';
@@ -22,7 +23,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (ref.watch(userModelProvider).value == null) {
+    final userModel = ref.watch(userModelProvider).value;
+    if (userModel == null) {
       return const Center(
         child: CircularProgressIndicator(),
       );
@@ -57,6 +59,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       await ref.read(authProvider.notifier).login(
                             loginId: idController.text,
                             loginPassword: passwordController.text,
+                            prevUserModel: userModel.copyWith(isDeleted: true),
                           );
 
                       final auth = ref.watch(authProvider);

@@ -40,7 +40,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
             child: Column(
               children: [
                 TextButton(
-                  onPressed: () => createThreadBottomSheet(userId: userModel.id),
+                  onPressed: () => createThreadBottomSheet(userId: userModel.documentId),
                   child: const Text('スレを立てる'),
                 ),
                 ref.watchEX(
@@ -58,10 +58,10 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                         return GestureDetector(
                           onTap: () {
                             // ルームID追加 awaitはしない TODO
-                            if (!userModel.chatRoomIds!.contains(chatRoom[index].id!)) {
+                            if (!userModel.chatRoomIds!.contains(chatRoom[index].documentId!)) {
                               final updateUserModel = userModel.copyWith(
                                 updatedAt: DateTime.now(),
-                              )..chatRoomIds?.add(chatRoom[index].id!);
+                              )..chatRoomIds?.add(chatRoom[index].documentId!);
                               // API
                               ref.read(userModelProvider.notifier).updateUserModel(updateUserModel);
                             }
@@ -69,7 +69,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                             // CHAT画面に遷移
                             context.goNamed(ChatScreen.path, extra: {
                               'label': chatRoom[index].name,
-                              'chatRoomId': chatRoom[index].id,
+                              'chatRoomId': chatRoom[index].documentId,
                             });
                             // if (context.mounted) {
                             //   context.goNamed(ChatScreen.path, extra: {

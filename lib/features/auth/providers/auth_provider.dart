@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:dart_appwrite/dart_appwrite.dart' show Users;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:programming_sns/apis/user_api_provider.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
+import 'package:programming_sns/core/dart_appwrite_providers.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
 
 import 'package:programming_sns/features/user/models/user_model.dart';
@@ -15,7 +18,7 @@ final authProvider = AsyncNotifierProvider<AuthNotifier, Session>(AuthNotifier.n
 
 class AuthNotifier extends AsyncNotifier<Session> {
   Account get _account => ref.watch(appwriteAccountProvider);
-
+  Users get _users => ref.watch(dartAppwriteUsersProvider);
   @override
   FutureOr<Session> build() async {
     return await _account.getSession(sessionId: 'current').then(
@@ -38,21 +41,41 @@ class AuthNotifier extends AsyncNotifier<Session> {
   }
 
   /// ログイン
-  Future<Session> login({required String loginId, required String loginPassword}) async {
+  Future<Session> login({
+    required String loginId,
+    required String loginPassword,
+    UserModel? prevUserModel,
+  }) async {
     return await futureGuard(() async {
+      // パスワード、IDが条件を満たしていない場合、throw
       exceptionMessage(userId: loginId, loginPassword: loginPassword);
-      return await _account
-          .createEmailSession(
-            email: '$loginId@gmail.com',
-            password: loginPassword,
-          )
-          .catchError((e) => exceptionMessage(error: e));
+
+      final queries = [
+        Query.equal('userId', loginId),
+        Query.equal('loginPassword', loginPassword),
+        Query.equal('isDeleted', false),
+      ];
+
+      await ref.read(userAPIProvider).getUsersDocumentList(queries: queries).then((docList) async {
+        // ユーザーがいない場合、throw
+        if (docList.documents.isEmpty) throw 'error';
+        // authのuser削除
+        await _users.delete(userId: state.requireValue.userId);
+        // userModelの削除
+        if (prevUserModel != null) {
+          ref.read(userModelProvider.notifier).updateUserModel(prevUserModel);
+        }
+      }).catchError((e) => exceptionMessage(error: e));
+
+      // セッション作成
+      return await _createSession(loginId, loginPassword, isDeleteSession: false);
     });
   }
 
   /// アカウント登録
   Future<void> accountUpdate({required UserModel userModel}) async {
     await futureGuard(() async {
+      // パスワード、IDが条件を満たしていない場合、throw
       exceptionMessage(userId: userModel.userId, loginPassword: userModel.loginPassword);
 
       return await _account
@@ -60,10 +83,13 @@ class AuthNotifier extends AsyncNotifier<Session> {
         email: '${userModel.userId}@gmail.com',
         password: userModel.loginPassword,
       )
-          .then((_) async {
+          .then((user) async {
+        // authユーザー名更新
+        await _account.updateName(name: userModel.name);
+        // ユーザー更新
         await ref.read(userModelProvider.notifier).updateUserModel(userModel);
-        // ログインしないとセッション更新されない
-        return await login(loginId: userModel.userId, loginPassword: userModel.loginPassword);
+        // セッション延長
+        return await _createSession(userModel.userId, userModel.loginPassword);
       }).catchError((e) => exceptionMessage(error: e));
     });
   }
@@ -72,6 +98,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
   Future<void> loginPasswordUpdate(
       {required String newLoginPassword, required UserModel userModel}) async {
     await futureGuard(() async {
+      // パスワード、IDが条件を満たしていない場合、throw
       exceptionMessage(loginPassword: newLoginPassword);
 
       return await _account
@@ -80,17 +107,32 @@ class AuthNotifier extends AsyncNotifier<Session> {
         await ref
             .read(userModelProvider.notifier)
             .updateUserModel(userModel.copyWith(loginPassword: newLoginPassword));
-        // ログインしないとセッション更新されない
-        return await login(loginId: userModel.userId, loginPassword: newLoginPassword);
+
+        // セッション延長
+        return await _createSession(userModel.userId, newLoginPassword);
       }).catchError((e) => exceptionMessage(error: e));
     });
   }
 
-  Future<dynamic> logout() async {
-    await _account.deleteSession(sessionId: 'current');
+  Future<Session> _createSession(
+    String loginId,
+    String loginPassword, {
+    bool isDeleteSession = true,
+  }) async {
+    if (isDeleteSession) await _account.deleteSession(sessionId: 'current');
+    return await _account
+        .createEmailPasswordSession(
+          email: '$loginId@gmail.com',
+          password: loginPassword,
+        )
+        .catchError((e) => exceptionMessage(error: e));
   }
 
   Future<dynamic> deleteAccount() async {
-    await _account.deleteIdentity(identityId: state.value!.userId);
+    return await ref.read(dartAppwriteUsersProvider).delete(userId: state.requireValue.userId);
+  }
+
+  Future<dynamic> logout() async {
+    await _account.deleteSession(sessionId: 'current');
   }
 }

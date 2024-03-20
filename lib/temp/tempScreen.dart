@@ -56,8 +56,6 @@ class AtMentionParagraphNode extends ElementNode {
   void accept(SpanNode? node) {
     if (node is TextNode) {
       final textList = splitText(node.text);
-      print(node.text);
-      print(textList);
 
       textList.forEach((text) => super.accept(
             TextNode(

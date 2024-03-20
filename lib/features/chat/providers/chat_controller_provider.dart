@@ -73,9 +73,18 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
   /// メッセージ一覧取得
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
-  Future<List<Message>> getMessages({String? id}) async {
+  Future<List<Message>> getMessages({String? before25MessageId}) async {
+    final queries = [
+      Query.orderDesc('createdAt'),
+      Query.equal('chatRoomId', arg),
+      Query.limit(25),
+    ];
+    // idより前を取得
+    if (before25MessageId != null) queries.add(Query.cursorAfter(before25MessageId));
+
     final messages = await _messageAPI
-        .getMessagesDocumentList(chatRoomId: arg, id: id)
+        // .getMessagesDocumentList(chatRoomId: arg, id: id)
+        .getMessageDocumentList(queries: queries)
         .then((docs) => docs.documents
             .map(
               (doc) => MessageEX.fromMap(doc.data),
@@ -100,10 +109,13 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
   /// 最初のメッセージ取得
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
   Future<Message> getFirstMessage() async {
+    final queries = [
+      Query.equal('chatRoomId', arg),
+      Query.orderAsc('createdAt'),
+      Query.limit(1),
+    ];
     final messages = await _messageAPI
-        .getFirstMessageDocument(
-          chatRoomId: arg,
-        )
+        .getMessageDocumentList(queries: queries)
         .then((docs) => docs.documents.map((doc) => MessageEX.fromMap(doc.data)).first)
         .catchError(ref.read(showDialogProvider));
 

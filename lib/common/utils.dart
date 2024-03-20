@@ -27,7 +27,14 @@ final showDialogProvider = Provider((ref) {
   };
 });
 
-exceptionMessage({dynamic error, String? userId, String? loginPassword}) {
+exceptionMessage({
+  dynamic error,
+  String? userId,
+  String? loginPassword,
+  bool isDefaultError = false,
+}) {
+  if (isDefaultError) throw error;
+
   //-------------- 認証系 --------------
   if ((userId?.isEmpty ?? false) || (loginPassword?.isEmpty ?? false)) {
     throw '入力は必須だよ(>_<)';
@@ -43,11 +50,14 @@ exceptionMessage({dynamic error, String? userId, String? loginPassword}) {
 
   //-------------- API系 --------------
   if (error != null) {
-    if (error is AppwriteException && error.code == 409) {
+    print('exceptionMessage：${error.toString()}');
+    if (error is AppwriteException &&
+        (error.code == 409 ||
+            (error.code == 400 && error.toString().contains('general_bad_request')))) {
       throw '既に使われているIDだよ(>_<)';
     }
     throw '''
-      code：${error is AppwriteException ? '${error.code}' : ''}
+      ${error is AppwriteException ? 'code：${error.code}' : ''}
       予期せぬエラーだあ(T ^ T)
       再立ち上げしてね(>_<)
       ''';

@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/at_mention_paragraph_node.dart';
 import 'package:flutter/foundation.dart';
@@ -248,6 +249,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   /// 送信 or 更新
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
     if (message.trim().isEmpty) return;
+    // メンション
+    final mentionUserIds = getMentionUserIds(message);
 
     if (updateMessage == null) {
       // メッセージ送信
@@ -259,6 +262,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
         chatRoomId: widget.chatRoomId,
         updatedAt: DateTime.now(),
+        mentionUserIds: mentionUserIds,
       );
       // メッセージ送信
       await _chatControllerNotifier.createMessage(msg);
@@ -271,23 +275,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           .updateChatRoomDocument(chatRoom.copyWith(updatedAt: DateTime.now()));
     } else {
       // メッセージ更新 前回のメッセージ違うなら更新
-      if (updateMessage?.message != message) {
+      if (updateMessage != null && updateMessage!.message != message) {
         updateMessage = updateMessage!.copyWith(
           message: message,
           updatedAt: DateTime.now(),
+          mentionUserIds: mentionUserIds,
         );
         await _chatControllerNotifier.updateMessage(updateMessage!);
+        // メッセージ更新リセット
+        updateMessage = null;
       }
     }
-
-    getMentionChatUsers(message);
 
     // スクロールが100件超えていたら25件にリセット
     if (_chatController.initialMessageList.length > 100) {
       _chatController.initialMessageList = await _chatControllerNotifier.getMessages();
     }
-    // メッセージ更新リセット
-    updateMessage = null;
   }
 
   /// ページング
@@ -300,8 +303,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     if (isFirst) return;
 
-    final messageList25Ago =
-        await _chatControllerNotifier.getMessages(id: _chatController.initialMessageList.first.id);
+    final messageList25Ago = await _chatControllerNotifier.getMessages(
+      before25MessageId: _chatController.initialMessageList.first.id,
+    );
 
     _chatController.loadMoreData(messageList25Ago);
   }
@@ -364,20 +368,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  void getMentionChatUsers(String text) {
+  List<String> getMentionUserIds(String text) {
     final textUserIdList = AtMentionParagraphNode.splitText(text)
         .where((e) => e.startsWith('@'))
         .map((e) => e.replaceAll('@', '').trim());
 
-    if (textUserIdList.isEmpty) return;
+    if (textUserIdList.isEmpty) return [];
 
-    List<ChatUser> mentionChatUsers = _chatController.chatUsers
-        .where((chatUser) =>
-            textUserIdList.any((id) => chatUser.userId == id && _currentChatUser.userId != id))
+    // List<String> mentionIdList = textUserIdList
+    //     .where((id) => _chatController.chatUsers
+    //         .any((chatUser) => chatUser.userId == id && _currentChatUser.userId != id))
+    //     .toList();
+
+    List<String> mentionIdList = _chatController.chatUsers
+        .where(
+          (chatUser) =>
+              textUserIdList.any((id) => chatUser.userId == id && _currentChatUser.userId != id),
+        )
+        .map((chatUser) => chatUser.id)
         .toList();
 
-    mentionChatUsers.forEach((element) {
-      print(element.userId);
-    });
+    return mentionIdList;
   }
 }

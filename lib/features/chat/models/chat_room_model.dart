@@ -1,7 +1,7 @@
 import 'package:chatview/chatview.dart';
 
 class ChatRoomModel {
-  String? id;
+  String? documentId;
   final String ownerId;
   final String name;
   // List<Message>? messages;
@@ -11,7 +11,7 @@ class ChatRoomModel {
   final DateTime updatedAt;
 
   ChatRoomModel({
-    this.id,
+    this.documentId,
     required this.ownerId,
     required this.name,
     // this.messages,
@@ -20,7 +20,7 @@ class ChatRoomModel {
   });
 
   ChatRoomModel copyWith({
-    String? id,
+    String? documentId,
     String? ownerId,
     String? name,
     List<Message>? messages,
@@ -28,7 +28,7 @@ class ChatRoomModel {
     DateTime? updatedAt,
   }) {
     return ChatRoomModel(
-      id: id ?? this.id,
+      documentId: documentId ?? this.documentId,
       ownerId: ownerId ?? this.ownerId,
       name: name ?? this.name,
       // messages: messages ?? this.messages,
@@ -52,7 +52,7 @@ class ChatRoomModel {
 
   factory ChatRoomModel.fromMap(Map<String, dynamic> map) {
     return ChatRoomModel(
-      id: map['\$id'],
+      documentId: map['\$id'],
       ownerId: map['ownerId'] ?? '',
       name: map['name'] ?? '',
       // messages: map['messages'] != null
@@ -65,7 +65,7 @@ class ChatRoomModel {
 
   @override
   String toString() {
-    return 'ChatRoomModel(id: $id, ownerId: $ownerId, name: $name,  $createdAt, updatedAt: $updatedAt )';
+    return 'ChatRoomModel(id: $documentId, ownerId: $ownerId, name: $name,  $createdAt, updatedAt: $updatedAt )';
   }
 
   @override
@@ -73,7 +73,7 @@ class ChatRoomModel {
     if (identical(this, other)) return true;
 
     return other is ChatRoomModel &&
-        other.id == id &&
+        other.documentId == documentId &&
         other.ownerId == ownerId &&
         other.name == name &&
         other.createdAt == createdAt &&
@@ -83,7 +83,11 @@ class ChatRoomModel {
 
   @override
   int get hashCode {
-    return id.hashCode ^ ownerId.hashCode ^ name.hashCode ^ createdAt.hashCode ^ updatedAt.hashCode;
+    return documentId.hashCode ^
+        ownerId.hashCode ^
+        name.hashCode ^
+        createdAt.hashCode ^
+        updatedAt.hashCode;
     // messages.hashCode;
   }
 

@@ -10,12 +10,14 @@
             "type": "dart",
             "args": [
                 "--web-port",
-                "1124",
+                "1127",
                 // "--web-renderer",
                 // "html",
                 // "web-server",
                 // "--web-browser-flag",
                 // "--disable-web-security"
+                "--dart-define",
+                "env=.env",
             ]
         },
         {
