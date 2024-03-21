@@ -5,6 +5,7 @@ import 'package:programming_sns/features/chat/providers/chat_room_model_list_pro
 import '../../../core/realtime_event_provider.dart';
 
 /// ホットリロードしたら例外が出るため、再立ち上げする
+/// FIXME ここがログを出している！
 final chatRoomEventProvider = AutoDisposeProvider<void>((ref) {
   ref.listen(realtimeEventProvider, (previous, next) {
     next.whenOrNull(

@@ -1,20 +1,23 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/theme/theme_color.dart';
 import 'package:programming_sns/routes/router.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
-late Box box;
 Future<void> main() async {
+  // リリースモードはログ出力を抑制(chromeだと何故か出てしまうため)
+  if (kReleaseMode) debugPrint = (message, {wrapWidth}) {};
+
+  // 環境
   const envFile = String.fromEnvironment('env');
   await dotenv.load(fileName: envFile);
 
-  usePathUrlStrategy(); // # delete
-  await Hive.initFlutter();
-  box = await Hive.openBox('users');
+  // urlの#を消す
+  usePathUrlStrategy();
+
   runApp(
     const ProviderScope(
       child: Main(),

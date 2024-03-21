@@ -30,7 +30,18 @@
             "name": "programming_sns (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "args": [
+                "--web-port",
+                "1127",
+                // "--web-renderer",
+                // "html",
+                // "web-server",
+                // "--web-browser-flag",
+                // "--disable-web-security"
+                "--dart-define",
+                "env=.env",
+            ]
         }
     ]
 }

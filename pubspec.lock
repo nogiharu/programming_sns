@@ -65,14 +65,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  carousel_slider:
-    dependency: "direct main"
-    description:
-      name: carousel_slider
-      sha256: "9c695cc963bf1d04a47bd6021f68befce8970bcd61d24938e1fb0918cf5d9c42"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.2.1"
   characters:
     dependency: transitive
     description:
@@ -367,22 +359,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.0"
-  hive:
-    dependency: transitive
-    description:
-      name: hive
-      sha256: "8dcf6db979d7933da8217edcec84e9df1bdb4e4edc7fc77dbd5aa74356d6d941"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.3"
-  hive_flutter:
-    dependency: "direct main"
-    description:
-      name: hive_flutter
-      sha256: dca1da446b1d808a51689fb5d0c6c9510c0a2ba01e22805d492c73b68e33eecc
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   html:
     dependency: transitive
     description:
@@ -599,14 +575,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
-  open_filex:
-    dependency: "direct main"
-    description:
-      name: open_filex
-      sha256: a6c95237767c5647e68b71a476602fcf4f1bfc530c126265e53addae22ef5fc2
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.3.4"
   package_info_plus:
     dependency: transitive
     description:

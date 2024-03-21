@@ -1,4 +1,3 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/at_mention_paragraph_node.dart';
 import 'package:flutter/foundation.dart';
@@ -275,7 +274,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           .updateChatRoomDocument(chatRoom.copyWith(updatedAt: DateTime.now()));
     } else {
       // メッセージ更新 前回のメッセージ違うなら更新
-      if (updateMessage != null && updateMessage!.message != message) {
+      if (updateMessage!.message != message) {
         updateMessage = updateMessage!.copyWith(
           message: message,
           updatedAt: DateTime.now(),
@@ -294,13 +293,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   /// ページング
+  /// 25件ずつ取得
   Future<void> loadMoreData() async {
     if (_chatController.initialMessageList.isEmpty) return;
 
     final firstMessage = ref.watch(firstChatMessageProvider(widget.chatRoomId)).value;
 
     final isFirst = _chatController.initialMessageList.first.createdAt == firstMessage?.createdAt;
-
+    // 一番最初のメッセージがすでに表示されていたらページングしない
     if (isFirst) return;
 
     final messageList25Ago = await _chatControllerNotifier.getMessages(
