@@ -83,7 +83,6 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     if (before25MessageId != null) queries.add(Query.cursorAfter(before25MessageId));
 
     final messages = await _messageAPI
-        // .getMessagesDocumentList(chatRoomId: arg, id: id)
         .getMessageDocumentList(queries: queries)
         .then((docs) => docs.documents
             .map(

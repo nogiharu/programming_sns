@@ -44,6 +44,7 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
 
           // final notificationModel = NotificationModel.instance(notificationType: NotificationType.mention);
           if (message.mentionUserIds!.isNotEmpty) {
+            debugPrint('MESSAGE_MENTION!');
             ref.read(notificationModelListProvider.notifier).chatMentionEvent(message);
           }
         }

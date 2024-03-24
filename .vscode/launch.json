@@ -11,8 +11,8 @@
             "args": [
                 "--web-port",
                 "1127",
-                // "--web-renderer",
-                // "html",
+                "--web-renderer",
+                "html",
                 // "web-server",
                 // "--web-browser-flag",
                 // "--disable-web-security"
