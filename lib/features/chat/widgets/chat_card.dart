@@ -44,7 +44,7 @@ class _ChatCardState extends State<ChatCard> {
     final isSendByCurrentUser = widget.message.sendBy == widget.currentUser.id;
 
     double? mobileFontSize; // FIXME共通化したい
-    if (kIsWeb) mobileFontSize = MediaQuery.of(context).size.width < 400 ? 10 : 13;
+    if (kIsWeb) mobileFontSize = MediaQuery.of(context).size.width < 400 ? 8 : 10;
 
     // 時間
     final timeWidget = Padding(
@@ -60,8 +60,9 @@ class _ChatCardState extends State<ChatCard> {
             ),
           ),
           Text(
-            DateFormat.Hm('ja').format(widget.message.createdAt),
-            style: TextStyle(fontSize: mobileFontSize),
+            DateFormat.MMMd('ja').format(widget.message.createdAt) +
+                DateFormat.Hm('ja').format(widget.message.createdAt),
+            style: TextStyle(fontSize: mobileFontSize, color: Colors.grey.shade500),
           ),
         ],
       ),

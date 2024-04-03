@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
-import 'package:programming_sns/features/notification/providers/notification_model_list_provider.dart';
+import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
 import '../../../core/realtime_event_provider.dart';
 
 /// ホットリロードしたら例外が出るため、再立ち上げする
@@ -30,6 +30,9 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
             data.events.contains('${AppwriteConstants.kMessagesDocmentsChannels}.*.update') &&
                 data.payload.containsValue(chatRoomId);
 
+        final isNotificationCreateEvent =
+            data.events.contains('${AppwriteConstants.kNotificationDocmentsChannels}.*.create');
+
         /// ユーザー更新イベント
         if (isUserUpdateEvent) {
           debugPrint('CHAT_USER_UPDATE!');
@@ -41,12 +44,6 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
           debugPrint('MESSAGE_CREATE!');
           final message = MessageEX.fromMap(data.payload);
           chatController.addMessage(message);
-
-          // final notificationModel = NotificationModel.instance(notificationType: NotificationType.mention);
-          if (message.mentionUserIds!.isNotEmpty) {
-            debugPrint('MESSAGE_MENTION!');
-            ref.read(notificationModelListProvider.notifier).chatMentionEvent(message);
-          }
         }
 
         /// メッセージ更新イベント
@@ -54,6 +51,8 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
           debugPrint('MESSAGE_UPDATE!');
           ref.read(chatControllerProvider(chatRoomId).notifier).updateMessageEvent(data);
         }
+
+        // // print(data.events.contains(AppwriteConstants.kNotificationCollection));
       },
     );
   });

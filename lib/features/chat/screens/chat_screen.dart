@@ -6,15 +6,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/apis/chat_room_api_provider.dart';
 import 'package:programming_sns/apis/message_api_provider.dart';
+import 'package:programming_sns/apis/notification_api_provider.dart';
 import 'package:programming_sns/apis/storage_api_provider.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
+import 'package:programming_sns/enums/notification_type.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event_provider.dart';
-import 'package:programming_sns/features/chat/providers/chat_room_model_list_provider.dart';
+import 'package:programming_sns/features/chat/providers/chat_room_list_provider.dart';
+import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
+import 'package:programming_sns/features/notification/models/notification_model.dart';
+import 'package:programming_sns/features/notification/providers/notification_event_provider.dart';
+import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
 import 'package:programming_sns/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
@@ -65,7 +71,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(widget.label)),
+        appBar: AppBar(
+          title: Text(widget.label),
+          leading: IconButton(
+              onPressed: () => context.go(ChatThreadScreen.metaData['path']),
+              icon: const Icon(Icons.arrow_back_outlined)),
+        ),
 
         /// USER
         body: ref.watchEX(
@@ -193,6 +204,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           .read(messageAPIProvider)
                           .updateMessageDocument(message)
                           .catchError(ref.read(showDialogProvider));
+
+                      // リアクション
+                      // onSendReaction(message);
                     },
                   ),
                   replyPopupConfig: ReplyPopupConfiguration(
@@ -248,9 +262,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   /// 送信 or 更新
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
     if (message.trim().isEmpty) return;
-    // メンション
-    final mentionUserIds = getMentionUserIds(message);
 
+    // 【送信処理】
     if (updateMessage == null) {
       // メッセージ送信
       final msg = Message(
@@ -261,30 +274,34 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
         chatRoomId: widget.chatRoomId,
         updatedAt: DateTime.now(),
-        mentionUserIds: mentionUserIds,
+        // mentionUserIds: mentionUserIds,
       );
       // メッセージ送信
       await _chatControllerNotifier.createMessage(msg);
 
       // このチャットルーム取得
-      final chatRoom = ref.read(chatRoomModelListProvider.notifier).getChatRoom(widget.chatRoomId);
-      // チャットルームの日付更新　awaitはしない
+      final chatRoom = ref.read(chatRoomListProvider.notifier).getChatRoom(widget.chatRoomId);
+      // 【チャットルームの日付更新】　awaitはしない
       ref
           .read(chatRoomAPIProvider)
           .updateChatRoomDocument(chatRoom.copyWith(updatedAt: DateTime.now()));
     } else {
+      // 【更新処理】
       // メッセージ更新 前回のメッセージ違うなら更新
       if (updateMessage!.message != message) {
+        // updateMessage.reaction.reactedUserIds;
         updateMessage = updateMessage!.copyWith(
           message: message,
           updatedAt: DateTime.now(),
-          mentionUserIds: mentionUserIds,
+          // mentionUserIds: mentionUserIds,
         );
         await _chatControllerNotifier.updateMessage(updateMessage!);
         // メッセージ更新リセット
         updateMessage = null;
       }
     }
+    // 【メンション】　awaitはしない
+    onSendMention(message);
 
     // スクロールが100件超えていたら25件にリセット
     if (_chatController.initialMessageList.length > 100) {
@@ -368,26 +385,54 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  List<String> getMentionUserIds(String text) {
-    final textUserIdList = AtMentionParagraphNode.splitText(text)
+  /// メンション通知
+  /// UPDATE時にリレーションシップを組めない
+  Future<void> onSendMention(String text) async {
+    print('あああああ');
+    print(text);
+    // @を除去
+    final mentionUserIds = AtMentionParagraphNode.splitText(text)
         .where((e) => e.startsWith('@'))
         .map((e) => e.replaceAll('@', '').trim());
 
-    if (textUserIdList.isEmpty) return [];
+    if (mentionUserIds.isEmpty) return;
 
-    // List<String> mentionIdList = textUserIdList
-    //     .where((id) => _chatController.chatUsers
-    //         .any((chatUser) => chatUser.userId == id && _currentChatUser.userId != id))
-    //     .toList();
-
-    List<String> mentionIdList = _chatController.chatUsers
+    // 現在のチャットユーザのユーザIDと等しいものがある場合、ドキュメントIDリストにする
+    final userDocumentIds = _chatController.chatUsers
         .where(
-          (chatUser) =>
-              textUserIdList.any((id) => chatUser.userId == id && _currentChatUser.userId != id),
+          (chatUser) => mentionUserIds.any((mentionUserId) =>
+              chatUser.userId == mentionUserId && _currentChatUser.userId != mentionUserId),
         )
-        .map((chatUser) => chatUser.id)
-        .toList();
+        .map((chatUser) => chatUser.id);
 
-    return mentionIdList;
+    await Future.forEach(userDocumentIds, (userDocumentId) async {
+      final notificationModel = NotificationModel.instance(
+        chatRoomId: widget.chatRoomId,
+        chatRoomLabel: widget.label,
+        userDocumentId: userDocumentId,
+        text: text,
+        notificationType: NotificationType.mention,
+        sendByUserName: _currentChatUser.name,
+      );
+
+      await ref.read(notificationAPIProvider).createNotificationDocument(notificationModel);
+    });
   }
+
+  /// リアクション
+  /// FIXME リアクションはやらない
+  // Future<void> onSendReaction(Message message) async {
+  //   if (message.reaction.reactions.isEmpty) return;
+
+  //   final notificationModel = NotificationModel.instance(
+  //     chatRoomId: widget.chatRoomId,
+  //     chatRoomLabel: widget.label,
+  //     userDocumentId: message.sendBy,
+  //     text: message.message,
+  //     notificationType: NotificationType.reaction,
+  //     sendByUserName: _currentChatUser.name,
+  //   );
+
+  //   await ref.read(notificationAPIProvider).createNotificationDocument(notificationModel);
+  // }
 }

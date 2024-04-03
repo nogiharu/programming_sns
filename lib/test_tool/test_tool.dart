@@ -8,6 +8,7 @@ import 'package:programming_sns/core/appwrite_providers.dart';
 import 'package:programming_sns/core/dart_appwrite_providers.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
+import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
 class TestToolcreen extends ConsumerWidget {
@@ -27,6 +28,12 @@ class TestToolcreen extends ConsumerWidget {
             children: [
               Column(
                 children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        ref.watch(aaa.notifier).state += 1;
+                        print(ref.watch(aaa.notifier).state);
+                      },
+                      child: const Text('aaa')),
                   // Container(
                   //     color: Colors.amber,
                   //     padding: const EdgeInsets.all(5),

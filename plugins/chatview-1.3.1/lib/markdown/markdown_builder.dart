@@ -61,6 +61,11 @@ class MarkdownBuilder extends StatelessWidget {
 
     final codeConfig = CodeConfig(style: const CodeConfig().style.copyWith(fontSize: 16));
 
+    List<String> mentionIdList = [];
+    if (chatUsers != null) {
+      mentionIdList = List.generate(chatUsers!.length, (index) => chatUsers![index].userId!);
+    }
+
     return MarkdownBlock(
       data: replacedMessage,
       config: markdownConfig.copy(configs: [
@@ -73,10 +78,8 @@ class MarkdownBuilder extends StatelessWidget {
             tag: MarkdownTag.p.name,
             generator: (e, config, visitor) {
               return AtMentionParagraphNode(
-                // text: e.textContent,
                 pConfig: config.p,
-                mentionIdList:
-                    List.generate(chatUsers!.length, (index) => chatUsers![index].userId!),
+                mentionIdList: mentionIdList,
               );
             }),
       ]),

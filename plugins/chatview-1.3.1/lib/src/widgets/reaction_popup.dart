@@ -47,13 +47,11 @@ class ReactionPopup extends StatefulWidget {
   ReactionPopupState createState() => ReactionPopupState();
 }
 
-class ReactionPopupState extends State<ReactionPopup>
-    with SingleTickerProviderStateMixin {
+class ReactionPopupState extends State<ReactionPopup> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
-  ReactionPopupConfiguration? get reactionPopupConfig =>
-      widget.reactionPopupConfig;
+  ReactionPopupConfiguration? get reactionPopupConfig => widget.reactionPopupConfig;
 
   bool get showPopUp => widget.showPopUp;
   double _yCoordinate = 0.0;
@@ -72,8 +70,7 @@ class ReactionPopupState extends State<ReactionPopup>
   void _initializeAnimationControllers() {
     _animationController = AnimationController(
       vsync: this,
-      duration: widget.reactionPopupConfig?.animationDuration ??
-          const Duration(milliseconds: 180),
+      duration: widget.reactionPopupConfig?.animationDuration ?? const Duration(milliseconds: 180),
     );
     _scaleAnimation = CurvedAnimation(
       parent: _animationController,
@@ -119,32 +116,33 @@ class ReactionPopupState extends State<ReactionPopup>
                           reactionPopupConfig: reactionPopupConfig,
                           child: _reactionPopupRow,
                         )
-                      : Container(
-                          constraints: BoxConstraints(
-                              maxWidth: reactionPopupConfig?.maxWidth ?? 350),
-                          margin: reactionPopupConfig?.margin ??
-                              const EdgeInsets.symmetric(horizontal: 25),
-                          padding: reactionPopupConfig?.padding ??
-                              const EdgeInsets.symmetric(
-                                vertical: 6,
-                                horizontal: 14,
+                      : currentUser?.id != _message?.sendBy // 追加変更
+                          ? Container(
+                              constraints:
+                                  BoxConstraints(maxWidth: reactionPopupConfig?.maxWidth ?? 350),
+                              margin: reactionPopupConfig?.margin ??
+                                  const EdgeInsets.symmetric(horizontal: 25),
+                              padding: reactionPopupConfig?.padding ??
+                                  const EdgeInsets.symmetric(
+                                    vertical: 6,
+                                    horizontal: 14,
+                                  ),
+                              decoration: BoxDecoration(
+                                color: reactionPopupConfig?.backgroundColor ?? Colors.white,
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  reactionPopupConfig?.shadow ??
+                                      BoxShadow(
+                                        color: Colors.grey.shade400,
+                                        blurRadius: 8,
+                                        spreadRadius: -2,
+                                        offset: const Offset(0, 8),
+                                      )
+                                ],
                               ),
-                          decoration: BoxDecoration(
-                            color: reactionPopupConfig?.backgroundColor ??
-                                Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              reactionPopupConfig?.shadow ??
-                                  BoxShadow(
-                                    color: Colors.grey.shade400,
-                                    blurRadius: 8,
-                                    spreadRadius: -2,
-                                    offset: const Offset(0, 8),
-                                  )
-                            ],
-                          ),
-                          child: _reactionPopupRow,
-                        ),
+                              child: _reactionPopupRow,
+                            )
+                          : const SizedBox.shrink(), // 追加変更
                 ),
               ),
             ),

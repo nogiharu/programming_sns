@@ -45,18 +45,23 @@ class AtMentionParagraphNode extends ElementNode {
     return result;
   }
 
+  /// MarkdownBlockのテキストの追加方法をカスタム
+  /// メンションされたPタグをハイライト
   @override
   void accept(SpanNode? node) {
-    if (mentionIdList.isNotEmpty && node is TextNode) {
+    if (node is TextNode) {
       final textList = splitText(node.text);
 
       textList.forEach((text) {
-        final isIdContain = mentionIdList.any((id) => text.replaceAll('@', '').trim() == id) &&
-            text.startsWith(regex);
+        bool isAtMention = text.startsWith(regex);
+        if (mentionIdList.isNotEmpty) {
+          isAtMention =
+              mentionIdList.any((id) => text.replaceAll('@', '').trim() == id) && isAtMention;
+        }
 
         final textStyle = pConfig.textStyle.copyWith(
-          color: isIdContain ? Colors.blue : null,
-          fontSize: isIdContain ? 13 : null,
+          color: isAtMention ? Colors.blue : null,
+          fontSize: isAtMention ? 13 : null,
         );
 
         super.accept(

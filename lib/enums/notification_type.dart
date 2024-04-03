@@ -1,9 +1,12 @@
 enum NotificationType {
-  reaction('reaction'),
-  mention('mention');
+  reaction('リアクション'),
+  mention('メンション');
 
   final String type;
   const NotificationType(this.type);
+
+  @override
+  String toString() => type.toString();
 }
 
 extension ConvertNotification on String {
@@ -11,10 +14,10 @@ extension ConvertNotification on String {
     switch (this) {
       case 'reaction':
         return NotificationType.reaction;
-      case 'mention':
+      case 'メンション':
         return NotificationType.mention;
       default:
-        return NotificationType.reaction;
+        return NotificationType.mention;
     }
   }
 }

@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api_provider.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/common/utils.dart';
+import 'package:programming_sns/features/notification/models/notification_model.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 
@@ -98,7 +99,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
   /// メッセージ作成
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
-  Future<void> createMessage(Message message) async {
+  Future<void> createMessage(Message message, {List<String>? mentionList}) async {
     await ref
         .read(messageAPIProvider)
         .createMessageDocument(message)

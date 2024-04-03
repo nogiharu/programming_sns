@@ -6,9 +6,12 @@ import 'package:programming_sns/features/auth/screens/login_credentials_update_s
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
+import 'package:programming_sns/temp/chat_screen4.dart';
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/notification/screens/notification_screen.dart';
 import 'package:programming_sns/features/user/screens/user_screen.dart';
+import 'package:programming_sns/temp/chat_screen2.dart';
 import 'package:programming_sns/temp/chat_screen3.dart';
 
 import 'package:programming_sns/temp/tempScreen.dart';
@@ -21,6 +24,9 @@ final shellNavigatorKeyProvider = Provider(
 );
 
 final router = Provider((ref) {
+  // 通知画面はstaticにできない
+  const notificationScreen = NotificationScreen();
+
   // タブの順番
   final bottomItems = [
     ChatThreadScreen.metaData,
@@ -62,9 +68,9 @@ final router = Provider((ref) {
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
                   final map = state.extra as Map<String, dynamic>;
-                  if (map['chatRoomId'] == '65c962068df47e2dddab') {
-                    return const ChatScreen3();
-                  }
+                  // if (map['chatRoomId'] == '65c962068df47e2dddab') {
+                  //   return const ChatScreen3();
+                  // }
                   return ChatScreen(
                     label: map['label'],
                     chatRoomId: map['chatRoomId'],
@@ -101,7 +107,9 @@ final router = Provider((ref) {
             path: NotificationScreen.metaData['path'],
             name: NotificationScreen.metaData['path'],
             pageBuilder: (context, state) {
-              return _pageAnimation(const NotificationScreen(), state, ref: ref);
+              // notificationScreen.metaData['icon'];
+
+              return _pageAnimation(notificationScreen, state, ref: ref);
             },
             routes: const [
               // GoRoute(

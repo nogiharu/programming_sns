@@ -22,6 +22,9 @@ class AppwriteConstants {
 
   static final kChatRoomDocmentsChannels =
       'databases.${AppwriteConstants.kDatabaseId}.collections.${AppwriteConstants.kChatRoomCollection}.documents';
+
+  static final kNotificationDocmentsChannels =
+      'databases.${AppwriteConstants.kDatabaseId}.collections.${AppwriteConstants.kNotificationCollection}.documents';
 }
 
 // Androidの場合

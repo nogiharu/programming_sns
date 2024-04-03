@@ -5,11 +5,11 @@ import 'package:programming_sns/apis/chat_room_api_provider.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
 import 'package:programming_sns/features/chat/models/chat_room_model.dart';
 
-final chatRoomModelListProvider =
-    AutoDisposeAsyncNotifierProvider<ChatRoomModelListNotifier, List<ChatRoomModel>>(
-        ChatRoomModelListNotifier.new);
+final chatRoomListProvider =
+    AutoDisposeAsyncNotifierProvider<ChatRoomListNotifier, List<ChatRoomModel>>(
+        ChatRoomListNotifier.new);
 
-class ChatRoomModelListNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
+class ChatRoomListNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
   ChatRoomAPI get _chatRoomAPI => ref.watch(chatRoomAPIProvider);
 
   @override

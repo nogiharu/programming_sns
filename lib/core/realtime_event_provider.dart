@@ -8,6 +8,7 @@ final realtimeEventProvider = AutoDisposeStreamProvider((ref) async* {
     AppwriteConstants.kChatRoomDocmentsChannels,
     AppwriteConstants.kMessagesDocmentsChannels,
     AppwriteConstants.kUsersDocumentsChannels,
+    AppwriteConstants.kNotificationDocmentsChannels,
   ]).stream;
 
   await for (final e in stream) {
