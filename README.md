@@ -78,3 +78,9 @@ fvm releases
 fvm list    
 
 fvm use 3.16.9 
+
+
+# サブモジュール
+git submodule add https://github.com/nogiharu/flutter_chatview.git
+git submodule update --init --recursive
+git submodule update --remote

@@ -1,0 +1,3 @@
+[submodule "flutter_chatview"]
+	path = flutter_chatview
+	url = https://github.com/nogiharu/flutter_chatview.git
