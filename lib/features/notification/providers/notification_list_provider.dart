@@ -51,10 +51,19 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
     );
   }
 
+  Future<void> updateNotification({required NotificationModel notificationModel}) async {
+    await futureGuard(() async {
+      return await _notificationAPI.updateNotificationDocument(notificationModel).then((doc) {
+        final notification = NotificationModel.fromMap(doc.data);
+        final index = state.value!.indexWhere((e) => e.documentId == notification.documentId);
+        return state.value!..[index] = notification;
+      });
+    }, isLoading: false);
+  }
+
   Future<List<NotificationModel>> getNotificationList() async {
     final queries = [
       Query.equal('userDocumentId', _currentUser.documentId),
-      Query.equal('isRead', false),
       Query.orderDesc('createdAt'),
       Query.limit(10000),
     ];

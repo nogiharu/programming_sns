@@ -58,17 +58,17 @@ class NotificationAPI {
   }
 
   /// 更新
-  // Future<Document> updateNotificationDocument(
-  //   NotificationModel notificationModel, {
-  //   isDefaultError = false,
-  // }) async {
-  //   return await _db
-  //       .updateDocument(
-  //         databaseId: AppwriteConstants.kDatabaseId,
-  //         collectionId: AppwriteConstants.kNotificationCollection,
-  //         documentId: notificationModel.id,
-  //         data: notificationModel.toMap(),
-  //       )
-  //       .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
-  // }
+  Future<Document> updateNotificationDocument(
+    NotificationModel notificationModel, {
+    isDefaultError = false,
+  }) async {
+    return await _db
+        .updateDocument(
+          databaseId: AppwriteConstants.kDatabaseId,
+          collectionId: AppwriteConstants.kNotificationCollection,
+          documentId: notificationModel.documentId!,
+          data: notificationModel.toMap(),
+        )
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+  }
 }

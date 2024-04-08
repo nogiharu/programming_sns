@@ -291,7 +291,6 @@ class _ChatScreen4State extends ConsumerState<ChatScreen4> {
         updateMessage = updateMessage!.copyWith(
           message: message,
           updatedAt: DateTime.now(),
-          mentionUserIds: mentionUserIds,
         );
         await _chatMessageListNotifier.updateMessage(updateMessage!);
         // メッセージ更新リセット

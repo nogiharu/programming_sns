@@ -20,9 +20,7 @@ extension MessageEX on Message {
     result.addAll({'status': status.toString()});
     result.addAll({'chatRoomId': chatRoomId});
     result.addAll({'updatedAt': updatedAt!.millisecondsSinceEpoch});
-    if (mentionUserIds != null) {
-      result.addAll({'mentionUserIds': mentionUserIds});
-    }
+
     return result;
   }
 
@@ -50,7 +48,6 @@ extension MessageEX on Message {
       updatedAt: map['updatedAt'] != null // FIXME
           ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'])
           : DateTime.now(),
-      mentionUserIds: List<String>.from(map['mentionUserIds']),
     );
   }
 
@@ -65,7 +62,6 @@ extension MessageEX on Message {
     Duration? voiceMessageDuration,
     String? chatRoomId,
     DateTime? updatedAt,
-    List<String>? mentionUserIds,
   }) {
     return Message(
       id: id ?? this.id,
@@ -78,7 +74,6 @@ extension MessageEX on Message {
       voiceMessageDuration: voiceMessageDuration ?? this.voiceMessageDuration,
       chatRoomId: chatRoomId ?? this.chatRoomId,
       updatedAt: updatedAt ?? this.updatedAt,
-      mentionUserIds: mentionUserIds ?? this.mentionUserIds,
     );
   }
 }

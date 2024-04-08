@@ -19,8 +19,6 @@ import 'package:programming_sns/features/chat/providers/chat_room_list_provider.
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
-import 'package:programming_sns/features/notification/providers/notification_event_provider.dart';
-import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
 import 'package:programming_sns/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
@@ -300,6 +298,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         updateMessage = null;
       }
     }
+
     // 【メンション】　awaitはしない
     onSendMention(message);
 
@@ -388,8 +387,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   /// メンション通知
   /// UPDATE時にリレーションシップを組めない
   Future<void> onSendMention(String text) async {
-    print('あああああ');
-    print(text);
     // @を除去
     final mentionUserIds = AtMentionParagraphNode.splitText(text)
         .where((e) => e.startsWith('@'))

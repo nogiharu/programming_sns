@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
-import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
 import '../../../core/realtime_event_provider.dart';
 
 /// ホットリロードしたら例外が出るため、再立ち上げする
@@ -29,9 +28,6 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
         final isMessageUpdateEvent =
             data.events.contains('${AppwriteConstants.kMessagesDocmentsChannels}.*.update') &&
                 data.payload.containsValue(chatRoomId);
-
-        final isNotificationCreateEvent =
-            data.events.contains('${AppwriteConstants.kNotificationDocmentsChannels}.*.create');
 
         /// ユーザー更新イベント
         if (isUserUpdateEvent) {
