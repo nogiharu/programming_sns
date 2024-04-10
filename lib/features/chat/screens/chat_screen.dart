@@ -170,7 +170,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
                   messageConfig: MessageConfiguration(
                     customMessageBuilder: (message) {
-                      if (message.isDeleted!) {
+                      if (message.isDeleted ?? false) {
                         return Text(
                           '削除されました',
                           style: TextStyle(color: Colors.grey.shade500),
