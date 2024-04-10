@@ -215,7 +215,7 @@ class _ChatScreen4State extends ConsumerState<ChatScreen4> {
                           });
                         },
                         // リアクションポップアップ閉じる
-                        onMoreTap: () async {
+                        onMoreTap: (message) async {
                           print('閉じる');
                         },
                         onReplyTap: (message) {
@@ -274,7 +274,7 @@ class _ChatScreen4State extends ConsumerState<ChatScreen4> {
         messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
         chatRoomId: widget.chatRoomId,
         updatedAt: DateTime.now(),
-        mentionUserIds: mentionUserIds,
+        // mentionUserIds: mentionUserIds,
       );
       // メッセージ送信
       await _chatMessageListNotifier.createMessage(msg);

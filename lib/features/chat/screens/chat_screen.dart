@@ -170,6 +170,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
                   messageConfig: MessageConfiguration(
                     customMessageBuilder: (message) {
+                      if (message.isDeleted!) {
+                        return Text(
+                          '削除されました',
+                          style: TextStyle(color: Colors.grey.shade500),
+                        );
+                      }
                       return ChatCard(
                         currentUser: _currentChatUser,
                         chatController: _chatController,
@@ -208,16 +214,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     },
                   ),
                   replyPopupConfig: ReplyPopupConfiguration(
-                    // リアクションポップアップ編集
+                    // メッセージ編集
                     onUnsendTap: (message) {
                       _textEditingController!.text = message.message;
                       setState(() {
                         updateMessage = message;
                       });
                     },
-                    // リアクションポップアップ閉じる
-                    onMoreTap: () async {
-                      print('閉じる');
+                    // メッセージ削除
+                    onMoreTap: (message) async {
+                      await _chatControllerNotifier.deleteMessage(message);
                     },
                     onReplyTap: (message) {
                       // print(message.reaction);

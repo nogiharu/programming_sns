@@ -122,12 +122,21 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     return messages;
   }
 
-  /// メッセージ作成
+  /// メッセージ編集
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
   Future<void> updateMessage(Message message) async {
     await ref
         .read(messageAPIProvider)
         .updateMessageDocument(message)
+        .catchError(ref.read(showDialogProvider));
+  }
+
+  /// メッセージ編集
+  /// FIXME state.valueではない値を返したいためfutureGuard使えない
+  Future<void> deleteMessage(Message message) async {
+    await ref
+        .read(messageAPIProvider)
+        .updateMessageDocument(message.copyWith(isDeleted: true))
         .catchError(ref.read(showDialogProvider));
   }
 }
