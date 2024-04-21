@@ -329,7 +329,7 @@ class _ChatScreen4State extends ConsumerState<ChatScreen4> {
         .downloadImage(url, AppwriteConstants.kMessageImagesBucket)
         .catchError(ref.read(showDialogProvider));
 
-    if (isSaved) ref.read(snackBarProvider('${kIsWeb ? 'ダウンロード' : '写真'}に保存完了したよ(*^_^*)'));
+    // if (isSaved) ref.read(snackBarProvider('${kIsWeb ? 'ダウンロード' : '写真'}に保存完了したよ(*^_^*)'));
   }
 
   /// 画像アップロード

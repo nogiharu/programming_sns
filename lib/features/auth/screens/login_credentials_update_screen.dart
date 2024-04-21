@@ -90,7 +90,8 @@ class _LoginCredentialsUpdateScreenState extends ConsumerState<LoginCredentialsU
                         }
 
                         if (context.mounted) context.pop();
-                        ref.read(snackBarProvider('更新完了だよ(*^_^*)'));
+                        // ref.read(snackBarProvider({'message': '更新完了だよ(*^_^*)'}));
+                        ref.read(snackBarProvider)(message: '更新完了だよ(*^_^*)');
                       },
                       child: const Text('更新'),
                     ),

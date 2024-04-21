@@ -1,16 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/common/error_dialog.dart';
-import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/routes/router.dart';
 import 'package:appwrite/appwrite.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-final snackBarProvider = Provider.family((ref, String msg) {
-  final messengerState = ref.read(scaffoldMessengerKeyProvider).currentState;
-  messengerState?.showSnackBar(SnackBar(content: Text(msg)));
+final snackBarProvider = AutoDisposeProvider((ref) {
+  final context = ref.read(shellNavigatorKeyProvider).currentState!.context;
+  return ({required String message, VoidCallback? onTap}) {
+    showTopSnackBar(
+      Overlay.of(context),
+      SizedBox(
+        height: 50,
+        child: CustomSnackBar.success(
+          message: message,
+          backgroundColor: Colors.amber.shade900,
+          iconPositionTop: -20,
+        ),
+      ),
+      onTap: onTap,
+    );
+  };
+
+  // final messengerState = ref.watch(scaffoldMessengerKeyProvider).currentState;
+
+  // if (messengerState == null) return;
+  // double height = MediaQuery.of(messengerState.context).size.height - 100;
+
+  // messengerState.showSnackBar(SnackBar(
+  //   behavior: SnackBarBehavior.floating,
+  //   content: Text(msg),
+  //   margin: EdgeInsets.only(bottom: height, left: 10, right: 10),
+  // ));
 });
 
+/// エラーダイアログ
 /// catchError専用
+/// chatScreenでしか使わない
 final showDialogProvider = Provider((ref) {
   bool isDialogShowing = false;
   return (e) async {

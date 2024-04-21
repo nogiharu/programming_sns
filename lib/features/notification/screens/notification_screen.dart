@@ -1,8 +1,12 @@
+import 'package:appwrite/appwrite.dart';
+import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/markdown_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:programming_sns/apis/message_api_provider.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
 import 'package:programming_sns/features/notification/providers/notification_event_provider.dart';
@@ -83,12 +87,25 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                               style: TextStyle(color: Colors.grey.shade500),
                             ),
                             TextSpan(
+                              text: notification.chatRoomLabel,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const TextSpan(
+                              text: 'スレッドで',
+                            ),
+                            TextSpan(
                               text: notification.sendByUserName,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
+                            const TextSpan(
+                              text: 'さんから',
+                            ),
                             TextSpan(
-                              text: 'さんから${notification.notificationType}されました',
-                              style: TextStyle(color: Colors.grey.shade500),
+                              text: notification.notificationType.toString(),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const TextSpan(
+                              text: 'されました',
                             ),
                           ]),
                         ),
@@ -102,18 +119,42 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                       ],
                     ),
                   ),
-                  onTap: () {
-                    // CHAT画面に遷移
-                    context.goNamed(ChatScreen.path, extra: {
-                      'label': notificationModelList[index].chatRoomLabel,
-                      'chatRoomId': notificationModelList[index].chatRoomId,
+                  onTap: () async {
+                    // どのメッセージがメンションされたか特定するために使用
+                    // ※ messageIdは作成後にIDが採番されるため
+                    final queries = [
+                      Query.equal('message', notification.text),
+                      Query.equal('updatedAt', notification.createdAt.millisecondsSinceEpoch),
+                    ];
+                    await ref
+                        .read(messageAPIProvider)
+                        .getMessageDocumentList(queries: queries)
+                        .then((e) {
+                      if (e.documents.isEmpty) return;
+
+                      final message = MessageEX.fromMap(e.documents.first.data);
+                      ref.read(mentionMessageIdProvider.notifier).state = message.id;
+
+                      // CHAT画面に遷移
+                      ref
+                          .read(notificationListProvider.notifier)
+                          .navigateToChatScreen(notification: notification);
                     });
-                    // 既読していないなら既読する
-                    if (!notificationModelList[index].isRead) {
-                      ref.read(notificationListProvider.notifier).updateNotification(
-                            notificationModel: notificationModelList[index].copyWith(isRead: true),
-                          );
-                    }
+
+                    // // CHAT画面に遷移
+                    // if (mounted) {
+                    //   context.goNamed(ChatScreen.path, extra: {
+                    //     'label': notification.chatRoomLabel,
+                    //     'chatRoomId': notification.chatRoomId,
+                    //   });
+
+                    //   // 既読していないなら既読する awaitはしない
+                    //   if (!notification.isRead) {
+                    //     ref.read(notificationListProvider.notifier).updateNotification(
+                    //           notificationModel: notification.copyWith(isRead: true),
+                    //         );
+                    //   }
+                    // }
                   },
                 );
               },

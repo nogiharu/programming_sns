@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/at_mention_paragraph_node.dart';
 import 'package:flutter/foundation.dart';
@@ -19,6 +21,7 @@ import 'package:programming_sns/features/chat/providers/chat_room_list_provider.
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
+import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
 import 'package:programming_sns/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
@@ -27,6 +30,8 @@ import 'package:programming_sns/temp/data2.dart';
 import 'package:programming_sns/temp/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:collection/collection.dart';
+import 'package:async/async.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final String label;
@@ -47,7 +52,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   AppTheme theme = LightTheme();
   bool isDarkTheme = false;
 
-  late ChatController _chatController;
+  ChatController _chatController =
+      ChatController(initialMessageList: [], scrollController: ScrollController(), chatUsers: []);
 
   late ChatUser _currentChatUser;
 
@@ -59,6 +65,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Message? updateMessage;
 
+  bool isMentionScrollFinish = false;
+
+  CancelableOperation? _initMentionScrollCancel;
+
   @override
   void initState() {
     super.initState();
@@ -67,12 +77,36 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    initMentionScroll();
+
+    // ref.listen(notificationListProvider, (_, next) {
+    //   next.whenOrNull(
+    //     data: (data) {
+    //       Future.forEach(data, (e) {
+
+    //         if (!e.isRead) {
+
+    //         }
+    //       });
+    //     },
+    //   );
+    // });
+
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.label),
           leading: IconButton(
-              onPressed: () => context.go(ChatThreadScreen.metaData['path']),
+              onPressed: () {
+                // ウィジェットが破棄される際に、非同期処理が完了していない場合は強制的に完了させる
+                if (_initMentionScrollCancel != null) _initMentionScrollCancel!.cancel();
+                context.pop();
+              },
               icon: const Icon(Icons.arrow_back_outlined)),
         ),
 
@@ -267,6 +301,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
     if (message.trim().isEmpty) return;
 
+    final updatedAt = DateTime.now();
     // 【送信処理】
     if (updateMessage == null) {
       // メッセージ送信
@@ -277,7 +312,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         replyMessage: replyMessage,
         messageType: MessageType.text == messageType ? MessageType.custom : messageType, //TODO カスタム
         chatRoomId: widget.chatRoomId,
-        updatedAt: DateTime.now(),
+        updatedAt: updatedAt,
         // mentionUserIds: mentionUserIds,
       );
       // メッセージ送信
@@ -296,7 +331,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         // updateMessage.reaction.reactedUserIds;
         updateMessage = updateMessage!.copyWith(
           message: message,
-          updatedAt: DateTime.now(),
+          updatedAt: updatedAt,
           // mentionUserIds: mentionUserIds,
         );
         await _chatControllerNotifier.updateMessage(updateMessage!);
@@ -306,7 +341,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
 
     // 【メンション】　awaitはしない
-    onSendMention(message);
+    onSendMention(text: message, updatedAt: updatedAt);
 
     // スクロールが100件超えていたら25件にリセット
     if (_chatController.initialMessageList.length > 100) {
@@ -317,6 +352,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   /// ページング
   /// 25件ずつ取得
   Future<void> loadMoreData() async {
+    // if (!isMentionScrollFinish || _chatController.initialMessageList.isEmpty) return;
     if (_chatController.initialMessageList.isEmpty) return;
 
     final firstMessage = ref.watch(firstChatMessageProvider(widget.chatRoomId)).value;
@@ -338,8 +374,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         .read(storageAPIProvider)
         .downloadImage(url, AppwriteConstants.kMessageImagesBucket)
         .catchError(ref.read(showDialogProvider));
-
-    if (isSaved) ref.read(snackBarProvider('${kIsWeb ? 'ダウンロード' : '写真'}に保存完了したよ(*^_^*)'));
+    if (isSaved) {
+      // ref.read(snackBarProvider({'message': '${kIsWeb ? 'ダウンロード' : '写真'}に保存完了したよ(*^_^*)'}));
+      ref.read(snackBarProvider)(message: '${kIsWeb ? 'ダウンロード' : '写真'}に保存完了したよ(*^_^*)');
+    }
   }
 
   /// 画像アップロード
@@ -392,7 +430,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   /// メンション通知
   /// UPDATE時にリレーションシップを組めない
-  Future<void> onSendMention(String text) async {
+  Future<void> onSendMention({required String text, required DateTime updatedAt}) async {
     // @を除去
     final mentionUserIds = AtMentionParagraphNode.splitText(text)
         .where((e) => e.startsWith('@'))
@@ -416,9 +454,47 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         text: text,
         notificationType: NotificationType.mention,
         sendByUserName: _currentChatUser.name,
+        createdAt: updatedAt,
       );
 
       await ref.read(notificationAPIProvider).createNotificationDocument(notificationModel);
+    });
+  }
+
+  void initMentionScroll() {
+    WidgetsBinding.instance.endOfFrame.then((_) {
+      if (_chatController.initialMessageList.isNotEmpty) {
+        _initMentionScrollCancel = CancelableOperation.fromFuture(
+            Future.delayed(const Duration(milliseconds: 300), () async {
+          // 非同期キャンセル後はrefも参照できなくなるため、アーリーリターンできないため、このスコープでrefを見る
+          final mentionMessageId = ref.read(mentionMessageIdProvider);
+          if (mentionMessageId.isEmpty) return;
+          final RenderObject? mentionMessageRender = _chatController.initialMessageList
+              .firstWhereOrNull((e) => mentionMessageId == e.id)
+              ?.key
+              .currentContext
+              ?.findRenderObject();
+
+          if (mentionMessageRender == null) {
+            await loadMoreData();
+            initMentionScroll();
+            return;
+          }
+
+          final screenHeight = MediaQuery.of(context).size.height;
+
+          final offset = (mentionMessageRender as RenderBox).localToGlobal(Offset.zero);
+          // MarkdownInputの高さは大体200
+          final scrollOffset = screenHeight - offset.dy - 200;
+
+          await _chatController.scrollController.animateTo(
+            scrollOffset,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+          ref.read(mentionMessageIdProvider.notifier).state = '';
+        }));
+      }
     });
   }
 

@@ -68,9 +68,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         errorMessage = auth.error.toString();
                         return;
                       }
-
-                      ref.read(snackBarProvider('ログイン完了だよ(*^_^*)'));
-
+                      // ref.read(snackBarProvider({'message': 'ログイン完了だよ(*^_^*)'}));
+                      ref.read(snackBarProvider)(message: 'ログイン完了だよ(*^_^*)');
                       if (context.mounted) context.pop();
                     },
                     child: const Text('ログイン'),

@@ -120,7 +120,8 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                   if (!ref.watch(chatRoomListProvider).hasError) {
                     context.pop();
                     textController.text = '';
-                    ref.read(snackBarProvider('作成完了だよ(*^_^*)'));
+                    // ref.read(snackBarProvider({'message': '作成完了だよ(*^_^*)'}));
+                    ref.read(snackBarProvider)(message: '作成完了だよ(*^_^*)');
                   }
                 });
               },

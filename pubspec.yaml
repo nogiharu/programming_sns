@@ -47,6 +47,7 @@ dependencies:
   dart_appwrite: ^11.0.1
   flutter_dotenv: ^5.1.0
   badges: ^3.1.2
+  top_snackbar_flutter: ^3.1.0
 
 dev_dependencies:
   flutter_test:

@@ -78,7 +78,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     final queries = [
       Query.orderDesc('createdAt'),
       Query.equal('chatRoomId', arg),
-      Query.limit(25),
+      // Query.limit(25),
     ];
     // idより前を取得
     if (before25MessageId != null) queries.add(Query.cursorAfter(before25MessageId));

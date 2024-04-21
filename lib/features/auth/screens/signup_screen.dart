@@ -80,8 +80,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           return;
                         }
 
-                        ref.read(snackBarProvider('登録完了だよ(*^_^*)'));
-
+                        // ref.read(snackBarProvider({'message': '登録完了だよ(*^_^*)'}));
+                        ref.read(snackBarProvider)(message: '登録完了だよ(*^_^*)');
                         if (context.mounted) context.pop();
                       },
                       child: const Text('アカウント登録'),

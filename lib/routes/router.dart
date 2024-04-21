@@ -16,9 +16,14 @@ import 'package:programming_sns/temp/chat_screen3.dart';
 
 import 'package:programming_sns/temp/tempScreen.dart';
 
+/// ScaffoldWithNavbarの外側のスコープ
+/// navigatorKey:に設定するとボトムナビバーが出ない
 final rootNavigatorKeyProvider = Provider(
   (_) => GlobalKey<NavigatorState>(debugLabel: 'root'),
 );
+
+/// ScaffoldWithNavbarの内側のスコープ
+/// navigatorKey:に設定するとボトムナビバーが出る
 final shellNavigatorKeyProvider = Provider(
   (_) => GlobalKey<NavigatorState>(debugLabel: 'shell'),
 );
@@ -68,9 +73,6 @@ final router = Provider((ref) {
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
                   final map = state.extra as Map<String, dynamic>;
-                  // if (map['chatRoomId'] == '65c962068df47e2dddab') {
-                  //   return const ChatScreen3();
-                  // }
                   return ChatScreen(
                     label: map['label'],
                     chatRoomId: map['chatRoomId'],
@@ -107,16 +109,19 @@ final router = Provider((ref) {
             path: NotificationScreen.metaData['path'],
             name: NotificationScreen.metaData['path'],
             pageBuilder: (context, state) {
-              // notificationScreen.metaData['icon'];
-
               return _pageAnimation(notificationScreen, state, ref: ref);
             },
             routes: const [
               // GoRoute(
-              //   path: DetailsScreen.path,
-              //   parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+              //   path: ChatScreen.path,
+              //   name: ChatScreen.path,
+              //   // parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
               //   builder: (context, state) {
-              //     return const DetailsScreen(label: 'B');
+              //     final map = state.extra as Map<String, dynamic>;
+              //     return ChatScreen(
+              //       label: map['label'],
+              //       chatRoomId: map['chatRoomId'],
+              //     );
               //   },
               // ),
             ],

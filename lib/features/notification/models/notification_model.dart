@@ -129,7 +129,7 @@ class NotificationModel {
         text: text ?? '',
         notificationType: notificationType ?? NotificationType.mention,
         chatRoomId: chatRoomId ?? '',
-        createdAt: DateTime.now(),
+        createdAt: createdAt ?? DateTime.now(),
         isRead: isRead ?? false,
         sendByUserName: sendByUserName ?? '',
         chatRoomLabel: chatRoomLabel ?? '',

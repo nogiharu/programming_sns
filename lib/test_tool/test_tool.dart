@@ -28,12 +28,7 @@ class TestToolcreen extends ConsumerWidget {
             children: [
               Column(
                 children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        ref.watch(aaa.notifier).state += 1;
-                        print(ref.watch(aaa.notifier).state);
-                      },
-                      child: const Text('aaa')),
+                  ElevatedButton(onPressed: () {}, child: const Text('aaa')),
                   // Container(
                   //     color: Colors.amber,
                   //     padding: const EdgeInsets.all(5),
