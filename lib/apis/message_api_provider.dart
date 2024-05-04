@@ -17,7 +17,7 @@ class MessageAPI {
   final Databases _db;
   MessageAPI({required Databases db}) : _db = db;
 
-  Future<Document> createMessageDocument(Message message, {bool isDefaultError = false}) async {
+  Future<Message> create(Message message, {bool isDefaultError = false}) async {
     return await _db
         .createDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -25,10 +25,11 @@ class MessageAPI {
           documentId: ID.unique(),
           data: message.toMap(),
         )
+        .then((doc) => MessageEX.fromMap(doc.data))
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<Document> updateMessageDocument(Message message, {bool isDefaultError = false}) async {
+  Future<Message> update(Message message, {bool isDefaultError = false}) async {
     return await _db
         .updateDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -36,23 +37,22 @@ class MessageAPI {
           documentId: message.id,
           data: message.toMap(),
         )
+        .then((doc) => MessageEX.fromMap(doc.data))
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<DocumentList> getMessageDocumentList({
-    List<String>? queries,
-    isDefaultError = false,
-  }) async {
+  Future<List<Message>> getList({List<String>? queries, isDefaultError = false}) async {
     return await _db
         .listDocuments(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kMessagesCollection,
           queries: queries,
         )
+        .then((docs) => docs.documents.map((doc) => MessageEX.fromMap(doc.data)).toList())
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<dynamic> deleteMessageDocument(String id, {bool isDefaultError = false}) async {
+  Future<dynamic> delete(String id, {bool isDefaultError = false}) async {
     return await _db
         .deleteDocument(
           databaseId: AppwriteConstants.kDatabaseId,

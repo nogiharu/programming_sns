@@ -55,14 +55,8 @@ class ChatMessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Messag
     }
 
     return await futureGuard(() async {
-      final messages = await _messageAPI.getMessageDocumentList(queries: queries).then(
-            (docs) => docs.documents
-                .map(
-                  (doc) => MessageEX.fromMap(doc.data),
-                )
-                .toList()
-                .reversed
-                .toList(),
+      final messages = await _messageAPI.getList(queries: queries).then(
+            (docs) => docs.reversed.toList(),
           );
 
       return messages;
@@ -72,10 +66,7 @@ class ChatMessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Messag
   /// メッセージ作成
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
   Future<void> createMessage(Message message) async {
-    await ref
-        .read(messageAPIProvider)
-        .createMessageDocument(message)
-        .catchError(ref.read(showDialogProvider));
+    await ref.read(messageAPIProvider).create(message).catchError(ref.read(showDialogProvider));
   }
 
   /// 最初のメッセージ取得
@@ -87,8 +78,8 @@ class ChatMessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Messag
       Query.limit(1),
     ];
     final messages = await _messageAPI
-        .getMessageDocumentList(queries: queries)
-        .then((docs) => docs.documents.map((doc) => MessageEX.fromMap(doc.data)).first)
+        .getList(queries: queries)
+        .then((docs) => docs.first)
         .catchError(ref.read(showDialogProvider));
 
     return messages;
@@ -97,9 +88,6 @@ class ChatMessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Messag
   /// メッセージ作成
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
   Future<void> updateMessage(Message message) async {
-    await ref
-        .read(messageAPIProvider)
-        .updateMessageDocument(message)
-        .catchError(ref.read(showDialogProvider));
+    await ref.read(messageAPIProvider).update(message).catchError(ref.read(showDialogProvider));
   }
 }

@@ -18,13 +18,13 @@ final chatRoomEventProvider = AutoDisposeProvider<void>((ref) {
         /// チャットルーム作成イベント
         if (isChatRoomUpdateEvent) {
           debugPrint('CHAT_ROOM_UPDATE!');
-          ref.read(chatRoomListProvider.notifier).updateChatRoomEvent(data);
+          ref.read(chatRoomListProvider.notifier).updateStateEvent(data);
         }
 
         /// チャットルーム作成イベント
         if (isChatRoomCreateEvent) {
           debugPrint('CHAT_ROOM_CREATE!');
-          ref.read(chatRoomListProvider.notifier).createChatRoomEvent(data);
+          ref.read(chatRoomListProvider.notifier).createStateEvent(data);
         }
       },
     );

@@ -92,15 +92,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         appBar: AppBar(
           title: Text(widget.label),
           leading: IconButton(
-              onPressed: () {
-                // ウィジェットが破棄される際に、非同期処理が完了していない場合は強制的に完了させる
-                if (_initMentionScrollCancel != null) {
-                  _initMentionScrollCancel!.cancel();
-                  ref.read(mentionCreatedAtProvider.notifier).state = null;
-                }
-                context.pop();
-              },
-              icon: const Icon(Icons.arrow_back_outlined)),
+            onPressed: () {
+              // ウィジェットが破棄される際に、非同期処理が完了していない場合は強制的に完了させる
+              if (_initMentionScrollCancel != null) {
+                _initMentionScrollCancel!.cancel();
+                ref.read(mentionCreatedAtProvider.notifier).state = null;
+              }
+              context.pop();
+            },
+            icon: const Icon(Icons.arrow_back_outlined),
+          ),
         ),
 
         /// USER
@@ -233,7 +234,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     userReactionCallback: (message, emoji) async {
                       await ref
                           .read(messageAPIProvider)
-                          .updateMessageDocument(message)
+                          .update(message)
                           .catchError(ref.read(showDialogProvider));
 
                       // リアクション
@@ -311,11 +312,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       await _chatControllerNotifier.createMessage(msg);
 
       // このチャットルーム取得
-      final chatRoom = ref.read(chatRoomListProvider.notifier).getChatRoom(widget.chatRoomId);
+      final chatRoom = ref.read(chatRoomListProvider.notifier).getState(widget.chatRoomId);
       // 【チャットルームの日付更新】　awaitはしない
-      ref
-          .read(chatRoomAPIProvider)
-          .updateChatRoomDocument(chatRoom.copyWith(updatedAt: DateTime.now()));
+      ref.read(chatRoomAPIProvider).update(chatRoom.copyWith(updatedAt: DateTime.now()));
     } else {
       // 【更新処理】
       // メッセージ更新 前回のメッセージ違うなら更新

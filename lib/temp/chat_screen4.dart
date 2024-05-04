@@ -202,7 +202,7 @@ class _ChatScreen4State extends ConsumerState<ChatScreen4> {
                         userReactionCallback: (message, emoji) async {
                           await ref
                               .read(messageAPIProvider)
-                              .updateMessageDocument(message)
+                              .update(message)
                               .catchError(ref.read(showDialogProvider));
                         },
                       ),
@@ -280,11 +280,9 @@ class _ChatScreen4State extends ConsumerState<ChatScreen4> {
       await _chatMessageListNotifier.createMessage(msg);
 
       // このチャットルーム取得
-      final chatRoom = ref.read(chatRoomListProvider.notifier).getChatRoom(widget.chatRoomId);
+      final chatRoom = ref.read(chatRoomListProvider.notifier).getState(widget.chatRoomId);
       // チャットルームの日付更新　awaitはしない
-      ref
-          .read(chatRoomAPIProvider)
-          .updateChatRoomDocument(chatRoom.copyWith(updatedAt: DateTime.now()));
+      ref.read(chatRoomAPIProvider).update(chatRoom.copyWith(updatedAt: DateTime.now()));
     } else {
       // メッセージ更新 前回のメッセージ違うなら更新
       if (updateMessage!.message != message) {

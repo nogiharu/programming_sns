@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:appwrite/appwrite.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:programming_sns/apis/user_api_provider.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 
@@ -16,7 +17,11 @@ final chatUserListProvider =
 class ChatUserListNotifier extends AutoDisposeFamilyAsyncNotifier<List<ChatUser>, String> {
   @override
   FutureOr<List<ChatUser>> build(arg) async {
-    return await getChatUsers();
+    return await ref.watch(userAPIProvider).getList(queries: [
+      Query.limit(100000),
+      Query.equal('isDeleted', false),
+      Query.contains('chatRoomIds', arg),
+    ]).then((users) => users.map((user) => UserModel.toChatUser(user)).toList());
   }
 
   void updateChatUser(RealtimeMessage event) {
@@ -33,12 +38,5 @@ class ChatUserListNotifier extends AutoDisposeFamilyAsyncNotifier<List<ChatUser>
       }
       return data;
     });
-  }
-
-  /// ユーザーリスト取得し、チャットユーザーリストに変換
-  Future<List<ChatUser>> getChatUsers() async {
-    return (await ref.read(userModelProvider.notifier).getUserModelList(chatRoomId: arg))
-        .map((userModel) => UserModel.toChatUser(userModel))
-        .toList();
   }
 }

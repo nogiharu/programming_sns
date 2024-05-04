@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:chatview/chatview.dart';
 import 'package:dart_appwrite/dart_appwrite.dart' as da;
 import 'package:dart_appwrite/models.dart' as model;
@@ -79,7 +80,7 @@ class TestToolcreen extends ConsumerWidget {
 
                   data = data.copyWith(name: name);
 
-                  final aa = await ref.read(userModelProvider.notifier).updateUserModel(data);
+                  final aa = await ref.read(userModelProvider.notifier).updateState(data);
                   // final aaa = await ref.read(userModelProvider.notifier).getUserModelList();
                   // print(aaa);
                 },
@@ -135,9 +136,13 @@ class TestToolcreen extends ConsumerWidget {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  final userList = await ref.watch(userModelProvider.notifier).getUserModelList();
+                  final userList = await ref.watch(userAPIProvider).getList(
+                    queries: [
+                      Query.limit(100000),
+                    ],
+                  );
                   await Future.forEach(userList, (user) async {
-                    await ref.read(userAPIProvider).deleteUserDocument(user);
+                    await ref.read(userAPIProvider).delete(user);
                   });
 
                   await ref.read(authProvider.notifier).logout();
@@ -180,7 +185,7 @@ class TestToolcreen extends ConsumerWidget {
                 onPressed: () async {
                   await ref
                       .read(userModelProvider.notifier)
-                      .updateUserModel(data.copyWith(chatRoomIds: []));
+                      .updateState(data.copyWith(chatRoomIds: []));
                 },
                 child: const Text('チャットID削除'),
               ),

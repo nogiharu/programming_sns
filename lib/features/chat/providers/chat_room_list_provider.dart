@@ -16,16 +16,21 @@ class ChatRoomListNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>>
   FutureOr<List<ChatRoomModel>> build() async {
     // chatRoomEvent();
     // ref.watch(realtimeEventProvider); // TODO 他ユーザもローディングされる
-    return await getChatRoomList();
+    // return await getChatRoomList();
+    final queries = [
+      Query.orderDesc('updatedAt'),
+      Query.limit(100000), // FIXME
+    ];
+    return await _chatRoomAPI.getList(queries: queries, isDefaultError: true);
   }
 
   /// 作成イベント
-  void createChatRoomEvent(RealtimeMessage event) {
+  void createStateEvent(RealtimeMessage event) {
     update((data) => data..insert(0, ChatRoomModel.fromMap(event.payload)));
   }
 
   /// 更新されたら一番上にソート
-  void updateChatRoomEvent(RealtimeMessage event) {
+  void updateStateEvent(RealtimeMessage event) {
     update((data) {
       final chatRoom = ChatRoomModel.fromMap(event.payload);
       final index = data.indexWhere((e) => e.documentId == chatRoom.documentId);
@@ -35,34 +40,18 @@ class ChatRoomListNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>>
     });
   }
 
-  Future<void> createChatRoom({required String ownerId, required String name}) async {
+  Future<void> createState({required String ownerId, required String name}) async {
     await futureGuard(
       () async {
         if (name.length <= 4) throw '5文字以上で入れてね(´；ω；`)';
         return await _chatRoomAPI
-            .createChatRoomDocument(ChatRoomModel.instance(ownerId: ownerId, name: name))
+            .create(ChatRoomModel.instance(ownerId: ownerId, name: name))
             .then((doc) => state.value!);
       },
     );
   }
 
-  Future<List<ChatRoomModel>> getChatRoomList() async {
-    final queries = [
-      Query.orderDesc('updatedAt'),
-      Query.limit(10000), // FIXME
-    ];
-    return await futureGuard(
-      () async {
-        return await _chatRoomAPI
-            .getChatRoomDocumentList(queries: queries, isDefaultError: true)
-            .then((docs) => docs.documents.map((doc) => ChatRoomModel.fromMap(doc.data)).toList());
-      },
-    );
-
-    // return state.value!;
-  }
-
-  ChatRoomModel getChatRoom(String chatRoomId) {
-    return state.value!.firstWhere((e) => e.documentId == chatRoomId);
+  ChatRoomModel getState(String documentId) {
+    return state.value!.firstWhere((e) => e.documentId == documentId);
   }
 }

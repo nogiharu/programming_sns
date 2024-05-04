@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
@@ -16,17 +15,18 @@ class UserAPI {
   final Databases _db;
   UserAPI({required Databases db}) : _db = db;
 
-  Future<Document> getUserDocument(String id, {bool isDefaultError = false}) async {
+  Future<UserModel> get(String id, {bool isDefaultError = false}) async {
     return await _db
         .getDocument(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kUsersCollection,
           documentId: id,
         )
+        .then((doc) => UserModel.fromMap(doc.data))
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<Document> createUserDocument(UserModel userModel, {bool isDefaultError = false}) async {
+  Future<UserModel> create(UserModel userModel, {bool isDefaultError = false}) async {
     return await _db
         .createDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -34,10 +34,11 @@ class UserAPI {
           documentId: userModel.documentId,
           data: userModel.toMap(),
         )
+        .then((doc) => UserModel.fromMap(doc.data))
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<Document> updateUserDocument(UserModel userModel, {bool isDefaultError = false}) async {
+  Future<UserModel> update(UserModel userModel, {bool isDefaultError = false}) async {
     return await _db
         .updateDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -45,10 +46,11 @@ class UserAPI {
           documentId: userModel.documentId,
           data: userModel.toMap(),
         )
+        .then((doc) => UserModel.fromMap(doc.data))
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<DocumentList> getUsersDocumentList({
+  Future<List<UserModel>> getList({
     List<String>? queries,
     bool isDefaultError = false,
   }) async {
@@ -58,10 +60,11 @@ class UserAPI {
           collectionId: AppwriteConstants.kUsersCollection,
           queries: queries,
         )
+        .then((docs) => docs.documents.map((doc) => UserModel.fromMap(doc.data)).toList())
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  Future<dynamic> deleteUserDocument(UserModel userModel, {bool isDefaultError = false}) async {
+  Future<dynamic> delete(UserModel userModel, {bool isDefaultError = false}) async {
     return await _db
         .deleteDocument(
           databaseId: AppwriteConstants.kDatabaseId,

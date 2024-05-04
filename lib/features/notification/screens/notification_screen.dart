@@ -77,7 +77,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
               itemCount: notificationModelList.length,
               itemBuilder: (context, index) {
                 final notification = notificationModelList[index];
-                print('いいいいいいい：${notificationModelList.length}');
+
                 return GestureDetector(
                   child: Container(
                     padding: const EdgeInsets.all(5),

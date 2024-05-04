@@ -63,7 +63,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                                 updatedAt: DateTime.now(),
                               )..chatRoomIds?.add(chatRoom[index].documentId!);
                               // API
-                              ref.read(userModelProvider.notifier).updateUserModel(updateUserModel);
+                              ref.read(userModelProvider.notifier).updateState(updateUserModel);
                             }
 
                             // CHAT画面に遷移
@@ -115,7 +115,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
               onPressed: () async {
                 await ref
                     .read(chatRoomListProvider.notifier)
-                    .createChatRoom(ownerId: userId, name: textController.text)
+                    .createState(ownerId: userId, name: textController.text)
                     .whenComplete(() {
                   // なぜかキャッチされないためwhenComplete使用
                   if (!ref.watch(chatRoomListProvider).hasError) {

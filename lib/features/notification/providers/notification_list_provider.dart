@@ -45,7 +45,7 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
   }
 
   /// メンションイベント
-  void onUpdateState(RealtimeMessage event) {
+  void createStateEvent(RealtimeMessage event) {
     update((data) {
       if (event.payload['userDocumentId'] == _currentUser.documentId) {
         final notification = NotificationModel.fromMap(event.payload);
@@ -101,18 +101,18 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
     );
   }
 
-  Future<List<NotificationModel>> getList({String documentId = ''}) async {
-    final queries = [
-      Query.equal('userDocumentId', _currentUser.documentId),
-      Query.orderDesc('createdAt'),
-    ];
+  // Future<List<NotificationModel>> getList({String documentId = ''}) async {
+  //   final queries = [
+  //     Query.equal('userDocumentId', _currentUser.documentId),
+  //     Query.orderDesc('createdAt'),
+  //   ];
 
-    if (documentId.isNotEmpty) {
-      queries.add(Query.cursorAfter(documentId));
-    }
+  //   if (documentId.isNotEmpty) {
+  //     queries.add(Query.cursorAfter(documentId));
+  //   }
 
-    return await _notificationAPI
-        .getList(queries: queries)
-        .catchError((e) => state = AsyncError(e, StackTrace.current));
-  }
+  //   return await _notificationAPI
+  //       .getList(queries: queries)
+  //       .catchError((e) => state = AsyncError(e, StackTrace.current));
+  // }
 }

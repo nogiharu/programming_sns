@@ -7,10 +7,9 @@ import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api_provider.dart';
+import 'package:programming_sns/apis/user_api_provider.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/common/utils.dart';
-import 'package:programming_sns/features/notification/models/notification_model.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 
 final firstChatMessageProvider = FutureProviderFamily<Message, String>((ref, chatRoomId) async {
@@ -27,12 +26,15 @@ final chatControllerProvider =
 
 class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatController, String> {
   MessageAPI get _messageAPI => ref.watch(messageAPIProvider);
+  String? firstDocumentId;
 
   @override
   FutureOr<ChatController> build(arg) async {
     final initialMessageList = await getMessages();
 
     final chatUsers = await getChatUsers();
+
+    firstDocumentId = (await getFirstMessage()).id;
 
     return ChatController(
       initialMessageList: initialMessageList,
@@ -67,9 +69,11 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
   /// ユーザーリスト取得し、チャットユーザーリストに変換
   Future<List<ChatUser>> getChatUsers() async {
-    return (await ref.read(userModelProvider.notifier).getUserModelList(chatRoomId: arg))
-        .map((userModel) => UserModel.toChatUser(userModel))
-        .toList();
+    return await ref.watch(userAPIProvider).getList(queries: [
+      Query.limit(100000),
+      Query.equal('isDeleted', false),
+      Query.contains('chatRoomIds', arg),
+    ]).then((users) => users.map((user) => UserModel.toChatUser(user)).toList());
   }
 
   /// メッセージ一覧取得
@@ -84,14 +88,8 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     if (before25MessageId != null) queries.add(Query.cursorAfter(before25MessageId));
 
     final messages = await _messageAPI
-        .getMessageDocumentList(queries: queries)
-        .then((docs) => docs.documents
-            .map(
-              (doc) => MessageEX.fromMap(doc.data),
-            )
-            .toList()
-            .reversed
-            .toList())
+        .getList(queries: queries)
+        .then((e) => e.reversed.toList())
         .catchError(ref.read(showDialogProvider));
 
     return messages;
@@ -100,10 +98,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
   /// メッセージ作成
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
   Future<void> createMessage(Message message, {List<String>? mentionList}) async {
-    await ref
-        .read(messageAPIProvider)
-        .createMessageDocument(message)
-        .catchError(ref.read(showDialogProvider));
+    await ref.read(messageAPIProvider).create(message).catchError(ref.read(showDialogProvider));
   }
 
   /// 最初のメッセージ取得
@@ -115,8 +110,8 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
       Query.limit(1),
     ];
     final messages = await _messageAPI
-        .getMessageDocumentList(queries: queries)
-        .then((docs) => docs.documents.map((doc) => MessageEX.fromMap(doc.data)).first)
+        .getList(queries: queries)
+        .then((e) => e.first)
         .catchError(ref.read(showDialogProvider));
 
     return messages;
@@ -125,10 +120,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
   /// メッセージ編集
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
   Future<void> updateMessage(Message message) async {
-    await ref
-        .read(messageAPIProvider)
-        .updateMessageDocument(message)
-        .catchError(ref.read(showDialogProvider));
+    await ref.read(messageAPIProvider).update(message).catchError(ref.read(showDialogProvider));
   }
 
   /// メッセージ編集
@@ -136,7 +128,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
   Future<void> deleteMessage(Message message) async {
     await ref
         .read(messageAPIProvider)
-        .updateMessageDocument(message.copyWith(isDeleted: true))
+        .update(message.copyWith(isDeleted: true))
         .catchError(ref.read(showDialogProvider));
   }
 }

@@ -17,8 +17,7 @@ class ChatRoomAPI {
   ChatRoomAPI({required Databases db}) : _db = db;
 
   /// チャットルーム作成
-  Future<Document> createChatRoomDocument(ChatRoomModel chatRoom,
-      {bool isDefaultError = false}) async {
+  Future<ChatRoomModel> create(ChatRoomModel chatRoom, {bool isDefaultError = false}) async {
     return await _db
         .createDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -26,34 +25,36 @@ class ChatRoomAPI {
           documentId: ID.unique(),
           data: chatRoom.toMap(),
         )
+        .then((doc) => ChatRoomModel.fromMap(doc.data))
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
   /// チャットルーム取得
-  Future<Document> getChatRoomDocument(String id, {bool isDefaultError = false}) async {
-    return await _db.getDocument(
-      databaseId: AppwriteConstants.kDatabaseId,
-      collectionId: AppwriteConstants.kChatRoomCollection,
-      documentId: id,
-      queries: [],
-    ).catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+  Future<ChatRoomModel> get(String id, {bool isDefaultError = false}) async {
+    return await _db
+        .getDocument(
+          databaseId: AppwriteConstants.kDatabaseId,
+          collectionId: AppwriteConstants.kChatRoomCollection,
+          documentId: id,
+        )
+        .then((doc) => ChatRoomModel.fromMap(doc.data))
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
   /// チャットルームリスト取得
-  Future<DocumentList> getChatRoomDocumentList(
-      {List<String>? queries, isDefaultError = false}) async {
+  Future<List<ChatRoomModel>> getList({List<String>? queries, isDefaultError = false}) async {
     return await _db
         .listDocuments(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kChatRoomCollection,
           queries: queries,
         )
+        .then((docs) => docs.documents.map((doc) => ChatRoomModel.fromMap(doc.data)).toList())
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
   /// チャットルーム更新
-  Future<Document> updateChatRoomDocument(ChatRoomModel chatRoom,
-      {bool isDefaultError = false}) async {
+  Future<ChatRoomModel> update(ChatRoomModel chatRoom, {bool isDefaultError = false}) async {
     return await _db
         .updateDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -61,6 +62,7 @@ class ChatRoomAPI {
           documentId: chatRoom.documentId!,
           data: chatRoom.toMap(),
         )
+        .then((doc) => ChatRoomModel.fromMap(doc.data))
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 }

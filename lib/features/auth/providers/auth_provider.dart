@@ -56,14 +56,14 @@ class AuthNotifier extends AsyncNotifier<Session> {
         Query.equal('isDeleted', false),
       ];
 
-      await ref.read(userAPIProvider).getUsersDocumentList(queries: queries).then((docList) async {
+      await ref.read(userAPIProvider).getList(queries: queries).then((docList) async {
         // ユーザーがいない場合、throw
-        if (docList.documents.isEmpty) throw 'error';
+        if (docList.isEmpty) throw 'error';
         // authのuser削除
         await _users.delete(userId: state.requireValue.userId);
         // userModelの削除
         if (prevUserModel != null) {
-          ref.read(userModelProvider.notifier).updateUserModel(prevUserModel);
+          ref.read(userModelProvider.notifier).updateState(prevUserModel);
         }
       }).catchError((e) => exceptionMessage(error: e));
 
@@ -87,7 +87,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
         // authユーザー名更新
         await _account.updateName(name: userModel.name);
         // ユーザー更新
-        await ref.read(userModelProvider.notifier).updateUserModel(userModel);
+        await ref.read(userModelProvider.notifier).updateState(userModel);
         // セッション延長
         return await _createSession(userModel.userId, userModel.loginPassword);
       }).catchError((e) => exceptionMessage(error: e));
@@ -106,7 +106,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
           .then((_) async {
         await ref
             .read(userModelProvider.notifier)
-            .updateUserModel(userModel.copyWith(loginPassword: newLoginPassword));
+            .updateState(userModel.copyWith(loginPassword: newLoginPassword));
 
         // セッション延長
         return await _createSession(userModel.userId, newLoginPassword);
