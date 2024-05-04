@@ -12,7 +12,7 @@ import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 
-final firstChatMessageProvider = FutureProviderFamily<Message, String>((ref, chatRoomId) async {
+final firstChatMessageProvider = FutureProviderFamily<Message?, String>((ref, chatRoomId) async {
   return ref.read(chatControllerProvider(chatRoomId).notifier).getFirstMessage();
 });
 
@@ -34,7 +34,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
     final chatUsers = await getChatUsers();
 
-    firstDocumentId = (await getFirstMessage()).id;
+    firstDocumentId = (await getFirstMessage())?.id;
 
     return ChatController(
       initialMessageList: initialMessageList,
@@ -103,7 +103,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
   /// 最初のメッセージ取得
   /// FIXME state.valueではない値を返したいためfutureGuard使えない
-  Future<Message> getFirstMessage() async {
+  Future<Message?> getFirstMessage() async {
     final queries = [
       Query.equal('chatRoomId', arg),
       Query.orderAsc('createdAt'),
@@ -111,7 +111,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     ];
     final messages = await _messageAPI
         .getList(queries: queries)
-        .then((e) => e.first)
+        .then((e) => e.firstOrNull)
         .catchError(ref.read(showDialogProvider));
 
     return messages;
