@@ -29,14 +29,11 @@ final shellNavigatorKeyProvider = Provider(
 );
 
 final router = Provider((ref) {
-  // 通知画面はstaticにできない
-  const notificationScreen = NotificationScreen();
-
   // タブの順番
   final bottomItems = [
     ChatThreadScreen.metaData,
     ScreenB.metaData,
-    NotificationScreen.metaData,
+    NotificationScreen.metadata,
     UserScreen.metaData,
   ];
 
@@ -56,39 +53,27 @@ final router = Provider((ref) {
           /// CHAT
           GoRoute(
             path: ChatThreadScreen.metaData['path'],
+            name: ChatThreadScreen.metaData['path'],
             pageBuilder: (context, state) {
-              return _pageAnimation(
-                const ChatThreadScreen(),
-                state,
-                ref: ref,
-              );
+              return _pageAnimation(const ChatThreadScreen(), state, ref: ref);
             },
-            // builder: (context, state) {
-            //   return const ChatThreadScreen();
-            // },
             routes: [
               GoRoute(
                 path: ChatScreen.path,
-                name: ChatScreen.path,
+                name: '${ChatThreadScreen.metaData['path']}/${ChatScreen.path}',
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
                   final map = state.extra as Map<String, dynamic>;
-                  return ChatScreen(
-                    label: map['label'],
-                    chatRoomId: map['chatRoomId'],
-                  );
+                  return ChatScreen(label: map['label'], chatRoomId: map['chatRoomId']);
                 },
               ),
             ],
           ),
           GoRoute(
             path: ScreenB.metaData['path'],
+            name: ScreenB.metaData['path'],
             pageBuilder: (context, state) {
-              return _pageAnimation(
-                const ScreenB(),
-                state,
-                ref: ref,
-              );
+              return _pageAnimation(const ScreenB(), state, ref: ref);
             },
             // builder: (context, state) {
             //   return const ScreenB();
@@ -106,24 +91,21 @@ final router = Provider((ref) {
 
           /// 通知
           GoRoute(
-            path: NotificationScreen.metaData['path'],
-            name: NotificationScreen.metaData['path'],
+            path: NotificationScreen.metadata['path'],
+            name: NotificationScreen.metadata['path'],
             pageBuilder: (context, state) {
-              return _pageAnimation(notificationScreen, state, ref: ref);
+              return _pageAnimation(const NotificationScreen(), state, ref: ref);
             },
-            routes: const [
-              // GoRoute(
-              //   path: ChatScreen.path,
-              //   name: ChatScreen.path,
-              //   // parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
-              //   builder: (context, state) {
-              //     final map = state.extra as Map<String, dynamic>;
-              //     return ChatScreen(
-              //       label: map['label'],
-              //       chatRoomId: map['chatRoomId'],
-              //     );
-              //   },
-              // ),
+            routes: [
+              GoRoute(
+                path: ChatScreen.path,
+                name: '${NotificationScreen.metadata['path']}/${ChatScreen.path}',
+                parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+                builder: (context, state) {
+                  final map = state.extra as Map<String, dynamic>;
+                  return ChatScreen(label: map['label'], chatRoomId: map['chatRoomId']);
+                },
+              ),
             ],
           ),
 
@@ -132,11 +114,7 @@ final router = Provider((ref) {
             path: UserScreen.metaData['path'],
             name: UserScreen.metaData['path'],
             pageBuilder: (context, state) {
-              return _pageAnimation(
-                const UserScreen(),
-                state,
-                ref: ref,
-              );
+              return _pageAnimation(const UserScreen(), state, ref: ref);
             },
             // builder: (context, state) {
             //   return const HomeScreen();

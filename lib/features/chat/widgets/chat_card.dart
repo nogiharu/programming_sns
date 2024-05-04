@@ -105,6 +105,7 @@ class _ChatCardState extends State<ChatCard> {
                 MarkdownBuilder(
                   message: widget.message.message,
                   chatUsers: widget.chatController.chatUsers,
+                  currenUser: widget.currentUser,
                 ),
 
                 // リンクプレビュー

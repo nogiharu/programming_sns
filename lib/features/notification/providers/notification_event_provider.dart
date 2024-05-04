@@ -17,7 +17,7 @@ final notificationEventProvider = AutoDisposeProvider<void>((ref) {
         /// 通知作成イベント
         if (isNotificationCreateEvent) {
           debugPrint('NOTIFICATION_CREATE!');
-          ref.read(notificationListProvider.notifier).chatMentionEvent(data);
+          ref.read(notificationListProvider.notifier).onUpdateState(data);
         }
       },
     );

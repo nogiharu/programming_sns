@@ -17,7 +17,7 @@ class NotificationAPI {
   NotificationAPI({required Databases db}) : _db = db;
 
   /// 作成
-  Future<Document> createNotificationDocument(
+  Future<NotificationModel> create(
     NotificationModel notificationModel, {
     isDefaultError = false,
   }) async {
@@ -28,37 +28,39 @@ class NotificationAPI {
           documentId: ID.unique(),
           data: notificationModel.toMap(),
         )
+        .then((doc) => NotificationModel.fromMap(doc.data))
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
-  /// 取得
-  Future<Document> getNotificationDocument(String id, {bool isDefaultError = false}) async {
-    return await _db.getDocument(
-      databaseId: AppwriteConstants.kDatabaseId,
-      collectionId: AppwriteConstants.kNotificationCollection,
-      documentId: id,
-      queries: [],
-    ).catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+  /// 単一取得
+  Future<NotificationModel> get(String id, {bool isDefaultError = false}) async {
+    return await _db
+        .getDocument(
+          databaseId: AppwriteConstants.kDatabaseId,
+          collectionId: AppwriteConstants.kNotificationCollection,
+          documentId: id,
+        )
+        .then((doc) => NotificationModel.fromMap(doc.data))
+        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
   /// リスト取得
-  Future<DocumentList> getNotificationDocumentList(
-      {List<String>? queries, isDefaultError = false}) async {
+  Future<List<NotificationModel>> getList({
+    List<String>? queries,
+    isDefaultError = false,
+  }) async {
     return await _db
         .listDocuments(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kNotificationCollection,
           queries: queries,
-          // [
-          //   Query.orderDesc('createdAt'),
-          //   Query.limit(10000), // FIXME
-          // ],
         )
+        .then((docs) => docs.documents.map((doc) => NotificationModel.fromMap(doc.data)).toList())
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 
   /// 更新
-  Future<Document> updateNotificationDocument(
+  Future<NotificationModel> update(
     NotificationModel notificationModel, {
     isDefaultError = false,
   }) async {
@@ -69,6 +71,7 @@ class NotificationAPI {
           documentId: notificationModel.documentId!,
           data: notificationModel.toMap(),
         )
+        .then((doc) => NotificationModel.fromMap(doc.data))
         .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
   }
 }

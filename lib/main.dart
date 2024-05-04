@@ -62,9 +62,9 @@ class Main extends ConsumerWidget {
         progressIndicatorTheme: const ProgressIndicatorThemeData(color: ThemeColor.main),
       ),
       debugShowCheckedModeBanner: false,
-      routerConfig: ref.watch(
-        router,
-      ),
+      routerConfig: ref.watch(router),
+      // routerDelegate: ref.watch(router).routerDelegate,
+
       scaffoldMessengerKey: ref.read(scaffoldMessengerKeyProvider),
     );
   }

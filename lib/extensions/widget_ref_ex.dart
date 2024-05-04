@@ -15,12 +15,16 @@ extension WidgetRefEX on WidgetRef {
   /// - loading ローディング中に出したいやつ
   Widget watchEX<T>(
     ProviderListenable<AsyncValue<T>> asyncValueProvider, {
-    required Widget Function(T) complete,
+    required Function(T) complete,
     bool isBackgroundColorNone = false,
     Widget? loading,
   }) {
     return watch(asyncValueProvider).when(
-      data: complete,
+      data: (data) {
+        final res = complete(data);
+        if (res is Widget) return res;
+        return const SizedBox.shrink();
+      },
       error: (e, _) {
         debugPrint('エラーです');
         // 画面の描画が終わったタイミングで状態の変更をする。（描画前に出すとエラーが出る）

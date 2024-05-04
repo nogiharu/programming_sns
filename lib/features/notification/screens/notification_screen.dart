@@ -1,15 +1,9 @@
-import 'package:appwrite/appwrite.dart';
-import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/markdown_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/apis/message_api_provider.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
-import 'package:programming_sns/features/notification/models/notification_model.dart';
-import 'package:programming_sns/features/notification/providers/notification_event_provider.dart';
 import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:badges/badges.dart' as badges;
@@ -19,7 +13,7 @@ import 'package:intl/date_symbol_data_local.dart';
 class NotificationScreen extends ConsumerStatefulWidget {
   const NotificationScreen({super.key});
 
-  static Map<String, dynamic> metaData = {
+  static Map<String, dynamic> metadata = {
     'path': '/notifier',
     'label': '通知',
     'icon': getIconBadge(),
@@ -48,9 +42,27 @@ class NotificationScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationScreenState extends ConsumerState<NotificationScreen> {
+  final scrollController = ScrollController();
+
+  @override
+  void initState() {
+    scrollController.addListener(scrollListener);
+    super.initState();
+  }
+
+  void scrollListener() async {
+    // await中にスクロールしたくないため消す
+    scrollController.removeListener(scrollListener);
+    if (MediaQuery.of(context).size.height < scrollController.position.pixels) {
+      await ref.read(notificationListProvider.notifier).addStateList();
+    }
+    scrollController.addListener(scrollListener);
+  }
+
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting("ja");
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('通知'),
@@ -61,10 +73,11 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           notificationListProvider,
           complete: (notificationModelList) {
             return ListView.builder(
+              controller: scrollController,
               itemCount: notificationModelList.length,
               itemBuilder: (context, index) {
                 final notification = notificationModelList[index];
-
+                print('いいいいいいい：${notificationModelList.length}');
                 return GestureDetector(
                   child: Container(
                     padding: const EdgeInsets.all(5),
@@ -119,42 +132,17 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                       ],
                     ),
                   ),
-                  onTap: () async {
-                    // どのメッセージがメンションされたか特定するために使用
-                    // ※ messageIdは作成後にIDが採番されるため
-                    final queries = [
-                      Query.equal('message', notification.text),
-                      Query.equal('updatedAt', notification.createdAt.millisecondsSinceEpoch),
-                    ];
-                    await ref
-                        .read(messageAPIProvider)
-                        .getMessageDocumentList(queries: queries)
-                        .then((e) {
-                      if (e.documents.isEmpty) return;
-
-                      final message = MessageEX.fromMap(e.documents.first.data);
-                      ref.read(mentionMessageIdProvider.notifier).state = message.id;
-
-                      // CHAT画面に遷移
-                      ref
-                          .read(notificationListProvider.notifier)
-                          .navigateToChatScreen(notification: notification);
+                  onTap: () {
+                    // CHAT画面
+                    final chatScreenPath =
+                        '${NotificationScreen.metadata['path']}/${ChatScreen.path}';
+                    // 遷移
+                    context.go(chatScreenPath, extra: {
+                      'label': notification.chatRoomLabel,
+                      'chatRoomId': notification.chatRoomId,
                     });
 
-                    // // CHAT画面に遷移
-                    // if (mounted) {
-                    //   context.goNamed(ChatScreen.path, extra: {
-                    //     'label': notification.chatRoomLabel,
-                    //     'chatRoomId': notification.chatRoomId,
-                    //   });
-
-                    //   // 既読していないなら既読する awaitはしない
-                    //   if (!notification.isRead) {
-                    //     ref.read(notificationListProvider.notifier).updateNotification(
-                    //           notificationModel: notification.copyWith(isRead: true),
-                    //         );
-                    //   }
-                    // }
+                    ref.read(mentionCreatedAtProvider.notifier).state = notification.createdAt;
                   },
                 );
               },

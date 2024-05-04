@@ -67,10 +67,11 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                             }
 
                             // CHAT画面に遷移
-                            context.goNamed(ChatScreen.path, extra: {
-                              'label': chatRoom[index].name,
-                              'chatRoomId': chatRoom[index].documentId,
-                            });
+                            context.go('${ChatThreadScreen.metaData['path']}/${ChatScreen.path}',
+                                extra: {
+                                  'label': chatRoom[index].name,
+                                  'chatRoomId': chatRoom[index].documentId,
+                                });
                             // if (context.mounted) {
                             //   context.goNamed(ChatScreen.path, extra: {
                             //     'label': chatRoom[index].name,

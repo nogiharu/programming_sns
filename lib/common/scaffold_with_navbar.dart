@@ -21,11 +21,13 @@ class ScaffoldWithNavbar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // ボトムアイテム
+    // 通知だけカウントを付与
     final iconLabelItems = ref.watch(notificationListProvider).maybeWhen(
           data: (data) => bottomItems.map((meta) {
             if (meta['label'] == '通知') {
               meta['icon'] = NotificationScreen.getIconBadge(
-                  notificationCount: data.where((e) => !e.isRead).length);
+                notificationCount: data.where((e) => !e.isRead).length,
+              );
             }
             return BottomNavigationBarItem(icon: meta['icon'], label: meta['label']);
           }).toList(),
@@ -51,7 +53,7 @@ class ScaffoldWithNavbar extends ConsumerWidget {
 
           currentBottomMap['preIndex'] = currentBottomMap['index']!;
           currentBottomMap['index'] = index;
-          context.go(bottomItems[index]['path']);
+          context.goNamed(bottomItems[index]['path']);
         },
       ),
     );
