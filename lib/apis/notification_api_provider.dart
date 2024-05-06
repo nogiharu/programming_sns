@@ -18,22 +18,22 @@ class NotificationAPI {
 
   /// 作成
   Future<NotificationModel> create(
-    NotificationModel notificationModel, {
-    isDefaultError = false,
+    NotificationModel notification, {
+    bool isCustomError = true,
   }) async {
     return await _db
         .createDocument(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kNotificationCollection,
           documentId: ID.unique(),
-          data: notificationModel.toMap(),
+          data: notification.toMap(),
         )
         .then((doc) => NotificationModel.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
   /// 単一取得
-  Future<NotificationModel> get(String id, {bool isDefaultError = false}) async {
+  Future<NotificationModel> get(String id, {bool isCustomError = true}) async {
     return await _db
         .getDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -41,13 +41,13 @@ class NotificationAPI {
           documentId: id,
         )
         .then((doc) => NotificationModel.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
   /// リスト取得
   Future<List<NotificationModel>> getList({
     List<String>? queries,
-    isDefaultError = false,
+    bool isCustomError = true,
   }) async {
     return await _db
         .listDocuments(
@@ -56,22 +56,22 @@ class NotificationAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => NotificationModel.fromMap(doc.data)).toList())
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
   /// 更新
   Future<NotificationModel> update(
-    NotificationModel notificationModel, {
-    isDefaultError = false,
+    NotificationModel notification, {
+    bool isCustomError = true,
   }) async {
     return await _db
         .updateDocument(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kNotificationCollection,
-          documentId: notificationModel.documentId!,
-          data: notificationModel.toMap(),
+          documentId: notification.documentId!,
+          data: notification.toMap(),
         )
         .then((doc) => NotificationModel.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 }

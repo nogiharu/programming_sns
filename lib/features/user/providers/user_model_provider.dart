@@ -8,36 +8,35 @@ import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:programming_sns/common/utils.dart';
 
-final userModelProvider =
-    AsyncNotifierProvider<UserModelNotifier, UserModel>(UserModelNotifier.new);
+final userProvider = AsyncNotifierProvider<UserModelNotifier, UserModel>(UserModelNotifier.new);
 
 class UserModelNotifier extends AsyncNotifier<UserModel> {
   UserAPI get _userAPI => ref.watch(userAPIProvider);
 
   @override
   FutureOr<UserModel> build() async {
-    final user = ref.watch(authProvider).value;
-    if (user == null) return UserModel.instance();
-    return await _userAPI.get(user.userId, isDefaultError: true).catchError((e) async {
+    final session = ref.watch(authProvider).value;
+    if (session == null) return UserModel.instance();
+    return await _userAPI.get(session.userId, isCustomError: false).catchError((e) async {
       // 存在しないエラー404
       if (e is AppwriteException && e.code == 404) {
         // 全ユーザ取得
-        final users = await _userAPI.getList(queries: [
-          Query.limit(100000),
-          Query.equal('isDeleted', false),
-        ]);
+        final allUsers = await getAllList();
+        final sessionId = session.$id.substring(session.$id.length - 4);
+        final userId = sessionId + allUsers.length.toString();
 
-        // セッションID＋カウント
-        final userId = '${user.$id.substring(user.$id.length - 4)}${users.length}';
-        final userModel = UserModel.instance(
-          documentId: user.userId,
+        final user = UserModel.instance(
+          documentId: session.userId,
           name: '名前はまだない',
           userId: userId,
         );
-        debugPrint('ユーザー作成OK!:$userModel');
-        return await _userAPI.create(userModel);
+
+        final createdUser = await _userAPI.create(user);
+        debugPrint('ユーザー作成OK!:$createdUser');
+
+        return createdUser;
       }
-      throw exceptionMessage(error: e);
+      throw customErrorMessage(error: e);
     });
   }
 
@@ -50,5 +49,26 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
         );
       },
     );
+  }
+
+  /// ユーザー削除
+  Future<UserModel> deleteUser(UserModel userModel) async {
+    final deleteUser = userModel.copyWith(
+      updatedAt: DateTime.now(),
+      isDeleted: true,
+    );
+    return await _userAPI.update(deleteUser);
+  }
+
+  Future<List<UserModel>> getAllList({String? chatRoomId}) async {
+    final queries = [
+      Query.limit(100000),
+      Query.equal('isDeleted', false),
+    ];
+
+    if (chatRoomId != null) {
+      queries.add(Query.contains('chatRoomIds', chatRoomId));
+    }
+    return await _userAPI.getList(queries: queries);
   }
 }

@@ -68,7 +68,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
         title: const Text('通知'),
       ),
       body: ref.watchEX(
-        userModelProvider,
+        userProvider,
         complete: (userModel) => ref.watchEX(
           notificationListProvider,
           complete: (notificationModelList) {

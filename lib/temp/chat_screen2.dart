@@ -78,7 +78,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen2> {
     return Scaffold(
         appBar: AppBar(title: Text(widget.label)),
         body: ref.watchEX(
-          userModelProvider,
+          userProvider,
           complete: (currentUserModel) {
             _currentChatUser = UserModel.toChatUser(currentUserModel);
 

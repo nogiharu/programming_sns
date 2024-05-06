@@ -15,7 +15,7 @@ class UserAPI {
   final Databases _db;
   UserAPI({required Databases db}) : _db = db;
 
-  Future<UserModel> get(String id, {bool isDefaultError = false}) async {
+  Future<UserModel> get(String id, {bool isCustomError = true}) async {
     return await _db
         .getDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -23,10 +23,10 @@ class UserAPI {
           documentId: id,
         )
         .then((doc) => UserModel.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
-  Future<UserModel> create(UserModel userModel, {bool isDefaultError = false}) async {
+  Future<UserModel> create(UserModel userModel, {bool isCustomError = true}) async {
     return await _db
         .createDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -35,10 +35,10 @@ class UserAPI {
           data: userModel.toMap(),
         )
         .then((doc) => UserModel.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
-  Future<UserModel> update(UserModel userModel, {bool isDefaultError = false}) async {
+  Future<UserModel> update(UserModel userModel, {bool isCustomError = true}) async {
     return await _db
         .updateDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -47,13 +47,10 @@ class UserAPI {
           data: userModel.toMap(),
         )
         .then((doc) => UserModel.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
-  Future<List<UserModel>> getList({
-    List<String>? queries,
-    bool isDefaultError = false,
-  }) async {
+  Future<List<UserModel>> getList({List<String>? queries, bool isCustomError = true}) async {
     return await _db
         .listDocuments(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -61,16 +58,16 @@ class UserAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => UserModel.fromMap(doc.data)).toList())
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
-  Future<dynamic> delete(UserModel userModel, {bool isDefaultError = false}) async {
+  Future<dynamic> delete(UserModel userModel, {bool isCustomError = true}) async {
     return await _db
         .deleteDocument(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kUsersCollection,
           documentId: userModel.documentId,
         )
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 }

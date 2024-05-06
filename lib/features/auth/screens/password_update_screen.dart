@@ -6,19 +6,18 @@ import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/auth/widgets/auth_field.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
-class SignupScreen extends ConsumerStatefulWidget {
-  const SignupScreen({
+class PasswordUpdateScreen extends ConsumerStatefulWidget {
+  const PasswordUpdateScreen({
     super.key,
   });
 
-  static const String path = 'signup';
+  static const String path = 'passwordUpdate';
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _SignupScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _PasswordUpdateScreenState();
 }
 
-class _SignupScreenState extends ConsumerState<SignupScreen> {
-  final userIdController = TextEditingController();
+class _PasswordUpdateScreenState extends ConsumerState<PasswordUpdateScreen> {
   final passwordController = TextEditingController();
   String errorMessage = '';
 
@@ -31,21 +30,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       );
     }
 
+    passwordController.text = userModel.password;
+
     return Scaffold(
         appBar: AppBar(
-          title: const Text('アカウント登録'),
+          title: const Text('パスワード更新'),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AuthField(
-                labelText: 'ユーザーID',
-                controller: userIdController,
-                hintText: 'ユーザーIDは記号、日本語以外で半角で入力してね(^^)',
-              ),
-              const SizedBox(height: 10),
               AuthField(
                 labelText: 'パスワード',
                 controller: passwordController,
@@ -55,32 +50,28 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               Align(
                 alignment: Alignment.topRight,
                 child: ElevatedButton(
-                  /// 送信
                   onPressed: () async {
-                    // 登録処理
+                    // 更新
                     final authNotifier = ref.read(authProvider.notifier);
-                    final newUser = userModel.copyWith(
-                      userId: userIdController.text,
-                      password: passwordController.text,
-                      isAnonymous: false,
+                    await authNotifier.passwordUpdate(
+                      userModel: userModel,
+                      newPassword: passwordController.text,
                     );
-                    await authNotifier.registerOrUpdate(userModel: newUser);
 
                     // エラーチェック
-                    final authState = ref.watch(authProvider);
-                    if (authState.hasError) {
-                      errorMessage = authState.error.toString();
+                    final auth = ref.watch(authProvider);
+                    if (auth.hasError) {
+                      errorMessage = auth.error.toString();
                       return;
                     }
 
                     // 遷移
-                    ref.read(snackBarProvider)(message: '登録完了だよ(*^_^*)');
                     if (context.mounted) context.pop();
+                    ref.read(snackBarProvider)(message: '更新完了だよ(*^_^*)');
                   },
-                  child: const Text('アカウント登録'),
+                  child: const Text('更新'),
                 ),
               ),
-              const SizedBox(height: 10),
               if (errorMessage.isNotEmpty)
                 Text(
                   errorMessage,

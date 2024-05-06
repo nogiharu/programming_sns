@@ -17,7 +17,7 @@ class ChatRoomAPI {
   ChatRoomAPI({required Databases db}) : _db = db;
 
   /// チャットルーム作成
-  Future<ChatRoomModel> create(ChatRoomModel chatRoom, {bool isDefaultError = false}) async {
+  Future<ChatRoomModel> create(ChatRoomModel chatRoom, {bool isCustomError = true}) async {
     return await _db
         .createDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -26,11 +26,11 @@ class ChatRoomAPI {
           data: chatRoom.toMap(),
         )
         .then((doc) => ChatRoomModel.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
   /// チャットルーム取得
-  Future<ChatRoomModel> get(String id, {bool isDefaultError = false}) async {
+  Future<ChatRoomModel> get(String id, {bool isCustomError = true}) async {
     return await _db
         .getDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -38,11 +38,11 @@ class ChatRoomAPI {
           documentId: id,
         )
         .then((doc) => ChatRoomModel.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
   /// チャットルームリスト取得
-  Future<List<ChatRoomModel>> getList({List<String>? queries, isDefaultError = false}) async {
+  Future<List<ChatRoomModel>> getList({List<String>? queries, isCustomError = true}) async {
     return await _db
         .listDocuments(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -50,11 +50,11 @@ class ChatRoomAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => ChatRoomModel.fromMap(doc.data)).toList())
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
   /// チャットルーム更新
-  Future<ChatRoomModel> update(ChatRoomModel chatRoom, {bool isDefaultError = false}) async {
+  Future<ChatRoomModel> update(ChatRoomModel chatRoom, {bool isCustomError = true}) async {
     return await _db
         .updateDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -63,6 +63,6 @@ class ChatRoomAPI {
           data: chatRoom.toMap(),
         )
         .then((doc) => ChatRoomModel.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 }

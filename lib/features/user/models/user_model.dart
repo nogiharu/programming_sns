@@ -14,7 +14,7 @@ class UserModel {
 
   final DateTime updatedAt;
 
-  final String loginPassword;
+  final String password;
 
   /// ユーザが変えられるID　メンションに使用
   final String userId;
@@ -31,7 +31,7 @@ class UserModel {
     required this.profilePhoto,
     required this.createdAt,
     required this.updatedAt,
-    required this.loginPassword,
+    required this.password,
     required this.userId,
     required this.isAnonymous,
     this.chatRoomIds,
@@ -44,7 +44,7 @@ class UserModel {
     String? profilePhoto,
     DateTime? createdAt,
     DateTime? updatedAt,
-    String? loginPassword,
+    String? password,
     String? userId,
     bool? isAnonymous,
     List<String>? chatRoomIds,
@@ -56,7 +56,7 @@ class UserModel {
       profilePhoto: profilePhoto ?? this.profilePhoto,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      loginPassword: loginPassword ?? this.loginPassword,
+      password: password ?? this.password,
       userId: userId ?? this.userId,
       isAnonymous: isAnonymous ?? this.isAnonymous,
       chatRoomIds: chatRoomIds ?? this.chatRoomIds,
@@ -72,7 +72,7 @@ class UserModel {
     result.addAll({'updatedAt': updatedAt.millisecondsSinceEpoch});
     result.addAll({'profilePhoto': profilePhoto});
 
-    result.addAll({'loginPassword': loginPassword});
+    result.addAll({'password': password});
     result.addAll({'userId': userId});
 
     result.addAll({'isAnonymous': isAnonymous});
@@ -91,7 +91,7 @@ class UserModel {
       profilePhoto: map['profilePhoto'] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt']),
-      loginPassword: map['loginPassword'] ?? '',
+      password: map['password'] ?? '',
       userId: map['userId'] ?? '',
       isAnonymous: map['isAnonymous'] ?? true,
       chatRoomIds: List<String>.from(map['chatRoomIds']),
@@ -101,7 +101,7 @@ class UserModel {
 
   @override
   String toString() =>
-      'UserModel(id: $documentId, name: $name, profilePhoto: $profilePhoto, createdAt: $createdAt, updatedAt: $updatedAt, loginPassword: $loginPassword, userId: $userId, isAnonymous: $isAnonymous   chatRoomIds: $chatRoomIds isDeleted: $isDeleted )';
+      'UserModel(id: $documentId, name: $name, profilePhoto: $profilePhoto, createdAt: $createdAt, updatedAt: $updatedAt, password: $password, userId: $userId, isAnonymous: $isAnonymous   chatRoomIds: $chatRoomIds isDeleted: $isDeleted )';
 
   @override
   bool operator ==(Object other) {
@@ -113,7 +113,7 @@ class UserModel {
         other.profilePhoto == profilePhoto &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
-        other.loginPassword == loginPassword &&
+        other.password == password &&
         other.userId == userId &&
         other.isAnonymous == isAnonymous &&
         listEquals(other.chatRoomIds, chatRoomIds) &&
@@ -127,7 +127,7 @@ class UserModel {
       profilePhoto.hashCode ^
       createdAt.hashCode ^
       updatedAt.hashCode ^
-      loginPassword.hashCode ^
+      password.hashCode ^
       userId.hashCode ^
       isAnonymous.hashCode ^
       chatRoomIds.hashCode ^
@@ -138,7 +138,7 @@ class UserModel {
     String? name,
     String? profilePhoto,
     DateTime? updatedAt,
-    String? loginPassword,
+    String? password,
     String? userId,
     bool? isAnonymous,
     List<String>? chatRoomIds,
@@ -151,7 +151,7 @@ class UserModel {
           "https://raw.githubusercontent.com/SimformSolutionsPvtLtd/flutter_showcaseview/master/example/assets/simform.png",
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      loginPassword: loginPassword ?? '',
+      password: password ?? '',
       userId: userId ?? documentId ?? '',
       isAnonymous: isAnonymous ?? true,
       chatRoomIds: chatRoomIds ?? [],

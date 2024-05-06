@@ -265,7 +265,7 @@ class ScreenM extends ConsumerWidget {
           );
         },
         child: ref.watchEX(
-          userModelProvider,
+          userProvider,
           complete: (p0) {
             return ListView.builder(
               itemCount: a.length,

@@ -2,9 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/scaffold_with_navbar.dart';
-import 'package:programming_sns/features/auth/screens/login_credentials_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
+import 'package:programming_sns/features/auth/screens/password_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
+import 'package:programming_sns/features/auth/screens/user_id_update_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
 import 'package:programming_sns/temp/chat_screen4.dart';
@@ -137,15 +138,19 @@ final router = Provider((ref) {
                 },
               ),
               GoRoute(
-                path: LoginCredentialsUpdateScreen.path,
-                name: LoginCredentialsUpdateScreen.path,
+                path: UserIdUpdateScreen.path,
+                name: UserIdUpdateScreen.path,
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
-                  final map = state.extra as Map<String, dynamic>;
-                  return LoginCredentialsUpdateScreen(
-                    label: map['label'],
-                    isIdUpdate: map['isIdUpdate'],
-                  );
+                  return const UserIdUpdateScreen();
+                },
+              ),
+              GoRoute(
+                path: PasswordUpdateScreen.path,
+                name: PasswordUpdateScreen.path,
+                parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+                builder: (context, state) {
+                  return const PasswordUpdateScreen();
                 },
               ),
             ],
@@ -162,10 +167,6 @@ final router = Provider((ref) {
         currentBottomMap['index'] = bottomItems.indexWhere((e) => uri == e['path']);
       }
 
-      // ログイン情報更新画面でリロードされたらextraがnullになる
-      if (uri.contains(LoginCredentialsUpdateScreen.path) && state.extra == null) {
-        return UserScreen.metaData['path'];
-      }
       if (uri.contains(ChatScreen.path) && state.extra == null) {
         return ChatThreadScreen.metaData['path'];
       }

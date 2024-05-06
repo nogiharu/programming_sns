@@ -21,7 +21,7 @@ class ChatRoomListNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>>
       Query.orderDesc('updatedAt'),
       Query.limit(100000), // FIXME
     ];
-    return await _chatRoomAPI.getList(queries: queries, isDefaultError: true);
+    return await _chatRoomAPI.getList(queries: queries);
   }
 
   /// 作成イベント

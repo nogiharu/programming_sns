@@ -106,7 +106,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
         /// USER
         body: ref.watchEX(
-          userModelProvider,
+          userProvider,
           complete: (currentUserModel) {
             _currentChatUser = UserModel.toChatUser(currentUserModel);
 
@@ -489,7 +489,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               if (mentionMessageLocation != null) {
                 // 既読にする
                 await ref.read(notificationListProvider.notifier).updateState(
-                      notificationModel: notification.copyWith(isRead: true),
+                      notification.copyWith(isRead: true),
                     );
               }
             }

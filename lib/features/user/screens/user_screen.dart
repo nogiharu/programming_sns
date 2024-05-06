@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
-import 'package:programming_sns/features/auth/screens/login_credentials_update_screen.dart';
+import 'package:programming_sns/features/auth/screens/password_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
+import 'package:programming_sns/features/auth/screens/user_id_update_screen.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/test_tool/test_tool.dart';
 
@@ -24,7 +25,7 @@ class UserScreen extends ConsumerWidget {
         title: const Text('ホーム'),
       ),
       body: ref.watchEX(
-        userModelProvider,
+        userProvider,
         complete: (data) {
           return Center(
             child: Column(
@@ -55,28 +56,16 @@ class UserScreen extends ConsumerWidget {
                 ] else ...[
                   ElevatedButton(
                     onPressed: () {
-                      context.goNamed(
-                        LoginCredentialsUpdateScreen.path,
-                        extra: {
-                          'label': 'ID更新',
-                          'isIdUpdate': true,
-                        },
-                      );
+                      context.goNamed(UserIdUpdateScreen.path);
                     },
                     child: const Text(
-                      'ID更新',
+                      'ユーザーID更新',
                     ),
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {
-                      context.goNamed(
-                        LoginCredentialsUpdateScreen.path,
-                        extra: {
-                          'label': 'パスワード更新',
-                          'isIdUpdate': false,
-                        },
-                      );
+                      context.goNamed(PasswordUpdateScreen.path);
                     },
                     child: const Text(
                       'パスワード更新',

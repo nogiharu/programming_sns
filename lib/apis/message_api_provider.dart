@@ -17,7 +17,7 @@ class MessageAPI {
   final Databases _db;
   MessageAPI({required Databases db}) : _db = db;
 
-  Future<Message> create(Message message, {bool isDefaultError = false}) async {
+  Future<Message> create(Message message, {bool isCustomError = true}) async {
     return await _db
         .createDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -26,10 +26,10 @@ class MessageAPI {
           data: message.toMap(),
         )
         .then((doc) => MessageEX.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
-  Future<Message> update(Message message, {bool isDefaultError = false}) async {
+  Future<Message> update(Message message, {bool isCustomError = true}) async {
     return await _db
         .updateDocument(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -38,10 +38,10 @@ class MessageAPI {
           data: message.toMap(),
         )
         .then((doc) => MessageEX.fromMap(doc.data))
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
-  Future<List<Message>> getList({List<String>? queries, isDefaultError = false}) async {
+  Future<List<Message>> getList({List<String>? queries, isCustomError = true}) async {
     return await _db
         .listDocuments(
           databaseId: AppwriteConstants.kDatabaseId,
@@ -49,16 +49,16 @@ class MessageAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => MessageEX.fromMap(doc.data)).toList())
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 
-  Future<dynamic> delete(String id, {bool isDefaultError = false}) async {
+  Future<dynamic> delete(String id, {bool isCustomError = true}) async {
     return await _db
         .deleteDocument(
           databaseId: AppwriteConstants.kDatabaseId,
           collectionId: AppwriteConstants.kMessagesCollection,
           documentId: id,
         )
-        .catchError((e) => exceptionMessage(error: e, isDefaultError: isDefaultError));
+        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
   }
 }

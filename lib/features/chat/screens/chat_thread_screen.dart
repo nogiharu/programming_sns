@@ -29,7 +29,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
       appBar: AppBar(
         title: const Text('チャットスレッド'),
       ),
-      body: ref.watchEX(userModelProvider, complete: (userModel) {
+      body: ref.watchEX(userProvider, complete: (userModel) {
         return RefreshIndicator(
           onRefresh: () async {
             await Future.delayed(
@@ -59,11 +59,9 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                           onTap: () {
                             // ルームID追加 awaitはしない TODO
                             if (!userModel.chatRoomIds!.contains(chatRoom[index].documentId!)) {
-                              final updateUserModel = userModel.copyWith(
-                                updatedAt: DateTime.now(),
-                              )..chatRoomIds?.add(chatRoom[index].documentId!);
+                              userModel.chatRoomIds?.add(chatRoom[index].documentId!);
                               // API
-                              ref.read(userModelProvider.notifier).updateState(updateUserModel);
+                              ref.read(userProvider.notifier).updateState(userModel);
                             }
 
                             // CHAT画面に遷移

@@ -54,16 +54,16 @@ final showDialogProvider = Provider((ref) {
   };
 });
 
-exceptionMessage({
+customErrorMessage({
   dynamic error,
   String? userId,
-  String? loginPassword,
-  bool isDefaultError = false,
+  String? password,
+  bool isCustomError = true,
 }) {
-  if (isDefaultError) throw error;
+  if (!isCustomError) throw error;
 
   //-------------- 認証系 --------------
-  if ((userId?.isEmpty ?? false) || (loginPassword?.isEmpty ?? false)) {
+  if ((userId?.isEmpty ?? false) || (password?.isEmpty ?? false)) {
     throw '入力は必須だよ(>_<)';
   }
 
@@ -71,22 +71,30 @@ exceptionMessage({
     throw 'IDに無効な文字が使われてるよ(>_<)';
   }
 
-  if (loginPassword != null && loginPassword.length < 8) {
+  if (password != null && password.length < 8) {
     throw 'パスワードは８桁以上で入れてね(>_<)';
   }
 
   //-------------- API系 --------------
   if (error != null) {
-    print('exceptionMessage：${error.toString()}');
-    if (error is AppwriteException &&
-        (error.code == 409 ||
-            (error.code == 400 && error.toString().contains('general_bad_request')))) {
-      throw '既に使われているIDだよ(>_<)';
-    }
-    throw '''
-      ${error is AppwriteException ? 'code：${error.code}' : ''}
+    debugPrint('exceptionMessage：${error.toString()}');
+
+    if (error is AppwriteException) {
+      final isException = (error.code == 400 && error.toString().contains('general_bad_request'));
+
+      final isExist = (error.code == 409 && error.toString().contains('user_already_exists'));
+
+      if (isException || isExist) {
+        throw '既に使われているIDだよ(>_<)';
+      }
+
+      throw '''
+      ${'code：${error.code}'}
       予期せぬエラーだあ(T ^ T)
       再立ち上げしてね(>_<)
       ''';
+    } else {
+      throw error;
+    }
   }
 }

@@ -24,7 +24,7 @@ final notificationListProvider =
 
 class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<NotificationModel>> {
   NotificationAPI get _notificationAPI => ref.watch(notificationAPIProvider);
-  UserModel get _currentUser => ref.watch(userModelProvider).requireValue;
+  UserModel get _currentUser => ref.watch(userProvider).requireValue;
   String? firstDocumentId;
 
   @override
@@ -33,15 +33,20 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
     ref.watch(notificationEventProvider);
 
     /// 最初のデータ取得
-    await _notificationAPI.getList(queries: [
-      Query.equal('userDocumentId', _currentUser.documentId),
-      Query.limit(1),
-    ]).then((e) => firstDocumentId = e.firstOrNull?.documentId);
+    final firstList = await _notificationAPI.getList(
+      queries: [
+        Query.equal('userDocumentId', _currentUser.documentId),
+        Query.limit(1),
+      ],
+    );
+    firstDocumentId = firstList.first.documentId;
 
-    return await _notificationAPI.getList(queries: [
-      Query.equal('userDocumentId', _currentUser.documentId),
-      Query.orderDesc('createdAt'),
-    ]);
+    return await _notificationAPI.getList(
+      queries: [
+        Query.equal('userDocumentId', _currentUser.documentId),
+        Query.orderDesc('createdAt'),
+      ],
+    );
   }
 
   /// メンションイベント
@@ -49,7 +54,7 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
     update((data) {
       if (event.payload['userDocumentId'] == _currentUser.documentId) {
         final notification = NotificationModel.fromMap(event.payload);
-        data = data..insert(0, notification);
+        data.insert(0, notification);
 
         // どのメッセージがメンションされたか特定するために使用
         // ※ messageIdは作成後にIDが採番されるため
@@ -73,13 +78,17 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
     });
   }
 
-  Future<void> updateState({required NotificationModel notificationModel}) async {
-    await futureGuard(() async {
-      return await _notificationAPI.update(notificationModel).then((notification) {
-        final index = state.value!.indexWhere((e) => e.documentId == notification.documentId);
-        return state.value!..[index] = notification;
-      });
-    }, isLoading: false);
+  Future<void> updateState(NotificationModel notification) async {
+    await futureGuard(
+      () async {
+        final updatedNotification = await _notificationAPI.update(notification);
+        final index =
+            state.requireValue.indexWhere((e) => e.documentId == updatedNotification.documentId);
+
+        return state.requireValue..[index] = updatedNotification;
+      },
+      isLoading: false,
+    );
   }
 
   Future<void> addStateList() async {
@@ -89,30 +98,36 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
 
     await futureGuard(
       () async {
-        return await _notificationAPI.getList(
-          queries: [
-            Query.equal('userDocumentId', _currentUser.documentId),
-            Query.orderDesc('createdAt'),
-            Query.cursorAfter(data.last.documentId!),
-          ],
-        ).then((data) => state.requireValue..addAll(data));
+        final queries = [
+          Query.equal('userDocumentId', _currentUser.documentId),
+          Query.orderDesc('createdAt'),
+          Query.cursorAfter(data.last.documentId!),
+        ];
+
+        final nextList = await _notificationAPI.getList(queries: queries);
+
+        return state.requireValue..addAll(nextList);
       },
       isLoading: false,
     );
   }
 
-  // Future<List<NotificationModel>> getList({String documentId = ''}) async {
+  // Future<List<NotificationModel>> getList({
+  //   bool isFirst = false,
+  //   bool isDesc = true,
+  //   String? afterId,
+  // }) async {
   //   final queries = [
   //     Query.equal('userDocumentId', _currentUser.documentId),
-  //     Query.orderDesc('createdAt'),
+  //     isDesc ? Query.orderDesc('createdAt') : Query.orderAsc('createdAt'),
+  //     isFirst ? Query.limit(1) : Query.limit(100000000),
   //   ];
 
-  //   if (documentId.isNotEmpty) {
-  //     queries.add(Query.cursorAfter(documentId));
+  //   if (afterId != null) {
+  //     queries.add(Query.cursorAfter(afterId));
   //   }
 
-  //   return await _notificationAPI
-  //       .getList(queries: queries)
-  //       .catchError((e) => state = AsyncError(e, StackTrace.current));
+  //   return await _notificationAPI.getList(queries: queries);
+  //   // .catchError((e) => state = AsyncError(e, StackTrace.current));
   // }
 }

@@ -20,7 +20,7 @@ class TestToolcreen extends ConsumerWidget {
     final auth = ref.watch(authProvider).value;
     // print(auth?.$createdAt);
     return ref.watchEX(
-      userModelProvider,
+      userProvider,
       complete: (data) {
         return Container(
           decoration: BoxDecoration(border: Border.all(color: Colors.black)),
@@ -29,7 +29,6 @@ class TestToolcreen extends ConsumerWidget {
             children: [
               Column(
                 children: [
-                  ElevatedButton(onPressed: () {}, child: const Text('aaa')),
                   // Container(
                   //     color: Colors.amber,
                   //     padding: const EdgeInsets.all(5),
@@ -58,7 +57,13 @@ class TestToolcreen extends ConsumerWidget {
                     ),
                 ],
               ),
-              // Text(ref.watch(authProvider).value?.email ?? 'ない'),
+              TextButton(
+                onPressed: () async {
+                  final a = await ref.read(userProvider.notifier).deleteUser(data);
+                  print('リザルト：$a');
+                },
+                child: const Text('状態チェック'),
+              ),
               TextButton(
                 onPressed: () async {
                   String name;
@@ -80,7 +85,7 @@ class TestToolcreen extends ConsumerWidget {
 
                   data = data.copyWith(name: name);
 
-                  final aa = await ref.read(userModelProvider.notifier).updateState(data);
+                  final aa = await ref.read(userProvider.notifier).updateState(data);
                   // final aaa = await ref.read(userModelProvider.notifier).getUserModelList();
                   // print(aaa);
                 },
@@ -183,9 +188,7 @@ class TestToolcreen extends ConsumerWidget {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  await ref
-                      .read(userModelProvider.notifier)
-                      .updateState(data.copyWith(chatRoomIds: []));
+                  await ref.read(userProvider.notifier).updateState(data.copyWith(chatRoomIds: []));
                 },
                 child: const Text('チャットID削除'),
               ),

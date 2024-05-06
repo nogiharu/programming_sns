@@ -71,7 +71,7 @@ class _ChatScreen4State extends ConsumerState<ChatScreen4> {
 
         /// USER
         body: ref.watchEX(
-          userModelProvider,
+          userProvider,
           complete: (currentUserModel) {
             _currentChatUser = UserModel.toChatUser(currentUserModel);
 

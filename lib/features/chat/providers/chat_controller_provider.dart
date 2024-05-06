@@ -7,10 +7,10 @@ import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api_provider.dart';
-import 'package:programming_sns/apis/user_api_provider.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 
 final firstChatMessageProvider = FutureProviderFamily<Message?, String>((ref, chatRoomId) async {
   return ref.read(chatControllerProvider(chatRoomId).notifier).getFirstMessage();
@@ -35,6 +35,8 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     final chatUsers = await getChatUsers();
 
     firstDocumentId = (await getFirstMessage())?.id;
+
+    print(firstDocumentId);
 
     return ChatController(
       initialMessageList: initialMessageList,
@@ -69,11 +71,10 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
   /// ユーザーリスト取得し、チャットユーザーリストに変換
   Future<List<ChatUser>> getChatUsers() async {
-    return await ref.watch(userAPIProvider).getList(queries: [
-      Query.limit(100000),
-      Query.equal('isDeleted', false),
-      Query.contains('chatRoomIds', arg),
-    ]).then((users) => users.map((user) => UserModel.toChatUser(user)).toList());
+    return await ref
+        .read(userProvider.notifier)
+        .getAllList(chatRoomId: arg)
+        .then((users) => users.map((user) => UserModel.toChatUser(user)).toList());
   }
 
   /// メッセージ一覧取得
@@ -82,7 +83,6 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     final queries = [
       Query.orderDesc('createdAt'),
       Query.equal('chatRoomId', arg),
-      // Query.limit(25),
     ];
     // idより前を取得
     if (before25MessageId != null) queries.add(Query.cursorAfter(before25MessageId));
@@ -109,6 +109,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
       Query.orderAsc('createdAt'),
       Query.limit(1),
     ];
+
     final messages = await _messageAPI
         .getList(queries: queries)
         .then((e) => e.firstOrNull)
