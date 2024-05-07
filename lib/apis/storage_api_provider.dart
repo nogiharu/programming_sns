@@ -27,7 +27,7 @@ class SrorageAPI {
           file: InputFile.fromBytes(bytes: uint8List, filename: xFile.name),
         )
         .then((uploadImage) => AppwriteConstants.imageUrl(uploadImage.$id))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   /// 画像ダウンロード
@@ -53,7 +53,7 @@ class SrorageAPI {
         isSave = (await ImageGallerySaver.saveImage(uint8List))['isSuccess'] as bool;
       }
       return isSave;
-    }).catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+    }).catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   /// 画像プレビュー
@@ -63,6 +63,6 @@ class SrorageAPI {
 
     return await _storage
         .getFilePreview(bucketId: bucketId, fileId: imageId!)
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 }

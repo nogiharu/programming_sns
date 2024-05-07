@@ -18,11 +18,9 @@ import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_message_event_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_list_provider.dart';
-import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
 import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
-import 'package:programming_sns/features/notification/screens/notification_screen.dart';
 import 'package:programming_sns/theme/theme_color.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
@@ -70,6 +68,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   CancelableOperation? _initMentionScrollCancel;
 
+  late final NotificationListNotifier notificationNotifier =
+      ref.read(notificationListProvider.notifier);
+
   @override
   void initState() {
     super.initState();
@@ -96,7 +97,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               // ウィジェットが破棄される際に、非同期処理が完了していない場合は強制的に完了させる
               if (_initMentionScrollCancel != null) {
                 _initMentionScrollCancel!.cancel();
-                ref.read(mentionCreatedAtProvider.notifier).state = null;
+                notificationNotifier.mentionCreatedAt = null;
               }
               context.pop();
             },
@@ -448,11 +449,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void initMentionScroll() {
-    final mentionCreatedAt = ref.read(mentionCreatedAtProvider);
-    if (_chatController.initialMessageList.isNotEmpty && mentionCreatedAt != null) {
+    final isNotEmpty = _chatController.initialMessageList.isNotEmpty;
+    if (isNotEmpty && notificationNotifier.mentionCreatedAt != null) {
       _initMentionScrollCancel = CancelableOperation.fromFuture(
           Future.delayed(const Duration(milliseconds: 500), () async {
-        final mentionMessageLocation = getMessageLocation(mentionCreatedAt: mentionCreatedAt);
+        final mentionMessageLocation =
+            getMessageLocation(mentionCreatedAt: notificationNotifier.mentionCreatedAt!);
 
         if (mentionMessageLocation == null) {
           await loadMoreData();
@@ -472,7 +474,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           curve: Curves.easeInOut,
         );
 
-        ref.read(mentionCreatedAtProvider.notifier).state = null;
+        notificationNotifier.mentionCreatedAt = null;
       }));
     }
   }

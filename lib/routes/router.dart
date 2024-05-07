@@ -7,13 +7,9 @@ import 'package:programming_sns/features/auth/screens/password_update_screen.dar
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/auth/screens/user_id_update_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
-import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
-import 'package:programming_sns/temp/chat_screen4.dart';
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/notification/screens/notification_screen.dart';
 import 'package:programming_sns/features/user/screens/user_screen.dart';
-import 'package:programming_sns/temp/chat_screen2.dart';
-import 'package:programming_sns/temp/chat_screen3.dart';
 
 import 'package:programming_sns/temp/tempScreen.dart';
 
@@ -61,7 +57,7 @@ final router = Provider((ref) {
             routes: [
               GoRoute(
                 path: ChatScreen.path,
-                name: '${ChatThreadScreen.metaData['path']}/${ChatScreen.path}',
+                // name: nameは一意出なければならない
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
                   final map = state.extra as Map<String, dynamic>;
@@ -76,9 +72,6 @@ final router = Provider((ref) {
             pageBuilder: (context, state) {
               return _pageAnimation(const ScreenB(), state, ref: ref);
             },
-            // builder: (context, state) {
-            //   return const ScreenB();
-            // },
             routes: [
               GoRoute(
                 path: DetailsScreen.path,
@@ -100,7 +93,7 @@ final router = Provider((ref) {
             routes: [
               GoRoute(
                 path: ChatScreen.path,
-                name: '${NotificationScreen.metadata['path']}/${ChatScreen.path}',
+                // name: nameは一意出なければならない
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
                   final map = state.extra as Map<String, dynamic>;
@@ -117,9 +110,6 @@ final router = Provider((ref) {
             pageBuilder: (context, state) {
               return _pageAnimation(const UserScreen(), state, ref: ref);
             },
-            // builder: (context, state) {
-            //   return const HomeScreen();
-            // },
             routes: [
               GoRoute(
                 path: LoginScreen.path,

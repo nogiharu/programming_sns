@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
@@ -29,7 +28,7 @@ class NotificationAPI {
           data: notification.toMap(),
         )
         .then((doc) => NotificationModel.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   /// 単一取得
@@ -41,7 +40,7 @@ class NotificationAPI {
           documentId: id,
         )
         .then((doc) => NotificationModel.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   /// リスト取得
@@ -56,7 +55,7 @@ class NotificationAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => NotificationModel.fromMap(doc.data)).toList())
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   /// 更新
@@ -72,6 +71,6 @@ class NotificationAPI {
           data: notification.toMap(),
         )
         .then((doc) => NotificationModel.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 }

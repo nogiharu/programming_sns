@@ -44,6 +44,8 @@ class NotificationScreen extends ConsumerStatefulWidget {
 class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   final scrollController = ScrollController();
 
+  late final notificationNotifier = ref.read(notificationListProvider.notifier);
+
   @override
   void initState() {
     scrollController.addListener(scrollListener);
@@ -54,7 +56,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     // await中にスクロールしたくないため消す
     scrollController.removeListener(scrollListener);
     if (MediaQuery.of(context).size.height < scrollController.position.pixels) {
-      await ref.read(notificationListProvider.notifier).addStateList();
+      await notificationNotifier.addStateList();
     }
     scrollController.addListener(scrollListener);
   }
@@ -103,23 +105,17 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                               text: notification.chatRoomLabel,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            const TextSpan(
-                              text: 'スレッドで',
-                            ),
+                            const TextSpan(text: 'スレッドで'),
                             TextSpan(
                               text: notification.sendByUserName,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            const TextSpan(
-                              text: 'さんから',
-                            ),
+                            const TextSpan(text: 'さんから'),
                             TextSpan(
                               text: notification.notificationType.toString(),
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            const TextSpan(
-                              text: 'されました',
-                            ),
+                            const TextSpan(text: 'されました'),
                           ]),
                         ),
                         Container(
@@ -141,8 +137,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                       'label': notification.chatRoomLabel,
                       'chatRoomId': notification.chatRoomId,
                     });
-
-                    ref.read(mentionCreatedAtProvider.notifier).state = notification.createdAt;
+                    // メンション日付を入れる
+                    notificationNotifier.mentionCreatedAt = notification.createdAt;
                   },
                 );
               },

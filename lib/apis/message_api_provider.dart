@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
@@ -26,7 +25,7 @@ class MessageAPI {
           data: message.toMap(),
         )
         .then((doc) => MessageEX.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   Future<Message> update(Message message, {bool isCustomError = true}) async {
@@ -38,7 +37,7 @@ class MessageAPI {
           data: message.toMap(),
         )
         .then((doc) => MessageEX.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   Future<List<Message>> getList({List<String>? queries, isCustomError = true}) async {
@@ -49,7 +48,7 @@ class MessageAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => MessageEX.fromMap(doc.data)).toList())
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   Future<dynamic> delete(String id, {bool isCustomError = true}) async {
@@ -59,6 +58,6 @@ class MessageAPI {
           collectionId: AppwriteConstants.kMessagesCollection,
           documentId: id,
         )
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 }

@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/appwrite_providers.dart';
@@ -26,7 +25,7 @@ class ChatRoomAPI {
           data: chatRoom.toMap(),
         )
         .then((doc) => ChatRoomModel.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   /// チャットルーム取得
@@ -38,7 +37,7 @@ class ChatRoomAPI {
           documentId: id,
         )
         .then((doc) => ChatRoomModel.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   /// チャットルームリスト取得
@@ -50,7 +49,7 @@ class ChatRoomAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => ChatRoomModel.fromMap(doc.data)).toList())
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   /// チャットルーム更新
@@ -63,6 +62,6 @@ class ChatRoomAPI {
           data: chatRoom.toMap(),
         )
         .then((doc) => ChatRoomModel.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 }

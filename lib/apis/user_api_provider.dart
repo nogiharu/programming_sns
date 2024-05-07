@@ -23,7 +23,7 @@ class UserAPI {
           documentId: id,
         )
         .then((doc) => UserModel.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   Future<UserModel> create(UserModel userModel, {bool isCustomError = true}) async {
@@ -35,7 +35,7 @@ class UserAPI {
           data: userModel.toMap(),
         )
         .then((doc) => UserModel.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   Future<UserModel> update(UserModel userModel, {bool isCustomError = true}) async {
@@ -47,7 +47,7 @@ class UserAPI {
           data: userModel.toMap(),
         )
         .then((doc) => UserModel.fromMap(doc.data))
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   Future<List<UserModel>> getList({List<String>? queries, bool isCustomError = true}) async {
@@ -58,7 +58,7 @@ class UserAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => UserModel.fromMap(doc.data)).toList())
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 
   Future<dynamic> delete(UserModel userModel, {bool isCustomError = true}) async {
@@ -68,6 +68,6 @@ class UserAPI {
           collectionId: AppwriteConstants.kUsersCollection,
           documentId: userModel.documentId,
         )
-        .catchError((e) => customErrorMessage(error: e, isCustomError: isCustomError));
+        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
   }
 }

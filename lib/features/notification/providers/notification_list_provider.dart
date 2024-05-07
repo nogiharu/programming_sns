@@ -2,21 +2,20 @@
 
 import 'dart:async';
 import 'package:appwrite/appwrite.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/apis/notification_api_provider.dart';
 import 'package:programming_sns/common/utils.dart';
+import 'package:programming_sns/constants/appwrite_constants.dart';
+import 'package:programming_sns/core/realtime_event_provider.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
-import 'package:programming_sns/features/notification/providers/notification_event_provider.dart';
 import 'package:programming_sns/features/notification/screens/notification_screen.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/routes/router.dart';
-
-/// メンションしたメッセージの送信日付を特定するために使用
-final mentionCreatedAtProvider = StateProvider<DateTime?>((ref) => null);
 
 final notificationListProvider =
     AutoDisposeAsyncNotifierProvider<NotificationListNotifier, List<NotificationModel>>(
@@ -27,57 +26,28 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
   UserModel get _currentUser => ref.watch(userProvider).requireValue;
   String? firstDocumentId;
 
+  /// メンションを特定するために使用
+  DateTime? mentionCreatedAt;
+
   @override
   FutureOr<List<NotificationModel>> build() async {
     /// 通知作成イベント
-    ref.watch(notificationEventProvider);
+    realtimeEvent();
 
     /// 最初のデータ取得
     final firstList = await _notificationAPI.getList(
       queries: [
         Query.equal('userDocumentId', _currentUser.documentId),
+        Query.orderAsc('createdAt'),
         Query.limit(1),
       ],
     );
-    firstDocumentId = firstList.first.documentId;
+    firstDocumentId = firstList.firstOrNull?.documentId;
 
-    return await _notificationAPI.getList(
-      queries: [
-        Query.equal('userDocumentId', _currentUser.documentId),
-        Query.orderDesc('createdAt'),
-      ],
-    );
+    return await getAllList();
   }
 
-  /// メンションイベント
-  void createStateEvent(RealtimeMessage event) {
-    update((data) {
-      if (event.payload['userDocumentId'] == _currentUser.documentId) {
-        final notification = NotificationModel.fromMap(event.payload);
-        data.insert(0, notification);
-
-        // どのメッセージがメンションされたか特定するために使用
-        // ※ messageIdは作成後にIDが採番されるため
-        ref.read(snackBarProvider)(
-          message: '${notification.sendByUserName}さんからメンションされました(*^^*)',
-          onTap: () {
-            final context = ref.read(shellNavigatorKeyProvider).currentContext;
-            final chatScreenPath = '${NotificationScreen.metadata['path']}/${ChatScreen.path}';
-            // CHAT画面に遷移
-            context!.go(chatScreenPath, extra: {
-              'label': notification.chatRoomLabel,
-              'chatRoomId': notification.chatRoomId,
-            });
-
-            ref.read(mentionCreatedAtProvider.notifier).state = notification.createdAt;
-          },
-        );
-      }
-
-      return data;
-    });
-  }
-
+  //========================== ステート(API) START ==========================
   Future<void> updateState(NotificationModel notification) async {
     await futureGuard(
       () async {
@@ -98,36 +68,77 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
 
     await futureGuard(
       () async {
-        final queries = [
-          Query.equal('userDocumentId', _currentUser.documentId),
-          Query.orderDesc('createdAt'),
-          Query.cursorAfter(data.last.documentId!),
-        ];
-
-        final nextList = await _notificationAPI.getList(queries: queries);
+        final nextList = await getAllList(nextPagenationId: data.last.documentId);
 
         return state.requireValue..addAll(nextList);
       },
       isLoading: false,
     );
   }
+  //========================== ステート(API) END ==========================
 
-  // Future<List<NotificationModel>> getList({
-  //   bool isFirst = false,
-  //   bool isDesc = true,
-  //   String? afterId,
-  // }) async {
-  //   final queries = [
-  //     Query.equal('userDocumentId', _currentUser.documentId),
-  //     isDesc ? Query.orderDesc('createdAt') : Query.orderAsc('createdAt'),
-  //     isFirst ? Query.limit(1) : Query.limit(100000000),
-  //   ];
+  //========================== API START ==========================
 
-  //   if (afterId != null) {
-  //     queries.add(Query.cursorAfter(afterId));
-  //   }
+  Future<List<NotificationModel>> getAllList({String? nextPagenationId}) async {
+    final queries = [
+      Query.equal('userDocumentId', _currentUser.documentId),
+      Query.orderDesc('createdAt'),
+    ];
 
-  //   return await _notificationAPI.getList(queries: queries);
-  //   // .catchError((e) => state = AsyncError(e, StackTrace.current));
-  // }
+    if (nextPagenationId != null) {
+      queries.add(Query.cursorAfter(nextPagenationId));
+    }
+
+    return await _notificationAPI.getList(queries: queries);
+  }
+  //========================== API END ==========================
+
+  //========================== イベント START ==========================
+
+  void realtimeEvent() {
+    ref.listen(realtimeEventProvider, (_, next) {
+      next.whenOrNull(
+        data: (event) {
+          final isNotificationCreateEvent =
+              event.events.contains('${AppwriteConstants.kNotificationDocmentsChannels}.*.create');
+
+          /// 通知作成イベント
+          if (isNotificationCreateEvent) {
+            debugPrint('NOTIFICATION_CREATE!');
+            _createStateEvent(event);
+          }
+        },
+      );
+    });
+  }
+
+  /// メンションイベント
+  void _createStateEvent(RealtimeMessage event) {
+    update((data) {
+      if (event.payload['userDocumentId'] == _currentUser.documentId) {
+        final notification = NotificationModel.fromMap(event.payload);
+        data.insert(0, notification);
+
+        // どのメッセージがメンションされたか特定するために使用
+        // ※ messageIdは作成後にIDが採番されるため
+        ref.read(snackBarProvider)(
+          message: '${notification.sendByUserName}さんからメンションされました(*^^*)',
+          onTap: () {
+            final context = ref.read(shellNavigatorKeyProvider).currentContext;
+            final chatScreenPath = '${NotificationScreen.metadata['path']}/${ChatScreen.path}';
+            // CHAT画面に遷移
+            context!.go(chatScreenPath, extra: {
+              'label': notification.chatRoomLabel,
+              'chatRoomId': notification.chatRoomId,
+            });
+
+            mentionCreatedAt = notification.createdAt;
+          },
+        );
+      }
+
+      return data;
+    });
+  }
+  //========================== イベント END ==========================
 }

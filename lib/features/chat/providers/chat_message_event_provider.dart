@@ -47,8 +47,6 @@ final chatMessageEventProvider = AutoDisposeProviderFamily<void, String>((ref, c
           debugPrint('MESSAGE_UPDATE!');
           ref.read(chatControllerProvider(chatRoomId).notifier).updateMessageEvent(data);
         }
-
-        // // print(data.events.contains(AppwriteConstants.kNotificationCollection));
       },
     );
   });

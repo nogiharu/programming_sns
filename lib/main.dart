@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/notification/providers/notification_event_provider.dart';
 import 'package:programming_sns/theme/theme_color.dart';
 import 'package:programming_sns/routes/router.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -63,7 +62,6 @@ class Main extends ConsumerWidget {
       ),
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(router),
-      // routerDelegate: ref.watch(router).routerDelegate,
 
       scaffoldMessengerKey: ref.read(scaffoldMessengerKeyProvider),
     );

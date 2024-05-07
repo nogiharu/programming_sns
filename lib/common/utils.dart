@@ -58,10 +58,7 @@ customErrorMessage({
   dynamic error,
   String? userId,
   String? password,
-  bool isCustomError = true,
 }) {
-  if (!isCustomError) throw error;
-
   //-------------- 認証系 --------------
   if ((userId?.isEmpty ?? false) || (password?.isEmpty ?? false)) {
     throw '入力は必須だよ(>_<)';

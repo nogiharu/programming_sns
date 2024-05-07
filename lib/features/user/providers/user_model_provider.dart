@@ -40,6 +40,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
     });
   }
 
+  //========================== ステート(API) START ==========================
   /// ユーザー更新
   Future<UserModel> updateState(UserModel userModel) async {
     return await futureGuard(
@@ -50,7 +51,9 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
       },
     );
   }
+  //========================== ステート(API) END ==========================
 
+  //========================== API START ==========================
   /// ユーザー削除
   Future<UserModel> deleteUser(UserModel userModel) async {
     final deleteUser = userModel.copyWith(
@@ -71,4 +74,5 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
     }
     return await _userAPI.getList(queries: queries);
   }
+  //========================== API END ==========================
 }

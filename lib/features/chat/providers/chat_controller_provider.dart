@@ -36,8 +36,6 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
     firstDocumentId = (await getFirstMessage())?.id;
 
-    print(firstDocumentId);
-
     return ChatController(
       initialMessageList: initialMessageList,
       scrollController: ScrollController(),

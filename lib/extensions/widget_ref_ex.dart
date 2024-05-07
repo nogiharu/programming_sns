@@ -23,10 +23,12 @@ extension WidgetRefEX on WidgetRef {
       data: (data) {
         final res = complete(data);
         if (res is Widget) return res;
+        // TODO ここがダサい
         return const SizedBox.shrink();
       },
-      error: (e, _) {
-        debugPrint('エラーです');
+      error: (e, s) {
+        debugPrint('エラー:$e');
+        debugPrint('スタックトレース:$s');
         // 画面の描画が終わったタイミングで状態の変更をする。（描画前に出すとエラーが出る）
         WidgetsBinding.instance.addPostFrameCallback(
           (_) => showDialog<void>(
