@@ -56,21 +56,21 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   //========================== API START ==========================
   /// ユーザー削除
   Future<UserModel> deleteUser(UserModel userModel) async {
-    // final deleteUser = userModel.copyWith(
-    //   updatedAt: DateTime.now(),
-    //   isDeleted: true,
-    // );
-    // return await _userAPI.update(deleteUser);
-
-    return await futureGuard(
-      () async {
-        final deleteUser = userModel.copyWith(
-          updatedAt: DateTime.now(),
-        );
-        return await _userAPI.update(deleteUser);
-      },
-      isStateOnly: true,
+    final deleteUser = userModel.copyWith(
+      updatedAt: DateTime.now(),
+      isDeleted: true,
     );
+    return await _userAPI.update(deleteUser);
+
+    // return await futureGuard(
+    //   () async {
+    //     final deleteUser = userModel.copyWith(
+    //       updatedAt: DateTime.now(),
+    //     );
+    //     return await _userAPI.update(deleteUser);
+    //   },
+    //   isStateOnly: true,
+    // );
   }
 
   Future<List<UserModel>> getAllList({String? chatRoomId}) async {
