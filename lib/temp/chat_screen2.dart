@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/chat_room_api_provider.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
-import 'package:programming_sns/features/chat/providers/chat_message_event_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_list_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/temp/chat_card2.dart';

@@ -58,6 +58,10 @@ class ChatRoomListNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>>
       isLoading: false,
     );
   }
+
+  ChatRoomModel getState(String documentId) {
+    return state.value!.firstWhere((e) => e.documentId == documentId);
+  }
   //========================== ステート(API) END ==========================
 
   //========================== API START ==========================
@@ -70,10 +74,6 @@ class ChatRoomListNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>>
     }
 
     return await _chatRoomAPI.getList(queries: queries);
-  }
-
-  ChatRoomModel getState(String documentId) {
-    return state.value!.firstWhere((e) => e.documentId == documentId);
   }
 
   //========================== API END ==========================

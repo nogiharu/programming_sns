@@ -13,6 +13,7 @@ final _dartAppwriteClientProvider = Provider((ref) {
 
 final dartAppwriteUsersProvider = Provider((ref) {
   final client = ref.watch(_dartAppwriteClientProvider);
+
   return Users(client);
 });
 

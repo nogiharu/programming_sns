@@ -19,6 +19,8 @@ class TestToolcreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authProvider).value;
     // print(auth?.$createdAt);
+
+    print('状態:${ref.watch(userProvider).value?.isDeleted}');
     return ref.watchEX(
       userProvider,
       complete: (data) {
@@ -59,10 +61,31 @@ class TestToolcreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () async {
-                  final a = await ref.read(userProvider.notifier).deleteUser(data);
-                  print('リザルト：$a');
+                  final a = await ref.read(userProvider.notifier).deleteUser(data.copyWith(
+                        documentId: '6637619b9589f10ceeb1',
+                        isDeleted: true,
+                      ));
+                  print('リザルト：${a.isDeleted}');
                 },
-                child: const Text('状態チェック'),
+                child: const Text('状態チェック正常'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final a = await ref
+                      .read(userProvider.notifier)
+                      .deleteUser(data.copyWith(documentId: '', isDeleted: true));
+                  print('リザルト：${a.isDeleted}');
+                },
+                child: const Text('状態チェック異常'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final a = await ref
+                      .read(userProvider.notifier)
+                      .updateState(data.copyWith(isDeleted: false));
+                  print('リザルト：${a.isDeleted}');
+                },
+                child: const Text('状態戻し'),
               ),
               TextButton(
                 onPressed: () async {

@@ -8,10 +8,12 @@ extension AsyncNotifierBaseEX<T> on AsyncNotifierBase<T> {
   /// - state更新の際にエラーだった場合、stateがAysncErrorのままになるため戻す
   /// - isLoading:　AsyncLoading 状態にするかどうか
   /// - isCustomError: カスタムエラーを返すかどうか
+  /// - isStateOnly: 値は更新せず状態だけ更新するか
   Future<T> futureGuard(
     Future<T> Function() futureFunction, {
     bool isLoading = true,
     bool isCustomError = false,
+    bool isStateOnly = false,
   }) async {
     // 現在のstateを保持
     final prevState = state.copyWithPrevious(state);
@@ -19,19 +21,25 @@ extension AsyncNotifierBaseEX<T> on AsyncNotifierBase<T> {
     if (isLoading) state = AsyncLoading<T>();
 
     // AsyncValue.guardを使って同期処理を実行
-    state = await AsyncValue.guard<T>(() async {
+    final asyncValue = await AsyncValue.guard<T>(() async {
       if (isCustomError) {
         return await futureFunction().catchError((e) => customErrorMessage(error: e));
       }
       return await futureFunction();
     });
 
+    // ローディングを戻す
+    state = isStateOnly ? prevState : asyncValue;
+
     // エラーがある場合、300ミリ秒後に非同期で戻す
-    if (state.hasError) {
+    if (asyncValue.hasError) {
+      // isStateOnly:trueの場合、エラー状態にする
+      if (isStateOnly) state = AsyncError(asyncValue.error!, StackTrace.current);
+
       // いきなり「state = prevState」をするとwatchEXのダイアログが出ないため,タイミングをずらす
       Future.delayed(const Duration(milliseconds: 300), () => state = prevState);
     }
 
-    return state.requireValue;
+    return asyncValue.requireValue;
   }
 }

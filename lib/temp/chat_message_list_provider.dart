@@ -9,13 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/apis/message_api_provider.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
-import 'package:programming_sns/common/utils.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
-import 'package:programming_sns/features/user/models/user_model.dart';
-
-final firstChatMessageProvider = FutureProviderFamily<Message, String>((ref, chatRoomId) async {
-  return ref.read(chatMessageListProvider(chatRoomId).notifier).getFirstMessage();
-});
 
 final textEditingControllerProvider = Provider<Map<String, TextEditingController>>((ref) {
   return {};
@@ -28,9 +21,11 @@ final chatMessageListProvider =
 
 class ChatMessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Message>, String> {
   MessageAPI get _messageAPI => ref.watch(messageAPIProvider);
+  String? firstDocumentId;
 
   @override
   FutureOr<List<Message>> build(arg) async {
+    firstDocumentId = await getFirstDocumentId();
     return await getMessages();
   }
 
@@ -43,51 +38,66 @@ class ChatMessageListNotifier extends AutoDisposeFamilyAsyncNotifier<List<Messag
   }
 
   /// メッセージ一覧取得
-  Future<List<Message>> getMessages({String? before25MessageId, List<String>? queries}) async {
-    if (queries == null) {
-      queries = [
-        Query.orderDesc('createdAt'),
-        Query.equal('chatRoomId', arg),
-        Query.limit(25),
-      ];
-      // idより前を取得
-      if (before25MessageId != null) queries.add(Query.cursorAfter(before25MessageId));
-    }
+  Future<List<Message>> getMessages({String? nextDocumentId}) async {
+    final queries = [
+      Query.orderDesc('createdAt'),
+      Query.equal('chatRoomId', arg),
+    ];
+    // idより前を取得
+    if (nextDocumentId != null) queries.add(Query.cursorAfter(nextDocumentId));
 
-    return await futureGuard(() async {
-      final messages = await _messageAPI.getList(queries: queries).then(
-            (docs) => docs.reversed.toList(),
-          );
-
-      return messages;
-    });
+    return await futureGuard(
+      () async {
+        return await _messageAPI.getList(queries: queries).then((e) => e.reversed.toList());
+      },
+      isStateOnly: true,
+      isLoading: false,
+    );
   }
 
   /// メッセージ作成
-  /// FIXME state.valueではない値を返したいためfutureGuard使えない
   Future<void> createMessage(Message message) async {
-    await ref.read(messageAPIProvider).create(message).catchError(ref.read(showDialogProvider));
+    await futureGuard(
+      () async {
+        return await ref.read(messageAPIProvider).create(message).then((doc) => state.requireValue);
+      },
+      isStateOnly: true,
+      isLoading: false,
+    );
   }
 
   /// 最初のメッセージ取得
-  /// FIXME state.valueではない値を返したいためfutureGuard使えない
-  Future<Message> getFirstMessage() async {
+  Future<String?> getFirstDocumentId() async {
     final queries = [
       Query.equal('chatRoomId', arg),
       Query.orderAsc('createdAt'),
       Query.limit(1),
     ];
-    final messages = await _messageAPI
-        .getList(queries: queries)
-        .then((docs) => docs.first)
-        .catchError(ref.read(showDialogProvider));
-
-    return messages;
+    return await _messageAPI.getList(queries: queries).then((docs) => docs.firstOrNull?.id);
   }
 
   /// メッセージ作成
-  /// FIXME state.valueではない値を返したいためfutureGuard使えない
   Future<void> updateMessage(Message message) async {
-    await ref.read(messageAPIProvider).update(message).catchError(ref.read(showDialogProvider));
+    await futureGuard(
+      () async {
+        return await ref.read(messageAPIProvider).update(message).then((doc) => state.requireValue);
+      },
+      isStateOnly: true,
+      isLoading: false,
+    );
+  }
+
+  /// メッセージ編集
+  Future<void> deleteMessage(Message message) async {
+    await futureGuard(
+      () async {
+        return await ref
+            .read(messageAPIProvider)
+            .update(message.copyWith(isDeleted: true))
+            .then((doc) => state.requireValue);
+      },
+      isStateOnly: true,
+      isLoading: false,
+    );
   }
 }

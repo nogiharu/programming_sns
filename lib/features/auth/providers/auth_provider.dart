@@ -44,6 +44,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
   }
 
   /// ログイン
+  /// TODO ロールバックできない
   Future<Session> login({
     required String userId,
     required String password,
@@ -75,6 +76,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
   }
 
   /// アカウント登録 or 更新
+  /// TODO ロールバックできない
   Future<void> registerOrUpdate({required UserModel userModel}) async {
     await futureGuard(
       () async {
@@ -99,6 +101,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
   }
 
   /// パスワード更新
+  /// TODO ロールバックできない
   Future<void> passwordUpdate({required String newPassword, required UserModel userModel}) async {
     await futureGuard(
       () async {
@@ -121,6 +124,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
 
   /// 現在ログイン中のユーザを削除
   /// Authユーザとユーザの削除
+  /// TODO ロールバックできない
   Future<void> _deleteCurrentUser({required UserModel prevUser}) async {
     // 現在ログイン中の匿名Authユーザを削除
     final currentAuthId = state.requireValue.userId;
@@ -129,6 +133,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
     await userNotifier.deleteUser(prevUser);
   }
 
+  /// TODO ロールバックできない
   Future<Session> _createSession(
     String userId,
     String password, {

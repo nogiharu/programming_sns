@@ -16,7 +16,6 @@ import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
-import 'package:programming_sns/features/chat/providers/chat_message_event_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_room_list_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
@@ -32,6 +31,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:collection/collection.dart';
 import 'package:async/async.dart';
 
+/// FIXME 適当に作ったから消します。
 class ChatScreen extends ConsumerStatefulWidget {
   final String label;
   final String chatRoomId;
@@ -115,20 +115,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             return ref.watchEX(
               chatControllerProvider(widget.chatRoomId),
               complete: (chatController) {
-                /// EVENT
-                ref.watch(chatMessageEventProvider(widget.chatRoomId));
-
                 _chatController = chatController;
                 return ChatView(
                   currentUser: _currentChatUser,
                   chatController: _chatController,
                   onSendTap: onSendTap,
                   featureActiveConfig: const FeatureActiveConfig(
-                    // enableSwipeToReply: !kIsWeb, // TODO
+                    // enableSwipeToReply: !kIsWeb,
                     enableSwipeToSeeTime: false,
                     enablePagination: true, // ページネーション
                   ),
-                  // loadingWidget: const SizedBox(height: 0),
 
                   /// ページネーション
                   loadMoreData: loadMoreData,
@@ -139,8 +135,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   /// TODO chat全体背景
                   chatBackgroundConfig: const ChatBackgroundConfiguration(
                     backgroundColor: ThemeColor.weak, // 背景色(chat全体背景)
-                    // height: 500,
-                    // width: 300,
                   ),
                   // 追加
                   textEditingController: _textEditingController!,
@@ -185,9 +179,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   chatBubbleConfig: ChatBubbleConfiguration(
                     onDoubleTap: (message) {
                       // これ入れないとハートになる　ChatBubbleWidget → 337行目
-                      setState(() {
-                        // showReaction = !showReaction;
-                      });
+                      setState(() {});
                     },
                     // TODO わからん
                     outgoingChatBubbleConfig: const ChatBubble(
@@ -237,9 +229,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           .read(messageAPIProvider)
                           .update(message)
                           .catchError(ref.read(showDialogProvider));
-
-                      // リアクション
-                      // onSendReaction(message);
                     },
                   ),
                   replyPopupConfig: ReplyPopupConfiguration(
@@ -254,17 +243,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     onMoreTap: (message) async {
                       await _chatControllerNotifier.deleteMessage(message);
                     },
-                    onReplyTap: (message) {
-                      // print(message.reaction);
-                    },
                   ),
 
                   repliedMessageConfig: const RepliedMessageConfiguration(
-                    // repliedMessageWidgetBuilder: (replyMessage) {
-                    //   // print(replyMessage.message);
-                    //   // return MarkdownBuilder(message: replyMessage!.message);
-                    //   return const Text('text');
-                    // },
                     backgroundColor: ThemeColor.strong,
                     verticalBarColor: ThemeColor.strong,
                     repliedMsgAutoScrollConfig: RepliedMsgAutoScrollConfig(
@@ -345,9 +326,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     // if (!isMentionScrollFinish || _chatController.initialMessageList.isEmpty) return;
     if (_chatController.initialMessageList.isEmpty) return;
 
-    final firstMessage = ref.watch(firstChatMessageProvider(widget.chatRoomId)).value;
-
-    final isFirst = _chatController.initialMessageList.first.createdAt == firstMessage?.createdAt;
+    final isFirst =
+        _chatController.initialMessageList.first.id == _chatControllerNotifier.firstMessageId;
     // 一番最初のメッセージがすでに表示されていたらページングしない
     if (isFirst) return;
 
@@ -510,21 +490,4 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         .currentContext
         ?.findRenderObject();
   }
-
-  /// リアクション
-  /// FIXME リアクションはやらない
-  // Future<void> onSendReaction(Message message) async {
-  //   if (message.reaction.reactions.isEmpty) return;
-
-  //   final notificationModel = NotificationModel.instance(
-  //     chatRoomId: widget.chatRoomId,
-  //     chatRoomLabel: widget.label,
-  //     userDocumentId: message.sendBy,
-  //     text: message.message,
-  //     notificationType: NotificationType.reaction,
-  //     sendByUserName: _currentChatUser.name,
-  //   );
-
-  //   await ref.read(notificationAPIProvider).createNotificationDocument(notificationModel);
-  // }
 }
