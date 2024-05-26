@@ -10,14 +10,14 @@
             "type": "dart",
             "args": [
                 "--web-port",
-                "1127",
+                "1128",
                 "--web-renderer",
                 "html",
                 // "web-server",
                 // "--web-browser-flag",
                 // "--disable-web-security"
                 "--dart-define",
-                "env=.env",
+                "env=.env.local",
             ]
         },
         {
@@ -33,7 +33,7 @@
             "flutterMode": "release",
             "args": [
                 "--web-port",
-                "1127",
+                "1128",
                 "--web-renderer",
                 "html",
                 "web-server",

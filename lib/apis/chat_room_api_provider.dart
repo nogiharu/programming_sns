@@ -25,7 +25,7 @@ class ChatRoomAPI {
           data: chatRoom.toMap(),
         )
         .then((doc) => ChatRoomModel.fromMap(doc.data))
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 
   /// チャットルーム取得
@@ -37,7 +37,7 @@ class ChatRoomAPI {
           documentId: id,
         )
         .then((doc) => ChatRoomModel.fromMap(doc.data))
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 
   /// チャットルームリスト取得
@@ -49,7 +49,7 @@ class ChatRoomAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => ChatRoomModel.fromMap(doc.data)).toList())
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 
   /// チャットルーム更新
@@ -62,6 +62,6 @@ class ChatRoomAPI {
           data: chatRoom.toMap(),
         )
         .then((doc) => ChatRoomModel.fromMap(doc.data))
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 }

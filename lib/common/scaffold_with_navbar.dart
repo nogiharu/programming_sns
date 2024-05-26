@@ -22,19 +22,19 @@ class ScaffoldWithNavbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // ボトムアイテム
     // 通知だけカウントを付与
-    final iconLabelItems = ref.watch(notificationListProvider).maybeWhen(
-          data: (data) => bottomItems.map((meta) {
-            if (meta['label'] == '通知') {
-              meta['icon'] = NotificationScreen.getIconBadge(
-                notificationCount: data.where((e) => !e.isRead).length,
-              );
-            }
-            return BottomNavigationBarItem(icon: meta['icon'], label: meta['label']);
-          }).toList(),
-          orElse: () => bottomItems
-              .map((meta) => BottomNavigationBarItem(icon: meta['icon'], label: meta['label']))
-              .toList(),
-        );
+    // final iconLabelItems = ref.watch(notificationListProvider).maybeWhen(
+    //       data: (data) => bottomItems.map((meta) {
+    //         if (meta['label'] == '通知') {
+    //           meta['icon'] = NotificationScreen.getIconBadge(
+    //             notificationCount: data.where((e) => !e.isRead).length,
+    //           );
+    //         }
+    //         return BottomNavigationBarItem(icon: meta['icon'], label: meta['label']);
+    //       }).toList(),
+    //       orElse: () => bottomItems
+    //           .map((meta) => BottomNavigationBarItem(icon: meta['icon'], label: meta['label']))
+    //           .toList(),
+    //     );
 
     return Scaffold(
       body: (child as HeroControllerScope).child,
@@ -46,7 +46,10 @@ class ScaffoldWithNavbar extends ConsumerWidget {
         ),
         unselectedItemColor: Colors.grey,
         // unselectedLabelStyle: const TextStyle(color: Colors.grey),
-        items: iconLabelItems,
+        // items: iconLabelItems,
+        items: bottomItems
+            .map((meta) => BottomNavigationBarItem(icon: meta['icon'], label: meta['label']))
+            .toList(),
         currentIndex: ref.watch(currentBottomIndexProvider)['index']!,
         onTap: (index) {
           final currentBottomMap = ref.read(currentBottomIndexProvider);

@@ -36,7 +36,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
 
         return createdUser;
       }
-      throw customErrorMessage(error: e);
+      throw errorMessage(error: e);
     });
   }
 

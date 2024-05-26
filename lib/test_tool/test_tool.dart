@@ -1,233 +1,109 @@
-import 'package:appwrite/appwrite.dart';
-import 'package:chatview/chatview.dart';
-import 'package:dart_appwrite/dart_appwrite.dart' as da;
-import 'package:dart_appwrite/models.dart' as model;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:programming_sns/apis/user_api_provider.dart';
-import 'package:programming_sns/core/appwrite_providers.dart';
-import 'package:programming_sns/core/dart_appwrite_providers.dart';
-import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/auth/providers/auth_provider.dart';
-import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:programming_sns/core/supabase_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class TestToolcreen extends ConsumerWidget {
   const TestToolcreen({super.key});
 
+  static const Map<String, dynamic> metaData = {
+    'path': '/test',
+    'label': 'test',
+    'icon': Icon(Icons.person),
+  };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authProvider).value;
-    // print(auth?.$createdAt);
-
-    print('状態:${ref.watch(userProvider).value?.isDeleted}');
-    return ref.watchEX(
-      userProvider,
-      complete: (data) {
-        return Container(
-          decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            children: [
-              Column(
-                children: [
-                  // Container(
-                  //     color: Colors.amber,
-                  //     padding: const EdgeInsets.all(5),
-                  //     child: Text(auth?.current?.toString())),
-                  Container(
-                      color: Colors.amber,
-                      padding: const EdgeInsets.all(5),
-                      child: Text(data.name)),
-                  const SizedBox(height: 10),
-                  Container(
-                      color: Colors.amber,
-                      padding: const EdgeInsets.all(5),
-                      child: Text(data.userId)),
-                  const SizedBox(height: 10),
-                  if (auth != null)
-                    Container(
-                      color: Colors.amber,
-                      padding: const EdgeInsets.all(5),
-                      child: Column(
-                        children: [
-                          Text(auth.userId),
-                          const SizedBox(height: 10),
-                          Text(auth.$createdAt),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-              TextButton(
-                onPressed: () async {
-                  final a = await ref.read(userProvider.notifier).deleteUser(data.copyWith(
-                        documentId: '6637619b9589f10ceeb1',
-                        isDeleted: true,
-                      ));
-                  print('リザルト：${a.isDeleted}');
-                },
-                child: const Text('状態チェック正常'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  final a = await ref
-                      .read(userProvider.notifier)
-                      .deleteUser(data.copyWith(documentId: '', isDeleted: true));
-                  print('リザルト：${a.isDeleted}');
-                },
-                child: const Text('状態チェック異常'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  final a = await ref
-                      .read(userProvider.notifier)
-                      .updateState(data.copyWith(isDeleted: false));
-                  print('リザルト：${a.isDeleted}');
-                },
-                child: const Text('状態戻し'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  String name;
-                  if (data.name == 'ポッポ') {
-                    name = '山田';
-                  } else if (data.name == '山田') {
-                    name = 'チコリータ';
-                  } else if (data.name == 'チコリータ') {
-                    name = '田島';
-                  } else if (data.name == '田島') {
-                    name = '佐々木';
-                  } else if (data.name == '佐々木') {
-                    name = 'ユウジ';
-                  } else if (data.name == 'ユウジ') {
-                    name = 'オリジン弁当';
-                  } else {
-                    name = 'ポッポ';
-                  }
-
-                  data = data.copyWith(name: name);
-
-                  final aa = await ref.read(userProvider.notifier).updateState(data);
-                  // final aaa = await ref.read(userModelProvider.notifier).getUserModelList();
-                  // print(aaa);
-                },
-                child: const Text('名前変更'),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextButton(
-                onPressed: () async {
-                  if (auth != null) {
-                    await ref.read(authProvider.notifier).logout();
-                  }
-                },
-                child: const Text('セッション削除'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  if (auth != null) {
-                    final model.UserList a = await ref
-                        .read(dartAppwriteUsersProvider)
-                        .list(queries: [da.Query.limit(2000)]);
-
-                    Future.forEach(a.users, (element) async {
-                      if (auth.userId != element.$id) {
-                        await ref.read(dartAppwriteUsersProvider).delete(userId: element.$id);
-                      }
-                    });
-
-                    // await ref
-                    //     .read(dartAppwriteUsersProvider)
-                    //     .delete(userId: '65f558ac54fbf6e3fc05');
-                  }
-                },
-                child: const Text('アカウント削除'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  // final messageList = await ref
-                  //     .watch(messageAPIProvider)
-                  //     .getMessagesDocumentList()
-                  //     .then((docList) => docList.documents.map((doc) => doc.data).toList());
-
-                  // await Future.forEach(messageList, (e) async {
-                  //   print(e['\$id']);
-                  //   await ref.read(messageAPIProvider).deleteMessageDocument(e['\$id']);
-                  // });
-                },
-                child: const Text('メッセージ全消し'),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  final userList = await ref.watch(userAPIProvider).getList(
-                    queries: [
-                      Query.limit(100000),
-                    ],
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  await supabase.auth.signInAnonymously(captchaToken: 'aaaaa');
+                  // supabase.auth.onAuthStateChange.listen((event) {event.event})
+                } catch (e) {
+                  print(e);
+                }
+              },
+              child: const Text('匿名サインイン'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  var uuid = const Uuid();
+                  String newId = uuid.v4();
+                  var count = await supabase.from('users').count();
+                  final aa = await supabase.auth.signUp(
+                    email: '${newId.substring(0, 8) + count.toString()}@gmail.com',
+                    password: newId,
                   );
-                  await Future.forEach(userList, (user) async {
-                    await ref.read(userAPIProvider).delete(user);
-                  });
 
-                  await ref.read(authProvider.notifier).logout();
-                  await ref.read(authProvider.notifier).deleteAccount();
-                },
-                child: const Text('ユーザ全消し,アカウント削除'),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextButton(
-                onPressed: () async {
-                  // final kk = await ref
-                  //     .watch(chatRoomAPIProvider)
-                  //     .getChatRoomDocument('654824d5add3b04b9eb9');
+                  print(aa.user);
+                } catch (e) {
+                  print(e);
+                }
+              },
+              child: const Text('サインイン'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () async {
+                var a = await supabase.auth.onAuthStateChange.first;
+                // supabase.auth.onAuthStateChange.listen
+                print('isAnonymous:${a.session}');
+              },
+              child: const Text('状態'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () async {
+                await supabase.auth.signOut();
+              },
+              child: const Text('ログアウト'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  // await supabase.auth.updateUser(
+                  //   UserAttributes(
+                  //     data: {'name': '太郎あああoooo'},
+                  //     // email: 'email@email.com',
+                  //     // password: 'aaaaaaaa',
+                  //   ),
+                  // );
+// API_EXTERNAL_URL: http://192.168.1.3:8000
+// GOTRUE_SITE_URL: http://192.168.1.3:8000
+                  await supabase.auth.updateUser(
+                    UserAttributes(
+                      data: {
+                        'name': '太郎あああoooo',
+                        'password': 'password',
+                      },
+                      email: 'email@email.com',
+                    ),
+                  );
+                  final a = await supabase.auth.refreshSession();
+                } catch (e) {
+                  print(e);
+                }
 
-                  // print(kk.data['messages']?.length);
-                  int a = 0;
-                  await Future.forEach(List.generate(10000, (index) async => index), (e) async {
-                    final msg = Message(
-                      // id: ID.unique(),
-                      createdAt: DateTime.now(),
-                      message: 'ほげええええ',
-                      sendBy: data.documentId,
-                      chatRoomId: '655a9b9cc6a4c4b7ddbd',
-                      messageType: MessageType.custom,
-                    );
+                // final a = await supabase.auth.signUp(
+                //     email: 'hoge@gmail.com', password: '11111111', data: {'name': '太郎あああpppp'});
+                // 昇格できない！！！！！！！
 
-                    // await ref.read(messageAPIProvider).createMessageDocument(msg);
-
-                    print(a);
-                  });
-                },
-                child: const Text('メッセージ50送信'),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  await ref.read(userProvider.notifier).updateState(data.copyWith(chatRoomIds: []));
-                },
-                child: const Text('チャットID削除'),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  // await ref.read(userModelProvider.notifier).testError();
-                },
-                child: const Text('IMAGE'),
-              ),
-            ],
-          ),
-        );
-      },
+                // supabase.auth.signUp(password: );
+              },
+              child: const Text('ユーザ昇格'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

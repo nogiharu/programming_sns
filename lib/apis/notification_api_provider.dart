@@ -28,7 +28,7 @@ class NotificationAPI {
           data: notification.toMap(),
         )
         .then((doc) => NotificationModel.fromMap(doc.data))
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 
   /// 単一取得
@@ -40,7 +40,7 @@ class NotificationAPI {
           documentId: id,
         )
         .then((doc) => NotificationModel.fromMap(doc.data))
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 
   /// リスト取得
@@ -55,7 +55,7 @@ class NotificationAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => NotificationModel.fromMap(doc.data)).toList())
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 
   /// 更新
@@ -71,6 +71,6 @@ class NotificationAPI {
           data: notification.toMap(),
         )
         .then((doc) => NotificationModel.fromMap(doc.data))
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 }

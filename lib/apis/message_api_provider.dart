@@ -25,7 +25,7 @@ class MessageAPI {
           data: message.toMap(),
         )
         .then((doc) => MessageEX.fromMap(doc.data))
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 
   Future<Message> update(Message message, {bool isCustomError = true}) async {
@@ -37,7 +37,7 @@ class MessageAPI {
           data: message.toMap(),
         )
         .then((doc) => MessageEX.fromMap(doc.data))
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 
   Future<List<Message>> getList({List<String>? queries, isCustomError = true}) async {
@@ -48,7 +48,7 @@ class MessageAPI {
           queries: queries,
         )
         .then((docs) => docs.documents.map((doc) => MessageEX.fromMap(doc.data)).toList())
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 
   Future<dynamic> delete(String id, {bool isCustomError = true}) async {
@@ -58,6 +58,6 @@ class MessageAPI {
           collectionId: AppwriteConstants.kMessagesCollection,
           documentId: id,
         )
-        .catchError((e) => isCustomError ? customErrorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
   }
 }

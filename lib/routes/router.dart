@@ -12,6 +12,7 @@ import 'package:programming_sns/features/notification/screens/notification_scree
 import 'package:programming_sns/features/user/screens/user_screen.dart';
 
 import 'package:programming_sns/temp/tempScreen.dart';
+import 'package:programming_sns/test_tool/test_tool.dart';
 
 /// ScaffoldWithNavbarの外側のスコープ
 /// navigatorKey:に設定するとボトムナビバーが出ない
@@ -28,6 +29,7 @@ final shellNavigatorKeyProvider = Provider(
 final router = Provider((ref) {
   // タブの順番
   final bottomItems = [
+    TestToolcreen.metaData,
     ChatThreadScreen.metaData,
     ScreenB.metaData,
     NotificationScreen.metadata,
@@ -36,7 +38,8 @@ final router = Provider((ref) {
 
   return GoRouter(
     navigatorKey: ref.read(rootNavigatorKeyProvider),
-    initialLocation: bottomItems.first['path'],
+    // initialLocation: bottomItems.first['path'],
+    initialLocation: TestToolcreen.metaData['path'],
     routes: [
       ShellRoute(
         navigatorKey: ref.read(shellNavigatorKeyProvider),
@@ -47,6 +50,15 @@ final router = Provider((ref) {
           );
         },
         routes: [
+          GoRoute(
+            path: TestToolcreen.metaData['path'],
+            name: TestToolcreen.metaData['path'],
+            // parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+            builder: (context, state) {
+              return const TestToolcreen();
+            },
+          ),
+
           /// CHAT
           GoRoute(
             path: ChatThreadScreen.metaData['path'],

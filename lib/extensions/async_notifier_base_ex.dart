@@ -62,7 +62,7 @@ extension AsyncNotifierBaseEX<T> on AsyncNotifierBase<T> {
     state = await AsyncValue.guard<T>(() async {
       // isCustomErrorがtrueの場合、エラー時にカスタムエラーメッセージを返す
       if (isCustomError) {
-        return await futureFunction().catchError((e) => customErrorMessage(error: e));
+        return await futureFunction().catchError((e) => errorMessage(error: e));
       }
       return await futureFunction();
     });

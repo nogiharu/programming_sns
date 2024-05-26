@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/common/error_dialog.dart';
 import 'package:programming_sns/routes/router.dart';
 import 'package:appwrite/appwrite.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -54,7 +55,7 @@ final showDialogProvider = Provider((ref) {
   };
 });
 
-customErrorMessage({
+errorMessage({
   dynamic error,
   String? userId,
   String? password,
@@ -75,18 +76,8 @@ customErrorMessage({
   //-------------- API系 --------------
   if (error != null) {
     debugPrint('exceptionMessage：${error.toString()}');
-
-    if (error is AppwriteException) {
-      final isException = (error.code == 400 && error.toString().contains('general_bad_request'));
-
-      final isExist = (error.code == 409 && error.toString().contains('user_already_exists'));
-
-      if (isException || isExist) {
-        throw '既に使われているIDだよ(>_<)';
-      }
-
+    if (error is PostgrestException) {
       throw '''
-      ${'code：${error.code}'}
       予期せぬエラーだあ(T ^ T)
       再立ち上げしてね(>_<)
       ''';

@@ -84,3 +84,84 @@ fvm use 3.16.9
 git submodule add https://github.com/nogiharu/flutter_chatview.git
 git submodule update --init --recursive
 git submodule update --remote
+
+# Supabase
+すべてのサービスを停止し、ローカル データベースをリセットするために使用します。
+
+         API URL: http://127.0.0.1:54321
+     GraphQL URL: http://127.0.0.1:54321/graphql/v1
+  S3 Storage URL: http://127.0.0.1:54321/storage/v1/s3
+          DB URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+      Studio URL: http://127.0.0.1:54323
+    Inbucket URL: http://127.0.0.1:54324
+      JWT secret: super-secret-jwt-token-with-at-least-32-characters-long
+        anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+   S3 Access Key: 625729a08b95bf1b7ff351a663f3a23c
+   S3 Secret Key: 850181e4652dd023b7a98c58ae0d2d34bd487ee0cc3254aed6eda37307425907
+       S3 Region: local
+
+
+
+# ローカル、サーバー問わず、Supabaseのダッシュボードからテーブルに変更を加えた時 現在のDBの状態(＝スキーマ)と、マイグレーションファイル に記録されているスキーマとの差分を取ります。
+
+supabase db diff -f 接尾辞
+
+※通常は-f フラグを使用して接尾辞を追加してマイグレーションファイルに出力します。
+
+↓サーバー(＝リンク先のプロジェクト)に対しての、ローカルのマイグレーションファイルに記録されているスキーマとの差分を取ります。
+
+supabase db diff --linked -f 接尾辞
+
+# サーバーと接続確認
+supabase migration list
+
+# サーバーとリンク
+supabase link --project-ref njnsyzcifjjovfdkpssp
+
+# サーバーと繋がっているかの確認
+supabase projects list
+
+supabase stop --no-backup
+
+# サーバーとの同期　
+supabase db pull 
+# authスキーマ
+supabase db pull --schema auth
+# ストレージとの同期
+supabase db pull --schema storage
+
+# マイグレーションファイルをローカルに反映（データの削除）
+supabase db reset 
+
+# サーバーにプッシュ
+supabase db push
+
+# マイグレーションファイルを一つにまとめる
+supabase migration squash --local
+
+supabase db pull 
+
+上記実行後、以下エラーが出るため、以下実行
+supabase migration repair --status reverted 日付
+supabase migration repair --status reverted 日付
+
+以下確認
+supabase migration list
+
+# マイグレーションファイルを作成
+supabase migration new ファイル名
+
+# 作成したマイグレーションファイルをローカルに適用
+supabase migration up
+
+# マイグレーションUPでローカルだけに適用した情報を消したい場合
+作成したマイグレーションファイルを消すだけ
+
+# ローカルの差分をマイグレーションファイルで出力
+supabase db diff -f ファイル名
+
+
+
+# CASCADEつけて
+DROP FUNCTION IF EXISTS "public"."handle_new_user" () CASCADE;
