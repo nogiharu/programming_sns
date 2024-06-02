@@ -49,4 +49,5 @@ app.*.map.json
 .fvm/
 
 # 環境
-# .env
+.env
+.env.local

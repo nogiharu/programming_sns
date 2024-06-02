@@ -117,17 +117,19 @@ supabase db diff --linked -f 接尾辞
 supabase migration list
 
 # サーバーとリンク
-supabase link --project-ref njnsyzcifjjovfdkpssp
+supabase link --project-ref uttwrhmwyiunhptzxaag
 
 # サーバーと繋がっているかの確認
 supabase projects list
 
 supabase stop --no-backup
 
-# サーバーとの同期　
+# サーバーとの同期　 作成したマイグレーションファイルをローカルに適用
+supabase migration up
 supabase db pull 
+
 # authスキーマ
-supabase db pull --schema auth
+supabase db pull --schema auth,storage
 # ストレージとの同期
 supabase db pull --schema storage
 
@@ -152,8 +154,7 @@ supabase migration list
 # マイグレーションファイルを作成
 supabase migration new ファイル名
 
-# 作成したマイグレーションファイルをローカルに適用
-supabase migration up
+
 
 # マイグレーションUPでローカルだけに適用した情報を消したい場合
 作成したマイグレーションファイルを消すだけ
@@ -165,3 +166,11 @@ supabase db diff -f ファイル名
 
 # CASCADEつけて
 DROP FUNCTION IF EXISTS "public"."handle_new_user" () CASCADE;
+
+
+
+
+
+
+
+

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS
         -- ユーザーIDを主キーとして設定 (authIDと同じ)
         id UUID NOT NULL PRIMARY KEY,
         -- ユーザーID メンションやログインに使用。変更可
-        user_id TEXT NOT NULL,
+        user_id UUID NOT NULL UNIQUE,
         -- ユーザー名
         NAME VARCHAR NOT NULL DEFAULT '名前はまだない',
         -- レコード作成日時を設定 (UTCタイムゾーンで現在時刻)  

@@ -96,7 +96,7 @@ enable_manual_linking = false
 enable_signup = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
-double_confirm_changes = true
+double_confirm_changes = false
 # If enabled, users need to confirm their email address before signing in.
 enable_confirmations = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
@@ -169,3 +169,11 @@ s3_region = "env(S3_REGION)"
 s3_access_key = "env(S3_ACCESS_KEY)"
 # Configures AWS_SECRET_ACCESS_KEY for S3 bucket
 s3_secret_key = "env(S3_SECRET_KEY)"
+
+
+# 【追加】リモートのauthスキーマの情報取得に使用
+# [auth.external.github]
+# enabled = true
+# client_id = "env(SUPABASE_AUTH_GITHUB_CLIENT_ID)"
+# secret = "env(SUPABASE_AUTH_GITHUB_SECRET)"
+# redirect_uri = "http://localhost:54321/auth/v1/callback"
