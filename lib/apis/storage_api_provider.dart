@@ -18,7 +18,7 @@ class SrorageAPI {
   SrorageAPI({required Storage storage}) : _storage = storage;
 
   Future<String> uploadImage(XFile xFile, String bucketId, {bool isCustomError = true}) async {
-    final uint8List = await xFile.readAsBytes().catchError((e) => errorMessage(error: e));
+    final uint8List = await xFile.readAsBytes().catchError((e) => customError(error: e));
 
     return await _storage
         .createFile(
@@ -27,7 +27,7 @@ class SrorageAPI {
           file: InputFile.fromBytes(bytes: uint8List, filename: xFile.name),
         )
         .then((uploadImage) => AppwriteConstants.imageUrl(uploadImage.$id))
-        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? customError(error: e) : throw e);
   }
 
   /// 画像ダウンロード
@@ -53,7 +53,7 @@ class SrorageAPI {
         isSave = (await ImageGallerySaver.saveImage(uint8List))['isSuccess'] as bool;
       }
       return isSave;
-    }).catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
+    }).catchError((e) => isCustomError ? customError(error: e) : throw e);
   }
 
   /// 画像プレビュー
@@ -63,6 +63,6 @@ class SrorageAPI {
 
     return await _storage
         .getFilePreview(bucketId: bucketId, fileId: imageId!)
-        .catchError((e) => isCustomError ? errorMessage(error: e) : throw e);
+        .catchError((e) => isCustomError ? customError(error: e) : throw e);
   }
 }

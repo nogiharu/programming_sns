@@ -37,9 +37,9 @@ class AuthNotifier extends AsyncNotifier<Session> {
             debugPrint('アカウント作成OK!');
             return session;
           },
-        ).catchError((e) => errorMessage(error: e));
+        ).catchError((e) => customError(error: e));
       }
-      throw errorMessage(error: e);
+      throw customError(error: e);
     });
   }
 
@@ -53,7 +53,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
     return await futureGuard(
       () async {
         // パスワード、IDが条件を満たしていない場合 例外を投げる
-        errorMessage(userId: userId, password: password);
+        customError(userId: userId, password: password);
 
         // ユーザの存在チェック
         final users = await _userAPI.getList(queries: [
@@ -81,7 +81,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
     await futureGuard(
       () async {
         // パスワード、IDが条件を満たしていない場合 例外を投げる
-        errorMessage(userId: userModel.userId, password: userModel.password);
+        customError(userId: userModel.userId, password: userModel.password);
 
         // 登録or更新
         await _authAPI.updateEmail(
@@ -106,7 +106,7 @@ class AuthNotifier extends AsyncNotifier<Session> {
     await futureGuard(
       () async {
         // パスワード、IDが条件を満たしていない場合 例外を投げる
-        errorMessage(password: newPassword);
+        customError(password: newPassword);
         // authパスワード更新
         await _authAPI.updatePassword(
           password: newPassword,

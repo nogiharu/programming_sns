@@ -42,7 +42,7 @@ COMMENT ON COLUMN public.users.updated_at IS 'レコード更新日時';
 CREATE INDEX idx_users_user_id ON public.users (user_id);
 
 ------------------------【関数の追加】------------------------
-DROP TRIGGER IF EXISTS before_user_trigger;
+DROP TRIGGER IF EXISTS before_user_trigger ON public.users;
 
 DROP FUNCTION IF EXISTS before_user ();
 

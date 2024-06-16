@@ -17,7 +17,7 @@ Future<void> main() async {
 
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL'] ?? '',
-    anonKey: dotenv.env['SUPABASE_SERVICE_ROLE_KEY'] ?? '',
+    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
 
   // リリースモードはログ出力を抑制(chromeだと何故か出てしまうため)

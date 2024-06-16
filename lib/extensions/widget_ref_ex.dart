@@ -49,42 +49,4 @@ extension WidgetRefEX on WidgetRef {
       },
     );
   }
-
-  // void handleAsyncValue<T>(ProviderListenable<AsyncValue<T>> asyncValueProvider,
-  //     {void Function(BuildContext context)? complete,
-  //     String? completeMessage,
-  //     bool isListen = false}) {
-  //   if (isListen) {
-  //     // ProviderをlistenしてAsyncValueの変更を監視する
-  //     listen<AsyncValue<T>>(
-  //       asyncValueProvider,
-  //       (_, next) {
-  //         // nextにはAsyncValueが格納されているので、AsyncValueの種類によって処理を分岐する
-  //         next.whenOrNull(
-  //           data: (_) {
-  //             // 完了メッセージがあればスナックバーを表示する
-  //             if (completeMessage != null) {
-  //               final messengerState = read(scaffoldMessengerKeyProvider).currentState;
-  //               messengerState?.showSnackBar(
-  //                 SnackBar(
-  //                   content: Text(completeMessage),
-  //                 ),
-  //               );
-  //             }
-  //             // completeが指定されている場合、コールバックを実行する
-  //             complete?.call(read(rootNavigatorKeyProvider).currentContext!);
-  //           },
-  //           error: (e, _) {
-  //             // エラーが発生したらエラーダイアログを表示する
-  //             showDialog<void>(
-  //               context: read(rootNavigatorKeyProvider).currentContext!,
-  //               builder: (context) => ErrorDialog(error: e),
-  //             );
-  //           },
-  //         );
-  //         read(loadingProvider.notifier).state = next.isLoading;
-  //       },
-  //     );
-  //   }
-  // }
 }

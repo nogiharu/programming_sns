@@ -1,24 +1,24 @@
 import 'package:chatview/chatview.dart';
 
 class ChatRoomModel {
-  String? documentId;
+  final String? id;
   final String ownerId;
   final String name;
 
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
 
   ChatRoomModel({
-    this.documentId,
+    this.id,
     required this.ownerId,
     required this.name,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   ChatRoomModel copyWith({
-    String? documentId,
+    String? id,
     String? ownerId,
     String? name,
     List<Message>? messages,
@@ -26,7 +26,7 @@ class ChatRoomModel {
     DateTime? updatedAt,
   }) {
     return ChatRoomModel(
-      documentId: documentId ?? this.documentId,
+      id: id ?? this.id,
       ownerId: ownerId ?? this.ownerId,
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
@@ -36,27 +36,28 @@ class ChatRoomModel {
 
   Map<String, dynamic> toMap() {
     final result = <String, dynamic>{};
+    if (id != null) {
+      result.addAll({'id': id});
+    }
 
-    result.addAll({'ownerId': ownerId});
+    result.addAll({'users_id': ownerId});
     result.addAll({'name': name});
-    result.addAll({'createdAt': createdAt.millisecondsSinceEpoch});
-    result.addAll({'updatedAt': updatedAt.millisecondsSinceEpoch});
     return result;
   }
 
   factory ChatRoomModel.fromMap(Map<String, dynamic> map) {
     return ChatRoomModel(
-      documentId: map['id'],
-      ownerId: map['ownerId'] ?? '',
+      id: map['id'] ?? '',
+      ownerId: map['users_id'] ?? '',
       name: map['name'] ?? '',
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt']),
+      createdAt: DateTime.parse(map['created_at']).toLocal(),
+      updatedAt: DateTime.parse(map['updated_at']).toLocal(),
     );
   }
 
   @override
   String toString() {
-    return 'ChatRoomModel(id: $documentId, ownerId: $ownerId, name: $name,  $createdAt, updatedAt: $updatedAt )';
+    return 'ChatRoomModel(id: $id, ownerId: $ownerId, name: $name,  $createdAt, updatedAt: $updatedAt )';
   }
 
   @override
@@ -64,34 +65,26 @@ class ChatRoomModel {
     if (identical(this, other)) return true;
 
     return other is ChatRoomModel &&
-        other.documentId == documentId &&
+        other.id == id &&
         other.ownerId == ownerId &&
         other.name == name &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
-    // listEquals(other.messages, messages);
   }
 
   @override
   int get hashCode {
-    return documentId.hashCode ^
-        ownerId.hashCode ^
-        name.hashCode ^
-        createdAt.hashCode ^
-        updatedAt.hashCode;
-    // messages.hashCode;
+    return id.hashCode ^ ownerId.hashCode ^ name.hashCode ^ createdAt.hashCode ^ updatedAt.hashCode;
   }
 
   factory ChatRoomModel.instance({
     String? ownerId,
     String? name,
-    DateTime? createdAt,
-    DateTime? updatedAt,
   }) =>
       ChatRoomModel(
         ownerId: ownerId ?? '',
         name: name ?? '',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        // createdAt: DateTime.now(),
+        // updatedAt: DateTime.now(),
       );
 }

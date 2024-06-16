@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "programming_sns",
+            "name": "programming_sns (local mode)",
             "request": "launch",
             "type": "dart",
             "args": [
                 "--web-port",
-                "1128",
+                "1129",
                 "--web-renderer",
                 "html",
                 // "web-server",

@@ -42,13 +42,13 @@ COMMENT ON COLUMN public.users.updated_at IS 'レコード更新日時';
 CREATE INDEX idx_users_user_id ON public.users (user_id);
 
 ------------------------【関数の追加】------------------------
-DROP TRIGGER IF EXISTS before_user_trigger;
+DROP TRIGGER IF EXISTS on_user_trigger ON users;
 
-DROP FUNCTION IF EXISTS before_user ();
+DROP FUNCTION IF EXISTS on_user ();
 
 -- 操作を処理するトリガー関数
 CREATE
-OR REPLACE FUNCTION before_users () RETURNS TRIGGER AS $$
+OR REPLACE FUNCTION before_user () RETURNS TRIGGER AS $$
 BEGIN
     ------------------------【UPDATEトリガー】------------------------
     IF TG_OP = 'UPDATE' THEN
@@ -65,6 +65,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 ------------------------【トリガーの追加】------------------------
 CREATE
-OR REPLACE TRIGGER before_users_trigger BEFORE
+OR REPLACE TRIGGER before_user_trigger BEFORE
 UPDATE ON public.users FOR EACH ROW
-EXECUTE FUNCTION before_users ();
+EXECUTE FUNCTION before_user ();

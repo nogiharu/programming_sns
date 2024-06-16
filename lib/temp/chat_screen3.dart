@@ -252,7 +252,7 @@ class _ChatScreenState extends State<ChatScreen3> {
     ReplyMessage replyMessage,
     MessageType messageType,
   ) {
-    final id = int.parse(Data.messageList.last.id) + 1;
+    final id = int.parse(Data.messageList.last.id!) + 1;
     _chatController.addMessage(
       Message(
         id: id.toString(),

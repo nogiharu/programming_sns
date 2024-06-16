@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/common/error_dialog.dart';
 import 'package:programming_sns/routes/router.dart';
-import 'package:appwrite/appwrite.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -23,17 +22,6 @@ final snackBarProvider = AutoDisposeProvider((ref) {
       onTap: onTap,
     );
   };
-
-  // final messengerState = ref.watch(scaffoldMessengerKeyProvider).currentState;
-
-  // if (messengerState == null) return;
-  // double height = MediaQuery.of(messengerState.context).size.height - 100;
-
-  // messengerState.showSnackBar(SnackBar(
-  //   behavior: SnackBarBehavior.floating,
-  //   content: Text(msg),
-  //   margin: EdgeInsets.only(bottom: height, left: 10, right: 10),
-  // ));
 });
 
 /// エラーダイアログ
@@ -55,7 +43,7 @@ final showDialogProvider = Provider((ref) {
   };
 });
 
-errorMessage({
+customError({
   dynamic error,
   String? userId,
   String? password,
@@ -75,14 +63,44 @@ errorMessage({
 
   //-------------- API系 --------------
   if (error != null) {
-    debugPrint('exceptionMessage：${error.toString()}');
-    if (error is PostgrestException) {
-      throw '''
+    //-------------- AuthException系 --------------
+    if (error is AuthException) {
+      final isRegistered = error.message.contains('email address has already been registered');
+      if (error.statusCode == '422' && isRegistered) throw 'すでに使われているIDだよ(>_<)';
+
+      final isEmailInvalid = error.message.contains('email address: invalid format');
+      if (error.statusCode == '420' && isEmailInvalid) throw 'IDに無効な文字が使われてるよ(>_<)';
+
+      final isLoginInvalid = error.message.contains('Invalid login credentials');
+      if (error.statusCode == '400' && isLoginInvalid) throw 'このIDの人は存在しないよ(>_<)';
+
+      final isPasswordSame = error.message.contains('different from the old password');
+      if (error.statusCode == '422' && isPasswordSame) throw 'パスワードは前のとは別のにしてね(>_<)';
+    }
+    throw error;
+    throw '''
       予期せぬエラーだあ(T ^ T)
       再立ち上げしてね(>_<)
       ''';
-    } else {
-      throw error;
-    }
+  }
+}
+
+/// catchErrorの拡張版
+extension FutureEX<T> on Future<T> {
+  /// catchErrorの拡張版
+  /// error - エラー
+  /// isCustomError デフォルトのエラーか
+  Future<T> catchErrorEX({isCustomError = true}) {
+    return catchError((e) => isCustomError ? customError(error: e) : throw e);
+  }
+}
+
+/// catchErrorの拡張版
+extension StreamEX<T> on Stream<T> {
+  /// catchErrorの拡張版
+  /// error - エラー
+  /// isCustomError デフォルトのエラーか
+  Stream<T> handleErrorEX({isCustomError = true}) {
+    return handleError((e) => isCustomError ? customError(error: e) : throw e);
   }
 }

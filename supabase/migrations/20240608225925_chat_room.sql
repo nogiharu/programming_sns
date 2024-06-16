@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS
         -- メッセージIDを主キーとして設定 (UUIDを自動生成)
         id UUID NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
         -- ユーザー固有のIDを設定（作成者）
-        owner_user_id UUID NOT NULL,
+        users_id UUID NOT NULL,
         -- チャット名
         NAME VARCHAR(2000) NOT NULL,
         -- 消されたか
@@ -24,7 +24,7 @@ COMMENT ON TABLE public.chat_rooms IS 'チャットルーム情報';
 -- カラムにコメントを追加
 COMMENT ON COLUMN public.chat_rooms.id IS '固有ID';
 
-COMMENT ON COLUMN public.chat_rooms.owner_user_id IS '作成者';
+COMMENT ON COLUMN public.chat_rooms.users_id IS '作成者';
 
 COMMENT ON COLUMN public.chat_rooms.name IS 'チャット名';
 
@@ -35,7 +35,7 @@ COMMENT ON COLUMN public.chat_rooms.created_at IS 'レコード作成日時';
 COMMENT ON COLUMN public.chat_rooms.updated_at IS 'レコード更新日時';
 
 -- インデックスの追加
-CREATE INDEX idx_chat_rooms_owner_user_id ON public.chat_rooms (owner_user_id);
+CREATE INDEX idx_chat_rooms_users_id ON public.chat_rooms (users_id);
 
 CREATE INDEX idx_chat_rooms_updated_at ON public.chat_rooms (updated_at);
 

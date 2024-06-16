@@ -1,8 +1,11 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:programming_sns/core/supabase_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:programming_sns/common/constans.dart';
+import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/features/auth/providers/auth_provider2.dart';
+import 'package:programming_sns/features/chat/models/chat_room_model2.dart';
+import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart';
+import 'package:programming_sns/features/user/providers/user_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class TestToolcreen extends ConsumerWidget {
@@ -24,7 +27,7 @@ class TestToolcreen extends ConsumerWidget {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  await supabase.auth.signInAnonymously(captchaToken: 'aaaaa');
+                  await supabase.auth.signInAnonymously();
                   // supabase.auth.onAuthStateChange.listen((event) {event.event})
                 } catch (e) {
                   print(e);
@@ -58,9 +61,10 @@ class TestToolcreen extends ConsumerWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () async {
-                var a = supabase.auth.currentUser;
+                var a = supabase.auth.currentSession;
                 // print(a);
-                print(a?.email);
+                print(a?.user.email);
+                print(a?.user.userMetadata);
               },
               child: const Text('状態'),
             ),
@@ -74,84 +78,86 @@ class TestToolcreen extends ConsumerWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () async {
-                final previousUser = supabase.auth.currentUser;
-                print(previousUser?.id);
-                await supabase.auth
-                    .signInWithPassword(email: 'hoge7@gmail.com', password: 'hogehoge7')
-                    .catchError((e) {
-                  print(e);
-                });
-                print(supabase.auth.currentUser?.id);
-                await supabase.auth.admin.deleteUser(previousUser!.id).catchError((e) {
-                  print(e);
-                });
-                // await supabase.auth.refreshSession();
-                // const envFile = String.fromEnvironment('env');
-                // await dotenv.load(fileName: envFile);
-                // final supabaseClient = SupabaseClient(
-                //   dotenv.env['kUrl'] ?? '',
-                //   dotenv.env['kServiceRoleKey'] ?? '',
-                // );
-                // await supabaseClient.auth.admin.deleteUser(previousUser!.id).catchError((e) {
-                //   print(e);
-                // });
-                // final a = await supabaseClient.auth.admin.getUserById(previousUser.id);
-                // print(a.user?.id);
+                await ref.read(authProvider.notifier).login(userId: 'hoge1', password: 'hogehoge1');
               },
               child: const Text('ログイン'),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () async {
-                // 削除できん
-                await supabase.auth.admin
-                    .deleteUser('94ffa4a8-2f7d-4264-84ad-9a3e334222c9')
-                    .catchError((e) {
-                  print(e);
-                });
-
-                // try {
-                //   final a = await supabase.functions.invoke(
-                //     "delete-user",
-                //     body: {'id': 'b6dad234-b310-4384-8fad-856bb63325d6'},
-                //   );
-                //   print(a.data);
-                //   // 削除後の処理など
-                // } on AuthException catch (error, stackTrace) {
-                //   print(error);
-                // }
+                await ref.read(chatRoomsProvider.notifier).pagination();
               },
-              child: const Text('削除'),
+              child: const Text('ページネーション'),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () async {
-                try {
-                  final meta = supabase.auth.currentUser?.userMetadata;
+                final count = await supabase.from('chat_rooms').count();
+                final a = ChatRoomModel(
+                    // id: 'd05dff58-9b40-444b-b360-06acc4703fa5',
+                    name: 'チャットルーム作成:$count',
+                    ownerId: ref.read(userProvider).value!.id);
+                await ref.read(chatRoomsProvider.notifier).upsertState(a);
+              },
+              child: const Text('チャットルーム作成'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () async {
+                final b = ref.read(chatRoomsProvider).requireValue;
 
-                  await supabase.auth.updateUser(
-                    UserAttributes(
-                      data: {
-                        ...meta!,
-                        'password': 'hogehoge7',
-                        'is_anonymous': false,
-                      },
-                      email: 'hoge7@gmail.com',
-                      password: 'hogehoge7',
-                    ),
-                  );
-                  final a = await supabase.auth.refreshSession();
-                } catch (e) {
-                  print(e);
-                }
-
-                // final a = await supabase.auth.signUp(
-                //     email: 'hoge@gmail.com', password: '11111111', data: {'name': '太郎あああpppp'});
-                // 昇格できない！！！！！！！
-
-                // supabase.auth.signUp(password: );
+                final a = ChatRoomModel(
+                  id: b[0].id,
+                  name: '${b[0].name}：更新',
+                  ownerId: ref.read(userProvider).value!.id,
+                );
+                await ref.read(chatRoomsProvider.notifier).upsertState(a);
+              },
+              child: const Text('チャット更新作成'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () async {
+                await ref
+                    .read(authProvider.notifier)
+                    .register(userId: 'hoge1', password: 'hogehoge1');
               },
               child: const Text('ユーザUPDATE'),
+            ),
+            ref.watchEX(
+              userProvider,
+              complete: (p0) {
+                return Column(
+                  children: [
+                    Text(p0.id),
+                    Text(p0.userId),
+                    Text(p0.name),
+                  ],
+                );
+              },
+            ),
+            ref.watchEX(
+              chatRoomsProvider,
+              complete: (p0) {
+                return ListView.builder(
+                  itemCount: p0.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    // p0[index].name
+                    // print(p0[index].id);
+                    return Row(
+                      children: [
+                        Text(p0[index].updatedAt.toString()),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text(p0[index].name),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),
