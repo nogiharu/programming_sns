@@ -9,7 +9,7 @@ import 'package:programming_sns/features/chat/models/message_ex2.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final messagesProvider =
-    AutoDisposeFamilyAsyncNotifierProvider<MessagesNotifier, List<Message>, String>(
+    AutoDisposeAsyncNotifierProviderFamily<MessagesNotifier, List<Message>, String>(
   MessagesNotifier.new,
 );
 
@@ -25,6 +25,7 @@ class MessagesNotifier extends AutoDisposeFamilyAsyncNotifier<List<Message>, Str
       firstId = await supabase
           .from('messages')
           .select('id')
+          .eq('chat_room_id', arg)
           .order('created_at', ascending: true)
           .limit(1)
           .then((v) => v.firstOrNull?['id'] ?? '')
@@ -35,44 +36,47 @@ class MessagesNotifier extends AutoDisposeFamilyAsyncNotifier<List<Message>, Str
     // realtimeEvent();
 
     // 初期データ取得
-    return await supabase
+    final a = await supabase
         .from('messages')
         .select()
+        .eq('chat_room_id', arg)
         .order('updated_at')
-        .limit(2)
-        .then((v) => v.map((e) => MessageEX.fromMap(e)).toList())
+        .limit(5)
+        .then((v) => v.reversed.map((e) => MessageEX.fromMap(e)).toList())
         .catchErrorEX();
+    print(a);
+    return a;
   }
 
   /// リアルタイムイベント
-  // void realtimeEvent() {
-  //   supabase
-  //       .channel('public:messages')
-  //       .onPostgresChanges(
-  //           event: PostgresChangeEvent.all,
-  //           table: 'messages',
-  //           callback: (payload) {
-  //             update(
-  //               (data) {
-  //                 final newData = MessageEX.fromMap(payload.newRecord);
-  //                 // 【INSERTイベント】
-  //                 if (PostgresChangeEvent.insert == payload.eventType) {
-  //                   data.insert(0, newData);
-  //                   debugPrint('MESSAGE_CREATE!');
-  //                 }
-  //                 // 【UPDATEイベント】
-  //                 else if (PostgresChangeEvent.update == payload.eventType) {
-  //                   final index = data.indexWhere((e) => e.id == newData.id);
-  //                   if (index != -1) data[index] = newData;
-  //                   debugPrint('MESSAGE_UPDATE!');
-  //                 }
+  void realtimeEvent() {
+    supabase
+        .channel('public:messages')
+        .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            table: 'messages',
+            callback: (payload) {
+              update(
+                (data) {
+                  final newData = MessageEX.fromMap(payload.newRecord);
+                  // 【INSERTイベント】
+                  if (PostgresChangeEvent.insert == payload.eventType) {
+                    data.insert(0, newData);
+                    debugPrint('MESSAGE_CREATE!');
+                  }
+                  // 【UPDATEイベント】
+                  else if (PostgresChangeEvent.update == payload.eventType) {
+                    final index = data.indexWhere((e) => e.id == newData.id);
+                    if (index != -1) data[index] = newData;
+                    debugPrint('MESSAGE_UPDATE!');
+                  }
 
-  //                 return data;
-  //               },
-  //             );
-  //           })
-  //       .subscribe();
-  // }
+                  return data;
+                },
+              );
+            })
+        .subscribe();
+  }
 
   /// ページネーション
   // Future<void> pagination() async {
@@ -95,9 +99,12 @@ class MessagesNotifier extends AutoDisposeFamilyAsyncNotifier<List<Message>, Str
   // }
 
   /// 更新、作成
-  // Future<void> upsertState(Message chatRoomModel) async {
-  //   await asyncGuard<void>(() async {
-  //     await supabase.from('messages').upsert(chatRoomModel.toMap());
-  //   });
-  // }
+  Future<void> upsertState(Message message) async {
+    await asyncGuard<void>(
+      () async {
+        await supabase.from('messages').upsert(message.toMap());
+      },
+      isLoading: false,
+    );
+  }
 }

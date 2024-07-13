@@ -2,16 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/scaffold_with_navbar.dart';
+import 'package:programming_sns/features/auth/screens/auth_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
-import 'package:programming_sns/features/auth/screens/password_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
-import 'package:programming_sns/features/auth/screens/user_id_update_screen.dart';
-import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/chat/screens/old/chat_screen.dart';
+import 'package:programming_sns/features/chat/screens/old/chat_screen2.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen3.dart';
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/notification/screens/notification_screen.dart';
 import 'package:programming_sns/features/user/screens/user_screen.dart';
 
-import 'package:programming_sns/temp/tempScreen.dart';
 import 'package:programming_sns/test_tool/test_tool.dart';
 
 /// ScaffoldWithNavbarの外側のスコープ
@@ -31,7 +31,7 @@ final router = Provider((ref) {
   final bottomItems = [
     TestToolcreen.metaData,
     ChatThreadScreen.metaData,
-    ScreenB.metaData,
+    // ScreenB.metaData,
     NotificationScreen.metadata,
     UserScreen.metaData,
   ];
@@ -68,32 +68,35 @@ final router = Provider((ref) {
             },
             routes: [
               GoRoute(
-                path: ChatScreen.path,
+                path: ChatScreen3.path,
                 // name: nameは一意出なければならない
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
                   final map = state.extra as Map<String, dynamic>;
-                  return ChatScreen(label: map['label'], chatRoomId: map['chatRoomId']);
+                  return ChatScreen3(
+                    label: map['label'],
+                    chatRoomId: map['chatRoomId'],
+                  );
                 },
               ),
             ],
           ),
-          GoRoute(
-            path: ScreenB.metaData['path'],
-            name: ScreenB.metaData['path'],
-            pageBuilder: (context, state) {
-              return _pageAnimation(const ScreenB(), state, ref: ref);
-            },
-            routes: [
-              GoRoute(
-                path: DetailsScreen.path,
-                parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
-                builder: (context, state) {
-                  return const DetailsScreen(label: 'B');
-                },
-              ),
-            ],
-          ),
+          // GoRoute(
+          //   path: ScreenB.metaData['path'],
+          //   name: ScreenB.metaData['path'],
+          //   pageBuilder: (context, state) {
+          //     return _pageAnimation(const ScreenB(), state, ref: ref);
+          //   },
+          //   routes: [
+          //     GoRoute(
+          //       path: DetailsScreen.path,
+          //       parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+          //       builder: (context, state) {
+          //         return const DetailsScreen(label: 'B');
+          //       },
+          //     ),
+          //   ],
+          // ),
 
           /// 通知
           GoRoute(
@@ -140,19 +143,11 @@ final router = Provider((ref) {
                 },
               ),
               GoRoute(
-                path: UserIdUpdateScreen.path,
-                name: UserIdUpdateScreen.path,
+                path: AuthUpdateScreen.path,
+                name: AuthUpdateScreen.path,
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
-                  return const UserIdUpdateScreen();
-                },
-              ),
-              GoRoute(
-                path: PasswordUpdateScreen.path,
-                name: PasswordUpdateScreen.path,
-                parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
-                builder: (context, state) {
-                  return const PasswordUpdateScreen();
+                  return const AuthUpdateScreen();
                 },
               ),
             ],
@@ -169,7 +164,7 @@ final router = Provider((ref) {
         currentBottomMap['index'] = bottomItems.indexWhere((e) => uri == e['path']);
       }
 
-      if (uri.contains(ChatScreen.path) && state.extra == null) {
+      if (uri.contains(ChatScreen3.path) && state.extra == null) {
         return ChatThreadScreen.metaData['path'];
       }
       return null;

@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/chat/providers/chat_room_list_provider.dart';
-import 'package:programming_sns/features/chat/screens/chat_screen.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:programming_sns/features/chat/models/chat_room_model2.dart';
+import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart';
+import 'package:programming_sns/features/chat/screens/old/chat_screen2.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen3.dart';
+import 'package:programming_sns/features/user/providers/user_provider.dart';
 
 class ChatThreadScreen extends ConsumerStatefulWidget {
   const ChatThreadScreen({super.key});
@@ -20,10 +22,26 @@ class ChatThreadScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
+  final scrollController = ScrollController();
   final textController = TextEditingController();
 
-  late final chatRoomNotifier = ref.read(chatRoomListProvider.notifier);
+  late final chatRoomsNotifier = ref.read(chatRoomsProvider.notifier);
   late final userNotifier = ref.read(userProvider.notifier);
+
+  @override
+  void initState() {
+    scrollController.addListener(scrollListener);
+    super.initState();
+  }
+
+  Future<void> scrollListener() async {
+    // await中にスクロールしたくないため消す
+    scrollController.removeListener(scrollListener);
+    if (scrollController.position.maxScrollExtent == scrollController.position.pixels) {
+      await chatRoomsNotifier.pagination();
+    }
+    scrollController.addListener(scrollListener);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,62 +50,51 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
         title: const Text('チャットスレッド'),
       ),
       body: ref.watchEX(userProvider, complete: (userModel) {
-        return RefreshIndicator(
-          onRefresh: () async {
-            await Future.delayed(
-              const Duration(seconds: 3),
-            );
-          },
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextButton(
-                  onPressed: () => createThreadBottomSheet(userId: userModel.documentId),
-                  child: const Text('スレを立てる'),
-                ),
-                ref.watchEX(
-                  chatRoomListProvider,
-                  isBackgroundColorNone: ref.watch(chatRoomListProvider).hasError,
-                  complete: (chatRoom) {
-                    // チャットルームイベント
-                    // ref.watch(chatRoomEventProvider);
-
-                    return ListView.builder(
-                      itemCount: chatRoom.length,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            // ルームID追加 awaitはしない
-                            final chatRoomIdContain =
-                                userModel.chatRoomIds!.contains(chatRoom[index].documentId!);
-                            if (!chatRoomIdContain) {
-                              userModel.chatRoomIds?.add(chatRoom[index].documentId!);
-                              // ステート更新
-                              userNotifier.updateState(userModel);
-                            }
-
-                            // CHAT画面に遷移
-                            context.go('${ChatThreadScreen.metaData['path']}/${ChatScreen.path}',
-                                extra: {
-                                  'label': chatRoom[index].name,
-                                  'chatRoomId': chatRoom[index].documentId,
-                                });
-                          },
-                          child: Card(
-                            child: ListTile(
-                              title: Text(chatRoom[index].name),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
+        return Column(
+          children: [
+            TextButton(
+              onPressed: () => createThreadBottomSheet(userId: userModel.id),
+              child: const Text('スレを立てる'),
             ),
-          ),
+            Expanded(
+              child: ref.watchEX(
+                chatRoomsProvider,
+                isBackgroundColorNone: ref.watch(chatRoomsProvider).hasError,
+                complete: (chatRooms) {
+                  // チャットルームイベント
+
+                  return ListView.builder(
+                    itemCount: chatRooms.length,
+                    controller: scrollController,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          // ルームID追加
+                          if (!userModel.chatRoomIds!.contains(chatRooms[index].id!)) {
+                            userModel.chatRoomIds?.add(chatRooms[index].id!);
+                            // API
+                            ref.read(userProvider.notifier).upsertState(userModel);
+                          }
+
+                          // CHAT画面に遷移
+                          context.go('${ChatThreadScreen.metaData['path']}/${ChatScreen3.path}',
+                              extra: {
+                                'label': chatRooms[index].name,
+                                'chatRoomId': chatRooms[index].id,
+                              });
+                        },
+                        child: Card(
+                          child: ListTile(
+                            title: Text(chatRooms[index].name),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         );
       }),
     );
@@ -109,11 +116,17 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
             contentPadding: const EdgeInsets.all(15),
             suffixIcon: IconButton(
               onPressed: () async {
-                await chatRoomNotifier
-                    .createState(ownerId: userId, name: textController.text)
+                await chatRoomsNotifier
+                    .upsertState(
+                  ChatRoomModel.instance(
+                    ownerId: userId,
+                    name: textController.text,
+                    memberUserIds: [userId],
+                  ),
+                )
                     .whenComplete(() {
                   // なぜかキャッチされないためwhenComplete使用
-                  if (!ref.watch(chatRoomListProvider).hasError) {
+                  if (!ref.watch(chatRoomsProvider).hasError) {
                     context.pop();
                     textController.text = '';
                     ref.read(snackBarProvider)(message: '作成完了だよ(*^_^*)');

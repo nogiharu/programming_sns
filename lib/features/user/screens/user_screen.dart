@@ -2,11 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/features/auth/providers/auth_provider2.dart';
+import 'package:programming_sns/features/auth/screens/auth_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
-import 'package:programming_sns/features/auth/screens/password_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
-import 'package:programming_sns/features/auth/screens/user_id_update_screen.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:programming_sns/test_tool/test_tool.dart';
 
 class UserScreen extends ConsumerWidget {
@@ -25,15 +24,15 @@ class UserScreen extends ConsumerWidget {
         title: const Text('ホーム'),
       ),
       body: ref.watchEX(
-        userProvider,
+        authProvider,
         complete: (data) {
           return Center(
             child: Column(
               children: [
-                const TestToolcreen(),
-                if (data.isAnonymous) ...[
+                // const TestToolcreen(),
+                if (data.userMetadata?['is_anonymous'] as bool) ...[
                   Tooltip(
-                    message: 'セッションが一年で切れるから登録をお勧めするよ(*^_^*)',
+                    message: '登録をお勧めするよ(*^_^*)',
                     child: ElevatedButton(
                       onPressed: () {
                         context.goNamed(SignupScreen.path);
@@ -56,19 +55,10 @@ class UserScreen extends ConsumerWidget {
                 ] else ...[
                   ElevatedButton(
                     onPressed: () {
-                      context.goNamed(UserIdUpdateScreen.path);
+                      context.goNamed(AuthUpdateScreen.path);
                     },
                     child: const Text(
-                      'ユーザーID更新',
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.goNamed(PasswordUpdateScreen.path);
-                    },
-                    child: const Text(
-                      'パスワード更新',
+                      'アカウント更新',
                     ),
                   ),
                 ]

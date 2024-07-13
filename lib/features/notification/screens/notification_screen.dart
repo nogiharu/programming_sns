@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/chat/screens/old/chat_screen.dart';
 import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:programming_sns/features/user/providers/user_provider.dart';
 
 class NotificationScreen extends ConsumerStatefulWidget {
   const NotificationScreen({super.key});

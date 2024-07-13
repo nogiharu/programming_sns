@@ -21,8 +21,8 @@ extension WidgetRefEX on WidgetRef {
   }) {
     return watch(asyncValueProvider).when(
       data: (data) {
-        final res = complete(data);
-        if (res is Widget) return res;
+        final result = complete(data);
+        if (result is Widget) return result;
         // TODO ここがダサい
         return const SizedBox.shrink();
       },

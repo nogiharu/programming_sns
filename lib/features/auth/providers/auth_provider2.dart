@@ -11,7 +11,7 @@ import 'package:uuid/uuid.dart';
 final authProvider = AsyncNotifierProvider<AuthNotifier, User>(AuthNotifier.new);
 
 class AuthNotifier extends AsyncNotifier<User> {
-  final _authChangeProvider = StreamProvider((ref) => supabase.auth.onAuthStateChange);
+  // final _authChangeProvider = StreamProvider((ref) => supabase.auth.onAuthStateChange);
 
   @override
   FutureOr<User> build() async {

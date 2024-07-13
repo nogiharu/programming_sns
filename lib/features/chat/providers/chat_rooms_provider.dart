@@ -36,7 +36,7 @@ class ChatRoomsNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
         .from('chat_rooms')
         .select()
         .order('updated_at')
-        .limit(2)
+        .limit(5)
         .then((v) => v.map((e) => ChatRoomModel.fromMap(e)).toList())
         .catchErrorEX();
   }
@@ -55,13 +55,13 @@ class ChatRoomsNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
                   // 【INSERTイベント】
                   if (PostgresChangeEvent.insert == payload.eventType) {
                     data.insert(0, newData);
-                    debugPrint('CHAT_ROOM_CREATE!');
+                    debugPrint('【INSERT:CHAT_ROOM】');
                   }
                   // 【UPDATEイベント】
                   else if (PostgresChangeEvent.update == payload.eventType) {
                     final index = data.indexWhere((e) => e.id == newData.id);
                     if (index != -1) data[index] = newData;
-                    debugPrint('CHAT_ROOM_UPDATE!');
+                    debugPrint('【UPDATE:CHAT_ROOM】');
                   }
 
                   return data;
@@ -72,7 +72,7 @@ class ChatRoomsNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
   }
 
   /// ページネーション
-  Future<void> pagination() async {
+  Future<void> pagination({int limit = 2}) async {
     final chatRooms = state.requireValue;
     if (chatRooms.isEmpty || chatRooms.last.id == firstId) return;
 
@@ -81,20 +81,27 @@ class ChatRoomsNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
         final result = await supabase
             .from('chat_rooms')
             .select()
-            .range(chatRooms.length, chatRooms.length + 2)
+            .range(chatRooms.length, chatRooms.length + limit)
             .order('updated_at')
-            .limit(2)
+            .limit(limit)
             .then((v) => v.map((e) => ChatRoomModel.fromMap(e)).toList());
 
         chatRooms.addAll(result);
       },
+      isLoading: false,
     );
   }
 
   /// 更新、作成
   Future<void> upsertState(ChatRoomModel chatRoomModel) async {
-    await asyncGuard<void>(() async {
-      await supabase.from('chat_rooms').upsert(chatRoomModel.toMap());
-    });
+    await asyncGuard<void>(
+      () async {
+        if (chatRoomModel.name.length <= 4) {
+          throw 'スレ名は5文字以上で入れてね(T ^ T)';
+        }
+        await supabase.from('chat_rooms').upsert(chatRoomModel.toMap());
+      },
+      isLoading: false,
+    );
   }
 }

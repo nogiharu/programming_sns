@@ -2,23 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/utils.dart';
-import 'package:programming_sns/features/auth/providers/auth_provider.dart';
+import 'package:programming_sns/features/auth/providers/auth_provider2.dart';
 import 'package:programming_sns/features/auth/widgets/auth_field.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:programming_sns/features/user/providers/user_provider.dart';
 
-class UserIdUpdateScreen extends ConsumerStatefulWidget {
-  const UserIdUpdateScreen({
+class AuthUpdateScreen extends ConsumerStatefulWidget {
+  const AuthUpdateScreen({
     super.key,
   });
 
-  static const String path = 'userIdUpdate';
+  static const String path = 'update';
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _UserIdUpdateScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _AuthUpdateScreenState();
 }
 
-class _UserIdUpdateScreenState extends ConsumerState<UserIdUpdateScreen> {
+class _AuthUpdateScreenState extends ConsumerState<AuthUpdateScreen> {
   final userIdController = TextEditingController();
+  final passwordController = TextEditingController();
 
   String errorMessage = '';
 
@@ -49,14 +50,20 @@ class _UserIdUpdateScreenState extends ConsumerState<UserIdUpdateScreen> {
                 hintText: 'ユーザーIDは記号、日本語以外で半角で入力してね(^^)',
               ),
               const SizedBox(height: 10),
+              AuthField(
+                labelText: 'パスワード',
+                controller: passwordController,
+                hintText: 'パスワードは日本語以外で半角で8桁以上で入れてね(^^)',
+              ),
               Align(
                 alignment: Alignment.topRight,
                 child: ElevatedButton(
                   onPressed: () async {
                     // 更新処理
                     final authNotifier = ref.read(authProvider.notifier);
-                    await authNotifier.registerOrUpdate(
-                      userModel: userModel.copyWith(userId: userIdController.text),
+                    await authNotifier.register(
+                      userId: userIdController.text,
+                      password: passwordController.text,
                     );
 
                     // エラーチェック

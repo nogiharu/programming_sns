@@ -15,17 +15,13 @@ import 'package:programming_sns/enums/notification_type.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/common/utils.dart';
-import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
-import 'package:programming_sns/features/chat/providers/chat_room_list_provider.dart';
+import 'package:programming_sns/features/chat/providers/old/chat_controller_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
 import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
+import 'package:programming_sns/features/user/providers/user_provider.dart';
 import 'package:programming_sns/theme/theme_color.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
-import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:programming_sns/routes/router.dart';
-import 'package:programming_sns/temp/data2.dart';
-import 'package:programming_sns/temp/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:collection/collection.dart';
@@ -48,7 +44,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
-  AppTheme theme = LightTheme();
+  // AppTheme theme = LightTheme();
   bool isDarkTheme = false;
 
   ChatController _chatController =
@@ -86,8 +82,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.endOfFrame.then((_) {
-      initMentionScroll();
-      onMentionMessageReaded();
+      // initMentionScroll();
+      // onMentionMessageReaded();
     });
     return Scaffold(
         appBar: AppBar(
@@ -109,7 +105,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         body: ref.watchEX(
           userProvider,
           complete: (currentUserModel) {
-            _currentChatUser = UserModel.toChatUser(currentUserModel);
+            // _currentChatUser = UserModel.toChatUser(currentUserModel);
 
             /// CHAT
             return ref.watchEX(
@@ -153,18 +149,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     replyTitleColor: ThemeColor.strong, // リプライタイトル(送信フォーム)
 
                     // textFieldBackgroundColor: Colors.grey.shade100, // 背景色
-                    closeIconColor: theme.closeIconColor,
-                    textFieldConfig: TextFieldConfiguration(
+                    // closeIconColor: theme.closeIconColor,
+                    textFieldConfig: const TextFieldConfiguration(
                       padding: EdgeInsets.zero,
                       // margin: EdgeInsets.zero,
                       borderRadius: BorderRadius.zero,
                       maxLines: 100, // 入力文字の行
-                      contentPadding: const EdgeInsets.all(10),
+                      contentPadding: EdgeInsets.all(10),
                       hintText: '文字入れてね(*^_^*)', // TODO ヒント
-                      compositionThresholdTime: const Duration(seconds: 5),
+                      compositionThresholdTime: Duration(seconds: 5),
                       textStyle: TextStyle(
-                        color: theme.textFieldTextColor,
-                      ),
+                          // color: theme.textFieldTextColor,
+                          ),
                       textCapitalization: TextCapitalization.none, // フォーマットしない
                     ),
                     // 編集フラグ
@@ -209,15 +205,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       height: kIsWeb ? 200 : null,
                       width: kIsWeb ? 200 : null,
                       shareIconConfig: ShareIconConfiguration(
-                        defaultIconBackgroundColor: theme.shareIconBackgroundColor,
-                        defaultIconColor: theme.shareIconColor,
+                        // defaultIconBackgroundColor: theme.shareIconBackgroundColor,
+                        // defaultIconColor: theme.shareIconColor,
                         onPressed: downloadImage,
                       ),
                       onTap: previewImage,
                     ),
                   ),
                   profileCircleConfig: ProfileCircleConfiguration(
-                    profileImageUrl: Data.profileImage,
+                    // profileImageUrl: Data.profileImage,
                     onAvatarTap: (p0) {
                       print(p0); // プロフィール画像タップ
                     },
@@ -263,9 +259,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ),
 
                   /// TODO スワイプ
-                  swipeToReplyConfig: SwipeToReplyConfiguration(
-                    replyIconColor: theme.swipeToReplyIconColor,
-                  ),
+                  swipeToReplyConfig: const SwipeToReplyConfiguration(
+                      // replyIconColor: theme.swipeToReplyIconColor,
+                      ),
                 );
               },
             );
@@ -294,9 +290,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       await _chatControllerNotifier.createMessage(msg);
 
       // このチャットルーム取得
-      final chatRoom = ref.read(chatRoomListProvider.notifier).getState(widget.chatRoomId);
+      // final chatRoom = ref.read(chatRoomListProvider.notifier).getState(widget.chatRoomId);
       // 【チャットルームの日付更新】　awaitはしない
-      ref.read(chatRoomAPIProvider).update(chatRoom.copyWith(updatedAt: DateTime.now()));
+      // ref.read(chatRoomAPIProvider).update(chatRoom.copyWith(updatedAt: DateTime.now()));
     } else {
       // 【更新処理】
       // メッセージ更新 前回のメッセージ違うなら更新
@@ -428,66 +424,66 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
-  void initMentionScroll() {
-    final isNotEmpty = _chatController.initialMessageList.isNotEmpty;
-    if (isNotEmpty && notificationNotifier.mentionCreatedAt != null) {
-      _initMentionScrollCancel = CancelableOperation.fromFuture(
-          Future.delayed(const Duration(milliseconds: 500), () async {
-        final mentionMessageLocation =
-            getMessageLocation(mentionCreatedAt: notificationNotifier.mentionCreatedAt!);
+  // void initMentionScroll() {
+  //   final isNotEmpty = _chatController.initialMessageList.isNotEmpty;
+  //   if (isNotEmpty && notificationNotifier.mentionCreatedAt != null) {
+  //     _initMentionScrollCancel = CancelableOperation.fromFuture(
+  //         Future.delayed(const Duration(milliseconds: 500), () async {
+  //       final mentionMessageLocation =
+  //           getMessageLocation(mentionCreatedAt: notificationNotifier.mentionCreatedAt!);
 
-        if (mentionMessageLocation == null) {
-          await loadMoreData();
-          initMentionScroll();
-          return;
-        }
+  //       if (mentionMessageLocation == null) {
+  //         await loadMoreData();
+  //         initMentionScroll();
+  //         return;
+  //       }
 
-        final screenHeight = MediaQuery.of(context).size.height;
+  //       final screenHeight = MediaQuery.of(context).size.height;
 
-        final offset = (mentionMessageLocation as RenderBox).localToGlobal(Offset.zero);
-        // MarkdownInputの高さは大体200
-        final scrollOffset = screenHeight - offset.dy - 200;
+  //       final offset = (mentionMessageLocation as RenderBox).localToGlobal(Offset.zero);
+  //       // MarkdownInputの高さは大体200
+  //       final scrollOffset = screenHeight - offset.dy - 200;
 
-        await _chatController.scrollController.animateTo(
-          scrollOffset,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
+  //       await _chatController.scrollController.animateTo(
+  //         scrollOffset,
+  //         duration: const Duration(milliseconds: 500),
+  //         curve: Curves.easeInOut,
+  //       );
 
-        notificationNotifier.mentionCreatedAt = null;
-      }));
-    }
-  }
+  //       notificationNotifier.mentionCreatedAt = null;
+  //     }));
+  //   }
+  // }
 
-  void onMentionMessageReaded() {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      ref.watch(notificationListProvider).whenOrNull(
-        data: (notifications) {
-          Future.forEach(notifications, (notification) async {
-            if (notification.chatRoomId == widget.chatRoomId && !notification.isRead) {
-              final mentionMessageLocation =
-                  getMessageLocation(mentionCreatedAt: notification.createdAt);
+  // void onMentionMessageReaded() {
+  //   Future.delayed(const Duration(milliseconds: 500), () {
+  //     ref.watch(notificationListProvider).whenOrNull(
+  //       data: (notifications) {
+  //         Future.forEach(notifications, (notification) async {
+  //           if (notification.chatRoomId == widget.chatRoomId && !notification.isRead) {
+  //             final mentionMessageLocation =
+  //                 getMessageLocation(mentionCreatedAt: notification.createdAt);
 
-              if (mentionMessageLocation != null) {
-                // 既読にする
-                await ref.read(notificationListProvider.notifier).updateState(
-                      notification.copyWith(isRead: true),
-                    );
-              }
-            }
-          });
-        },
-      );
-    });
-  }
+  //             if (mentionMessageLocation != null) {
+  //               // 既読にする
+  //               await ref.read(notificationListProvider.notifier).updateState(
+  //                     notification.copyWith(isRead: true),
+  //                   );
+  //             }
+  //           }
+  //         });
+  //       },
+  //     );
+  //   });
+  // }
 
-  RenderObject? getMessageLocation({required DateTime mentionCreatedAt}) {
-    return _chatController.initialMessageList
-        .firstWhereOrNull(
-          (e) => mentionCreatedAt.millisecondsSinceEpoch == e.createdAt.millisecondsSinceEpoch,
-        )
-        ?.key
-        .currentContext
-        ?.findRenderObject();
-  }
+  // RenderObject? getMessageLocation({required DateTime mentionCreatedAt}) {
+  //   return _chatController.initialMessageList
+  //       .firstWhereOrNull(
+  //         (e) => mentionCreatedAt.millisecondsSinceEpoch == e.createdAt.millisecondsSinceEpoch,
+  //       )
+  //       ?.key
+  //       .currentContext
+  //       ?.findRenderObject();
+  // }
 }

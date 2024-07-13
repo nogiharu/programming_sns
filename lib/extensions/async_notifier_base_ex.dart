@@ -49,7 +49,7 @@ extension AsyncNotifierBaseEX<T> on AsyncNotifierBase<T> {
   }) async {
     // 現在のstateを保持
     final prevState = state.copyWithPrevious(state);
-    // isLoadingがtrueの場合、stateをAsyncLoadingに更新
+
     if (isLoading) state = AsyncLoading<T>();
 
     dynamic reslut;
@@ -57,20 +57,18 @@ extension AsyncNotifierBaseEX<T> on AsyncNotifierBase<T> {
       // isCustomErrorがtrueの場合、エラー時にカスタムエラーメッセージを返す
       reslut = await futureFunction().catchErrorEX(isCustomError: isCustomError);
       // futureFunctionの戻り型がstateの値の型と同一か
-      if (isValueUpdate && R == T) {
-        return reslut as T;
-      }
+      if (isValueUpdate && R == T) return reslut as T;
       return prevState.requireValue;
     });
 
-    // エラーがある場合、非同期で300ミリ秒後にprevStateに戻す
+    // エラーがある場合、300ミリ秒後にprevStateに戻す
     if (state.hasError) {
-      // いきなり「state = prevState」をするとwatchEXのダイアログが出ないため,タイミングをずらす
+      // いきなり「state = prevState」をするとwatchEXのダイアログが出ないため,300ミリ秒後にエラーを戻す
       Future.delayed(const Duration(milliseconds: 300), () => state = prevState);
     }
 
-    reslut ??= prevState.requireValue;
-
-    return reslut;
+    // reslutがnullの場合(Rがvoid、スローされた時)もあるため、prevStateを入れておく
+    // 戻りの型をR?にすればいいだけの話だが、使う側が毎回nullチェックするのは面倒なので、以下を実施しておく
+    return reslut ??= prevState.requireValue;
   }
 }

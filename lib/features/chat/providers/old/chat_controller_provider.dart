@@ -12,7 +12,7 @@ import 'package:programming_sns/core/realtime_event_provider.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:programming_sns/features/user/providers/user_provider.dart';
 
 final textEditingControllerProvider = Provider<Map<String, TextEditingController>>((ref) {
   return {};
@@ -34,24 +34,24 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
     final initialMessageList = await getMessages();
 
-    final chatUsers = await getChatUsers();
+    // final chatUsers = await getChatUsers();
 
     firstMessageId = await getFirstMessageId();
 
     return ChatController(
       initialMessageList: initialMessageList,
       scrollController: ScrollController(),
-      chatUsers: chatUsers,
+      chatUsers: [],
     );
   }
 
   /// ユーザーリスト取得し、チャットユーザーリストに変換
-  Future<List<ChatUser>> getChatUsers() async {
-    return await ref
-        .read(userProvider.notifier)
-        .getAllList(chatRoomId: arg)
-        .then((users) => users.map((user) => UserModel.toChatUser(user)).toList());
-  }
+  // Future<List<ChatUser>> getChatUsers() async {
+  //   return await ref
+  //       .read(userProvider.notifier)
+  //       .getAllList(chatRoomId: arg)
+  //       .then((users) => users.map((user) => UserModel.toChatUser(user)).toList());
+  // }
 
   /// メッセージ一覧取得
   /// FIXME state.valueではない値を返したいためfutureGuard使えない

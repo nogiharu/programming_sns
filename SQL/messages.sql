@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS
         -- リアクションしたユーザーID
         reacted_user_ids UUID[],
         -- 消されたか
-        is_deleted BOOL DEFAULT FALSE NOT NULL,
+        is_deleted BOOL DEFAULT FALSE,
         -- レコード作成日時を設定 (UTCタイムゾーンで現在時刻)
         created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE ('utc'::TEXT, NOW()) NOT NULL,
         -- レコード更新日時を設定 (UTCタイムゾーンで現在時刻)

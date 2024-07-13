@@ -10,11 +10,11 @@ import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/constants/appwrite_constants.dart';
 import 'package:programming_sns/core/realtime_event_provider.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
-import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/chat/screens/old/chat_screen.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
 import 'package:programming_sns/features/notification/screens/notification_screen.dart';
-import 'package:programming_sns/features/user/models/user_model.dart';
-import 'package:programming_sns/features/user/providers/user_model_provider.dart';
+import 'package:programming_sns/features/user/models/user_model2.dart';
+import 'package:programming_sns/features/user/providers/user_provider.dart';
 import 'package:programming_sns/routes/router.dart';
 
 final notificationListProvider =
@@ -37,7 +37,7 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
     /// 最初のデータ取得
     final firstList = await _notificationAPI.getList(
       queries: [
-        Query.equal('userDocumentId', _currentUser.documentId),
+        Query.equal('userDocumentId', _currentUser.id),
         Query.orderAsc('createdAt'),
         Query.limit(1),
       ],
@@ -81,7 +81,7 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
 
   Future<List<NotificationModel>> getAllList({String? nextPagenationId}) async {
     final queries = [
-      Query.equal('userDocumentId', _currentUser.documentId),
+      Query.equal('userDocumentId', _currentUser.id),
       Query.orderDesc('createdAt'),
     ];
 
@@ -115,7 +115,7 @@ class NotificationListNotifier extends AutoDisposeAsyncNotifier<List<Notificatio
   /// メンションイベント
   void _createStateEvent(RealtimeMessage event) {
     update((data) {
-      if (event.payload['userDocumentId'] == _currentUser.documentId) {
+      if (event.payload['userDocumentId'] == _currentUser.id) {
         final notification = NotificationModel.fromMap(event.payload);
         data.insert(0, notification);
 

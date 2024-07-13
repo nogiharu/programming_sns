@@ -18,7 +18,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
                 .from('users')
                 .select()
                 .eq('id', auth.id)
-                .then((result) => UserModel.fromMap(result[0]))
+                .then((v) => UserModel.fromMap(v[0]))
                 .catchErrorEX();
           },
           orElse: () => UserModel.instance(),
@@ -26,7 +26,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   }
 
   /// ユーザー更新
-  Future<UserModel> updateState(UserModel userModel) async {
+  Future<UserModel> upsertState(UserModel userModel) async {
     return await asyncGuard(
       () async {
         // SQL
@@ -34,7 +34,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
             .from('users')
             .upsert(userModel.toMap())
             .select()
-            .then((result) => UserModel.fromMap(result[0]));
+            .then((v) => UserModel.fromMap(v[0]));
       },
     );
   }

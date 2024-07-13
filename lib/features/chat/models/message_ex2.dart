@@ -1,5 +1,4 @@
 import 'package:chatview/chatview.dart';
-import 'package:programming_sns/enums/message_status_ex.dart';
 import 'package:programming_sns/enums/message_type_ex.dart';
 
 extension MessageEX on Message {
@@ -14,7 +13,7 @@ extension MessageEX on Message {
     result.addAll({'message_type': messageType.toString()});
     result.addAll({'reactions': reaction.reactions});
     result.addAll({'reacted_user_ids': reaction.reactedUserIds});
-    result.addAll({'is_deleted': isDeleted});
+    result.addAll({'is_deleted': isDeleted ?? false});
 
     return result;
   }
@@ -33,13 +32,14 @@ extension MessageEX on Message {
       isDeleted: map['is_deleted'] ?? false,
       createdAt: DateTime.parse(map['created_at']).toLocal(),
       updatedAt: DateTime.parse(map['updated_at']).toLocal(),
-      replyMessage: ReplyMessage(
-        messageId: map['message_id'],
-        replyBy: map['reply_by_user_id'],
-        replyTo: map['send_by_user_id'],
-        message: map['reply_message'] ?? '',
-        messageType: (map['reply_message_type'] as String).messageTypeToEnum(),
-      ),
+      replyMessage: const ReplyMessage(),
+      // ReplyMessage(
+      //   messageId: map['message_id'] ?? '',
+      //   replyBy: map['reply_by_user_id'] ?? '',
+      //   replyTo: map['send_by_user_id'] ?? '',
+      //   message: map['reply_message'] ?? '',
+      //   messageType: (map['reply_message_type'] as String).messageTypeToEnum(),
+      // ),
       status: MessageStatus.read,
     );
   }
