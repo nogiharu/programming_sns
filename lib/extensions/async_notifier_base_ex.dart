@@ -69,6 +69,6 @@ extension AsyncNotifierBaseEX<T> on AsyncNotifierBase<T> {
 
     // reslutがnullの場合(Rがvoid、スローされた時)もあるため、prevStateを入れておく
     // 戻りの型をR?にすればいいだけの話だが、使う側が毎回nullチェックするのは面倒なので、以下を実施しておく
-    return reslut ??= prevState.requireValue;
+    return reslut ?? prevState.requireValue;
   }
 }
