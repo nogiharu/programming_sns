@@ -2,142 +2,127 @@
 
 import 'package:chatview/chatview.dart';
 import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
 
 class UserModel {
-  final String documentId;
+  final String id;
 
   final String name;
 
-  final String profilePhoto;
+  final String? profilePhoto;
 
   final DateTime createdAt;
 
   final DateTime updatedAt;
 
-  final String password;
-
   /// ユーザが変えられるID　メンションに使用
-  final String userId;
-
-  final bool isAnonymous;
-
-  List<String>? chatRoomIds;
+  final String mentionId;
 
   final bool isDeleted;
 
+  List<String>? chatRoomIds;
+
   UserModel({
-    required this.documentId,
+    required this.id,
     required this.name,
     required this.profilePhoto,
     required this.createdAt,
     required this.updatedAt,
-    required this.password,
-    required this.userId,
-    required this.isAnonymous,
-    this.chatRoomIds,
+    required this.mentionId,
     required this.isDeleted,
+    this.chatRoomIds,
   });
 
   UserModel copyWith({
-    String? documentId,
+    String? id,
     String? name,
     String? profilePhoto,
     DateTime? createdAt,
     DateTime? updatedAt,
-    String? password,
     String? userId,
-    bool? isAnonymous,
-    List<String>? chatRoomIds,
     bool? isDeleted,
+    List<String>? chatRoomIds,
   }) {
     return UserModel(
-      documentId: documentId ?? this.documentId,
+      id: id ?? this.id,
       name: name ?? this.name,
       profilePhoto: profilePhoto ?? this.profilePhoto,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      password: password ?? this.password,
-      userId: userId ?? this.userId,
-      isAnonymous: isAnonymous ?? this.isAnonymous,
-      chatRoomIds: chatRoomIds ?? this.chatRoomIds,
+      mentionId: userId ?? mentionId,
       isDeleted: isDeleted ?? this.isDeleted,
+      chatRoomIds: chatRoomIds ?? this.chatRoomIds,
     );
   }
 
   Map<String, dynamic> toMap() {
     final result = <String, dynamic>{};
 
+    result.addAll({'id': id});
     result.addAll({'name': name});
-    result.addAll({'createdAt': createdAt.millisecondsSinceEpoch});
-    result.addAll({'updatedAt': updatedAt.millisecondsSinceEpoch});
-    result.addAll({'profilePhoto': profilePhoto});
+    result.addAll({'profile_photo': profilePhoto});
 
-    result.addAll({'password': password});
-    result.addAll({'userId': userId});
+    result.addAll({'mention_id': mentionId});
 
-    result.addAll({'isAnonymous': isAnonymous});
+    result.addAll({'is_deleted': isDeleted});
+
     if (chatRoomIds != null) {
-      result.addAll({'chatRoomIds': chatRoomIds});
+      result.addAll({'chat_room_ids': chatRoomIds});
     }
-    result.addAll({'isDeleted': isDeleted});
+    result.addAll({'updated_at': DateTime.now().toString()});
 
     return result;
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      documentId: map['\$id'] ?? '',
-      name: map['name'] ?? '',
-      profilePhoto: map['profilePhoto'] ?? '',
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt']),
-      password: map['password'] ?? '',
-      userId: map['userId'] ?? '',
-      isAnonymous: map['isAnonymous'] ?? true,
-      chatRoomIds: List<String>.from(map['chatRoomIds']),
-      isDeleted: map['isDeleted'] ?? false,
+      id: map['id'],
+      name: map['name'],
+      profilePhoto: map['profile_photo'],
+      createdAt: DateTime.parse(map['created_at']).toLocal(),
+      updatedAt: DateTime.parse(map['updated_at']).toLocal(),
+      mentionId: map['mention_id'],
+      isDeleted: map['is_deleted'],
+      chatRoomIds: List<String>.from(map['chat_room_ids'] ?? []),
     );
   }
 
   @override
   String toString() =>
-      'UserModel(id: $documentId, name: $name, profilePhoto: $profilePhoto, createdAt: $createdAt, updatedAt: $updatedAt, password: $password, userId: $userId, isAnonymous: $isAnonymous   chatRoomIds: $chatRoomIds isDeleted: $isDeleted )';
+      'UserModel(id: $id, name: $name, profilePhoto: $profilePhoto, createdAt: $createdAt, updatedAt: $updatedAt, mentionId: $mentionId, isDeleted: $isDeleted chatRoomIds: $chatRoomIds )';
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
     return other is UserModel &&
-        other.documentId == documentId &&
+        other.id == id &&
         other.name == name &&
         other.profilePhoto == profilePhoto &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
-        other.password == password &&
-        other.userId == userId &&
-        other.isAnonymous == isAnonymous &&
+        other.mentionId == mentionId &&
         listEquals(other.chatRoomIds, chatRoomIds) &&
         other.isDeleted == isDeleted;
   }
 
   @override
   int get hashCode =>
-      documentId.hashCode ^
+      id.hashCode ^
       name.hashCode ^
       profilePhoto.hashCode ^
       createdAt.hashCode ^
       updatedAt.hashCode ^
-      password.hashCode ^
-      userId.hashCode ^
-      isAnonymous.hashCode ^
+      mentionId.hashCode ^
       chatRoomIds.hashCode ^
       isDeleted.hashCode;
 
   factory UserModel.instance({
-    String? documentId,
+    String? id,
     String? name,
     String? profilePhoto,
     DateTime? updatedAt,
+    DateTime? createdAt,
     String? password,
     String? userId,
     bool? isAnonymous,
@@ -145,26 +130,24 @@ class UserModel {
     bool? isDeleted,
   }) {
     return UserModel(
-      documentId: documentId ?? '',
+      id: id ?? '',
       name: name ?? '名前はまだない',
       profilePhoto:
           "https://raw.githubusercontent.com/SimformSolutionsPvtLtd/flutter_showcaseview/master/example/assets/simform.png",
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      password: password ?? '',
-      userId: userId ?? documentId ?? '',
-      isAnonymous: isAnonymous ?? true,
-      chatRoomIds: chatRoomIds ?? [],
+      createdAt: createdAt ?? DateTime.now(),
+      updatedAt: updatedAt ?? DateTime.now(),
+      mentionId: userId ?? '',
       isDeleted: isDeleted ?? false,
+      chatRoomIds: chatRoomIds ?? [],
     );
   }
 
   static ChatUser toChatUser(UserModel userModel) {
     return ChatUser(
-      id: userModel.documentId,
+      id: userModel.id,
       name: userModel.name,
       profilePhoto: userModel.profilePhoto,
-      userId: userModel.userId,
+      mentionId: userModel.mentionId,
     );
   }
 }

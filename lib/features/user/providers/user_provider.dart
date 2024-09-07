@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/common/constans.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
-import 'package:programming_sns/features/auth/providers/auth_provider2.dart';
-import 'package:programming_sns/features/user/models/user_model2.dart';
+import 'package:programming_sns/features/auth/providers/auth_provider.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
 
 final userProvider = AsyncNotifierProvider<UserModelNotifier, UserModel>(UserModelNotifier.new);
 
@@ -13,7 +13,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   FutureOr<UserModel> build() async {
     return ref.watch(authProvider).maybeWhen(
           data: (auth) async {
-            // SQL
+            // TODO StreamNotifierにしてリアルタイムに返してupsertStateをvoidにするか検討必要
             return await supabase
                 .from('users')
                 .select()

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/utils.dart';
-import 'package:programming_sns/features/auth/providers/auth_provider2.dart';
+import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/auth/widgets/auth_field.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
 
@@ -24,6 +24,13 @@ class _AuthUpdateScreenState extends ConsumerState<AuthUpdateScreen> {
   String errorMessage = '';
 
   @override
+  void initState() {
+    userIdController.text = ref.read(userProvider).value?.mentionId ?? '';
+    passwordController.text = ref.read(authProvider).value?.userMetadata?['password'] ?? '';
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final userModel = ref.watch(userProvider).value;
     if (userModel == null) {
@@ -31,8 +38,6 @@ class _AuthUpdateScreenState extends ConsumerState<AuthUpdateScreen> {
         child: CircularProgressIndicator(),
       );
     }
-
-    userIdController.text = userModel.userId;
 
     return Scaffold(
         appBar: AppBar(
@@ -55,6 +60,7 @@ class _AuthUpdateScreenState extends ConsumerState<AuthUpdateScreen> {
                 controller: passwordController,
                 hintText: 'パスワードは日本語以外で半角で8桁以上で入れてね(^^)',
               ),
+              const SizedBox(height: 10),
               Align(
                 alignment: Alignment.topRight,
                 child: ElevatedButton(

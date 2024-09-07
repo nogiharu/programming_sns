@@ -2,11 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/auth/providers/auth_provider2.dart';
+import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/auth/screens/auth_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
-import 'package:programming_sns/test_tool/test_tool.dart';
+import 'package:programming_sns/features/user/providers/user_provider.dart';
 
 class UserScreen extends ConsumerWidget {
   const UserScreen({super.key});
@@ -24,13 +24,16 @@ class UserScreen extends ConsumerWidget {
         title: const Text('ホーム'),
       ),
       body: ref.watchEX(
-        authProvider,
+        userProvider,
         complete: (data) {
+          final auth = ref.read(authProvider).value;
+          // TODO watchEXを使うとエラー時SignupScreenでもダイアログが出てしまう
+          if (auth == null) return const Center(child: CircularProgressIndicator());
+
           return Center(
             child: Column(
               children: [
-                // const TestToolcreen(),
-                if (data.userMetadata?['is_anonymous'] as bool) ...[
+                if (auth.userMetadata!['is_anonymous'] as bool) ...[
                   Tooltip(
                     message: '登録をお勧めするよ(*^_^*)',
                     child: ElevatedButton(
@@ -60,8 +63,8 @@ class UserScreen extends ConsumerWidget {
                     child: const Text(
                       'アカウント更新',
                     ),
-                  ),
-                ]
+                  )
+                ],
               ],
             ),
           );

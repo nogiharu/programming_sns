@@ -1,55 +1,84 @@
 import 'package:chatview/chatview.dart';
-import 'package:programming_sns/enums/message_status_ex.dart';
 import 'package:programming_sns/enums/message_type_ex.dart';
 
 extension MessageEX on Message {
   Map<String, dynamic> toMap() {
     final result = <String, dynamic>{};
+    if (id != null) {
+      result.addAll({'id': id});
+    }
 
+    result.addAll({'send_by_user_id': sendBy});
+    result.addAll({'chat_room_id': chatRoomId});
     result.addAll({'message': message});
-    result.addAll({'createdAt': createdAt.millisecondsSinceEpoch});
-    result.addAll({'sendByUserId': sendBy});
-    result.addAll({'messageType': messageType.toString()});
-    result.addAll({'reactions': reaction.reactions});
-    result.addAll({'reactedUserIds': reaction.reactedUserIds});
-    result.addAll({'replyByUserId': replyMessage.replyBy});
-    result.addAll({'replyToUserId': replyMessage.replyTo});
-    result.addAll({'replyMessageType': replyMessage.messageType.toString()});
-    result.addAll({'replyMessageId': replyMessage.messageId});
-    result.addAll({'replyMessage': replyMessage.message});
-    result.addAll({'status': status.toString()});
-    result.addAll({'chatRoomId': chatRoomId});
-    result.addAll({'updatedAt': updatedAt!.millisecondsSinceEpoch});
-    result.addAll({'isDeleted': isDeleted});
+    result.addAll({'message_type': messageType.toString()});
+    result.addAll({'is_deleted': isDeleted ?? false});
+    result.addAll({'updated_at': DateTime.now().toUtc().toIso8601String()});
+    result.addAll({'created_at': createdAt.toUtc().toIso8601String()});
+
+    if (reaction.reactedUserIds.isEmpty) {
+      result.addAll({'reactions': null});
+    } else {
+      List.generate(reaction.reactedUserIds.length, (index) {
+        result.addAll({
+          'reactions': {reaction.reactedUserIds[index]: reaction.reactions[index]}
+        });
+      });
+    }
+
+    if (replyMessage.messageId.isNotEmpty) {
+      result.addAll({
+        'reply_to': {
+          'message_id': replyMessage.messageId,
+          'user_id': replyMessage.replyTo,
+          'message_type': replyMessage.messageType.toString(),
+          'message': replyMessage.message
+        }
+      });
+    }
 
     return result;
   }
 
   static Message fromMap(Map<String, dynamic> map) {
+    List<String> reactions = [];
+    List<String> reactedUserIds = [];
+
+    if (map['reactions'] is Map<String, dynamic>) {
+      (map['reactions'] as Map<String, dynamic>).forEach((k, v) {
+        reactedUserIds.add(k);
+        reactions.add(v);
+      });
+    }
+
+    ReplyMessage replyMessage = const ReplyMessage();
+    if (map['reply_to'] is Map<String, dynamic>) {
+      replyMessage = ReplyMessage(
+        messageId: map['reply_to']['message_id'] ?? '',
+        replyTo: map['reply_to']['user_id'] ?? '',
+        message: map['reply_to']['message'] ?? '',
+        messageType: map['reply_to']['message_type'] != null
+            ? (map['message_type'] as String).messageTypeToEnum()
+            : MessageType.text,
+        replyBy: map['send_by_user_id'] ?? '',
+      );
+    }
+
     return Message(
-      id: map['\$id'] ?? '',
+      id: map['id'] ?? '',
+      sendBy: map['send_by_user_id'],
+      chatRoomId: map['chat_room_id'] ?? '',
       message: map['message'] ?? '',
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      // createdAt: DateTime.parse(map['\$createdAt']),
-      sendBy: map['sendByUserId'],
-      messageType: (map['messageType'] as String).messageTypeToEnum(),
+      messageType: (map['message_type'] as String).messageTypeToEnum(),
       reaction: Reaction(
-        reactions: List<String>.from(map['reactions']),
-        reactedUserIds: List<String>.from(map['reactedUserIds']),
+        reactions: reactions,
+        reactedUserIds: reactedUserIds,
       ),
-      replyMessage: ReplyMessage(
-        replyBy: map['replyByUserId'],
-        replyTo: map['replyToUserId'],
-        messageType: (map['replyMessageType'] as String).messageTypeToEnum(),
-        messageId: map['replyMessageId'],
-        message: map['replyMessage'] ?? '',
-      ),
-      status: (map['status'] as String).messageStatusToEnum(),
-      chatRoomId: map['chatRoomId'] ?? '',
-      updatedAt: map['updatedAt'] != null // FIXME
-          ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'])
-          : DateTime.now(),
-      isDeleted: map['isDeleted'] ?? false,
+      isDeleted: map['is_deleted'] ?? false,
+      createdAt: DateTime.parse(map['created_at']).toLocal(),
+      updatedAt: DateTime.parse(map['updated_at']).toLocal(),
+      replyMessage: replyMessage,
+      status: MessageStatus.read,
     );
   }
 
@@ -65,6 +94,7 @@ extension MessageEX on Message {
     String? chatRoomId,
     DateTime? updatedAt,
     bool? isDeleted,
+    MessageStatus? status,
   }) {
     return Message(
       id: id ?? this.id,
@@ -78,6 +108,7 @@ extension MessageEX on Message {
       chatRoomId: chatRoomId ?? this.chatRoomId,
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
+      status: status ?? this.status,
     );
   }
 }

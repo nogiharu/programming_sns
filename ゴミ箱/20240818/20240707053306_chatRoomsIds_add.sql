@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS
         -- ユーザーIDを主キーとして設定 (authIDと同じ)
         id UUID NOT NULL PRIMARY KEY,
         -- ユーザーID メンションやログインに使用。変更可
-        mention_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
         -- ユーザー名
         NAME VARCHAR NOT NULL DEFAULT '名前はまだない',
         -- レコード作成日時を設定 (UTCタイムゾーンで現在時刻)  
@@ -28,7 +28,7 @@ COMMENT ON TABLE public.users IS 'ユーザー名などのユーザー情報を�
 ------------------------【カラムにコメントを追加】------------------------
 COMMENT ON COLUMN public.users.id IS '固有ID';
 
-COMMENT ON COLUMN public.users.mention_id IS 'メンションやログインに使用。変更可';
+COMMENT ON COLUMN public.users.user_id IS 'メンションやログインに使用。変更可';
 
 COMMENT ON COLUMN public.users.name IS '名前';
 
@@ -43,7 +43,7 @@ COMMENT ON COLUMN public.users.created_at IS 'レコード作成日時';
 COMMENT ON COLUMN public.users.updated_at IS 'レコード更新日時';
 
 ------------------------【インデックスの追加】------------------------
-CREATE INDEX idx_users_mention_id ON public.users (mention_id);
+CREATE INDEX idx_users_user_id ON public.users (user_id);
 
 ------------------------【関数の追加】------------------------
 -- DROP TRIGGER IF EXISTS before_user_trigger;
@@ -70,3 +70,26 @@ CREATE
 OR REPLACE TRIGGER before_users_trigger BEFORE
 UPDATE ON public.users FOR EACH ROW
 EXECUTE FUNCTION before_users ();
+
+------------------------【AFTERトリガー】------------------------
+-- 操作を処理するトリガー関数
+CREATE
+OR REPLACE FUNCTION after_messages () RETURNS TRIGGER AS $$
+BEGIN
+    ------------------------【INSERTトリガー】------------------------
+    IF TG_OP = 'INSERT' THEN
+        -- チャットルームの日付も更新
+        UPDATE public.chat_rooms
+        SET updated_at = TIMEZONE('utc', NOW())
+        WHERE id = NEW.chat_room_id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- トリガー追加
+CREATE
+OR REPLACE TRIGGER after_messages_trigger
+AFTER INSERT ON public.messages FOR EACH ROW
+EXECUTE FUNCTION after_messages ();

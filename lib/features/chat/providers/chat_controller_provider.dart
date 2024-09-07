@@ -5,15 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/common/constans.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
-import 'package:programming_sns/features/chat/models/message_ex2.dart';
-import 'package:programming_sns/features/user/models/user_model2.dart';
+import 'package:programming_sns/features/chat/models/chat_room_model.dart';
+import 'package:programming_sns/features/chat/models/message_ex.dart';
+import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:collection/src/iterable_extensions.dart';
 
-final textEditingControllerProvider = Provider<Map<String, TextEditingController>>((ref) {
-  return {};
-});
-
-final chatControllerProvider2 =
+final chatControllerProvider =
     AutoDisposeAsyncNotifierProviderFamily<ChatControllerNotifier, ChatController, String>(
   ChatControllerNotifier.new,
 );
@@ -64,8 +63,15 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
 
   /// チャットユーザー取得
   Future<List<ChatUser>> getChatUsers() async {
-    return await supabase.from('users').select().contains('chat_room_ids', [arg]).then(
-        (v) => v.map((e) => UserModel.toChatUser(UserModel.fromMap(e))).toList());
+    ChatRoomModel? chatRoom = ref.read(chatRoomsProvider).value?.firstWhere((e) => e.id == arg);
+
+    chatRoom ??= await ref.read(chatRoomsProvider.notifier).getChatRoom(arg);
+
+    return await supabase
+        .from('users')
+        .select()
+        .inFilter('id', chatRoom.memberUserIds)
+        .then((v) => v.map((e) => UserModel.toChatUser(UserModel.fromMap(e))).toList());
   }
 
   /// メッセージ一覧取得
@@ -74,10 +80,31 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
         .from('messages')
         .select()
         .eq('chat_room_id', arg)
-        .order('updated_at')
+        .order('created_at')
         .limit(25)
         .then((v) => v.reversed.map((e) => MessageEX.fromMap(e)).toList())
         .catchErrorEX();
+  }
+
+  /// ページネーション
+  Future<List<Message>> getNextMessages() async {
+    final messageList = state.value!.initialMessageList;
+
+    return asyncGuard(
+      () async {
+        return await supabase
+            .from('messages')
+            .select()
+            .eq('chat_room_id', arg)
+            .range(messageList.length, messageList.length + 25)
+            .order('created_at')
+            .limit(25)
+            .then((v) => v.reversed.map((e) => MessageEX.fromMap(e)).toList())
+            .catchErrorEX();
+      },
+      isLoading: false,
+      isValueUpdate: false,
+    );
   }
 
   /// リアルタイムイベント
@@ -88,51 +115,26 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
         .onPostgresChanges(
             event: PostgresChangeEvent.all,
             table: 'messages',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'chat_room_id',
+              value: arg,
+            ),
             callback: (payload) {
               update(
                 (data) {
-                  final newData = MessageEX.fromMap(payload.newRecord);
+                  Message newData = MessageEX.fromMap(payload.newRecord);
                   // 【INSERTイベント】
                   if (PostgresChangeEvent.insert == payload.eventType) {
-                    data.addMessage(newData);
-                    debugPrint('MESSAGE_CREATE!');
+                    data.initialMessageList.add(newData);
+                    debugPrint('【INSERT:メッセージ】');
                   }
                   // 【UPDATEイベント】
                   else if (PostgresChangeEvent.update == payload.eventType) {
                     final index = data.initialMessageList.indexWhere((e) => e.id == newData.id);
                     if (index != -1) data.initialMessageList[index] = newData;
-                    debugPrint('MESSAGE_UPDATE!');
+                    debugPrint('【UPDATE:メッセージ】');
                   }
-
-                  return data;
-                },
-              );
-            })
-        .subscribe();
-
-    // 【ユーザーテーブル】
-    supabase
-        .channel('public:users')
-        .onPostgresChanges(
-            event: PostgresChangeEvent.all,
-            table: 'users',
-            callback: (payload) {
-              update(
-                (data) {
-                  // 【UPDATEイベント】
-                  if (PostgresChangeEvent.update == payload.eventType) {
-                    final chatUser = UserModel.toChatUser(UserModel.fromMap(payload.newRecord));
-                    final index = data.chatUsers.indexWhere((e) => e.id == chatUser.id);
-                    // ユーザがいない場合は追加
-                    if (index == -1) {
-                      data.chatUsers.add(chatUser);
-                    } else {
-                      // 更新
-                      data.chatUsers[index] = chatUser;
-                    }
-                    debugPrint('USER_UPDATE!');
-                  }
-
                   return data;
                 },
               );

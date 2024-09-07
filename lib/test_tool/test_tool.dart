@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:programming_sns/common/constans.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/auth/providers/auth_provider2.dart';
+import 'package:programming_sns/features/auth/providers/auth_provider.dart';
+import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart';
-import 'package:programming_sns/features/chat/providers/old/messages_provider.dart';
+import 'package:programming_sns/features/notification/models/notification_model.dart';
+import 'package:programming_sns/features/notification/providers/notifications_provider.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -47,9 +49,6 @@ class TestToolcreen extends ConsumerWidget {
                         chatRoomId: aa[0].id,
                         updatedAt: DateTime.now(),
                       );
-
-                      final a =
-                          await ref.read(messagesProvider(aa[0].id!).notifier).upsertState(msg);
                     } catch (e) {
                       print(e);
                     }
@@ -60,19 +59,17 @@ class TestToolcreen extends ConsumerWidget {
                 ElevatedButton(
                   onPressed: () async {
                     try {
-                      var uuid = const Uuid();
-                      String newId = uuid.v4();
-                      var count = await supabase.from('users').count();
-                      // // print(newId);
-                      // print(count);
-                      final aa = await supabase.auth.signUp(
-                        email: '${newId.substring(0, 8) + count.toString()}@gmail.com',
-                        // email: '${newId.substring(0, 8)}@gmail.com',
-                        password: newId,
-                        data: {'is_anonymous': true, 'password': newId},
+                      final count = await supabase.from('users').count();
+                      final uuid = const Uuid().v4();
+                      final newUserId = uuid.substring(0, 8) + count.toString();
+                      print('来たかな？１');
+                      final result = await supabase.auth.signUp(
+                        email: '$newUserId@email.com',
+                        password: uuid,
+                        data: {'is_anonymous': true, 'password': uuid, 'userId': newUserId},
                       );
 
-                      print(aa.user);
+                      print(result.user);
                     } catch (e) {
                       print(e);
                     }
@@ -142,7 +139,58 @@ class TestToolcreen extends ConsumerWidget {
                       ],
                     );
                   },
-                )
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final user = ref.read(userProvider).requireValue;
+                    String name = user.name;
+                    if (name == '名前はまだない') {
+                      name = '佐々木';
+                    } else if (name == '佐々木') {
+                      name = 'チコリータ';
+                    } else if (name == 'チコリータ') {
+                      name = '伊藤';
+                    } else if (name == '伊藤') {
+                      name = '谷口';
+                    } else if (name == '谷口') {
+                      name = 'エンジニア';
+                    } else if (name == 'エンジニア') {
+                      name = '矢島';
+                    } else if (name == '矢島') {
+                      name = '安藤';
+                    } else if (name == '安藤') {
+                      name = 'ヨモギ';
+                    } else if (name == 'ヨモギ') {
+                      name = '深夜';
+                    } else if (name == '深夜') {
+                      name = 'シェリルノーム';
+                    } else if (name == 'シェリルノーム') {
+                      name = '名前はまだない';
+                    }
+
+                    await ref.read(userProvider.notifier).upsertState(user.copyWith(name: name));
+                  },
+                  child: const Text('名前変更'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    print(ref.read(userProvider).value!.id);
+                    await ref
+                        .read(notificationsProvider.notifier)
+                        .upsertState(NotificationModel.instance(
+                          userId: ref.read(userProvider).value!.id,
+                          chatRoomId: ref.read(userProvider).value!.id,
+                        ));
+                  },
+                  child: const Text('通知'),
+                ),
+                ref.watchEX(
+                  userProvider,
+                  complete: (p0) {
+                    return Text(p0.name);
+                  },
+                ),
               ],
             ),
           ),

@@ -4,13 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/common/constans.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
-import 'package:programming_sns/features/chat/models/chat_room_model2.dart';
+import 'package:programming_sns/features/chat/models/chat_room_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final chatRoomsProvider =
-    AutoDisposeAsyncNotifierProvider<ChatRoomsNotifier, List<ChatRoomModel>>(ChatRoomsNotifier.new);
+    AsyncNotifierProvider<ChatRoomsNotifier, List<ChatRoomModel>>(ChatRoomsNotifier.new);
 
-class ChatRoomsNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
+class ChatRoomsNotifier extends AsyncNotifier<List<ChatRoomModel>> {
   /// 最初のレコードid
   /// ページネーションで使用
   String firstId = '';
@@ -22,7 +22,7 @@ class ChatRoomsNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
       firstId = await supabase
           .from('chat_rooms')
           .select('id')
-          .order('created_at', ascending: true)
+          .order('updated_at', ascending: true)
           .limit(1)
           .then((v) => v.firstOrNull?['id'] ?? '')
           .catchErrorEX();
@@ -36,8 +36,17 @@ class ChatRoomsNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
         .from('chat_rooms')
         .select()
         .order('updated_at')
-        .limit(5)
+        .limit(25)
         .then((v) => v.map((e) => ChatRoomModel.fromMap(e)).toList())
+        .catchErrorEX();
+  }
+
+  Future<ChatRoomModel> getChatRoom(String id) async {
+    return await supabase
+        .from('chat_rooms')
+        .select()
+        .eq('id', id)
+        .then((v) => ChatRoomModel.fromMap(v[0]))
         .catchErrorEX();
   }
 
@@ -55,15 +64,19 @@ class ChatRoomsNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
                   // 【INSERTイベント】
                   if (PostgresChangeEvent.insert == payload.eventType) {
                     data.insert(0, newData);
-                    debugPrint('【INSERT:CHAT_ROOM】');
+                    debugPrint('【INSERT:チャットルーム】');
                   }
                   // 【UPDATEイベント】
                   else if (PostgresChangeEvent.update == payload.eventType) {
+                    // 更新データを一番上に移動
                     final index = data.indexWhere((e) => e.id == newData.id);
-                    if (index != -1) data[index] = newData;
-                    debugPrint('【UPDATE:CHAT_ROOM】');
+                    if (index != -1) {
+                      data
+                        ..removeAt(index)
+                        ..insert(0, newData);
+                    }
+                    debugPrint('【UPDATE:チャットルーム】');
                   }
-
                   return data;
                 },
               );
@@ -72,7 +85,7 @@ class ChatRoomsNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
   }
 
   /// ページネーション
-  Future<void> pagination({int limit = 2}) async {
+  Future<void> pagination({int limit = 25}) async {
     final chatRooms = state.requireValue;
     if (chatRooms.isEmpty || chatRooms.last.id == firstId) return;
 
@@ -88,7 +101,6 @@ class ChatRoomsNotifier extends AutoDisposeAsyncNotifier<List<ChatRoomModel>> {
 
         chatRooms.addAll(result);
       },
-      isLoading: false,
     );
   }
 

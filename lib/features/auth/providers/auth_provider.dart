@@ -19,28 +19,32 @@ class AuthNotifier extends AsyncNotifier<User> {
     // ref.watch(authChangeStateProvider);
     // await supabase.auth.refreshSession();
 
-    // あればそのまま返す
-    if (supabase.auth.currentUser != null) return supabase.auth.currentUser!;
-
     try {
+      // あればそのまま返す
+      if (supabase.auth.currentUser?.id != null) {
+        final result =
+            await supabase.from('users').select().eq('id', supabase.auth.currentUser!.id);
+
+        if (result.isNotEmpty) return supabase.auth.currentUser!;
+      }
+
       final count = await supabase.from('users').count();
       final uuid = const Uuid().v4();
       final newUserId = uuid.substring(0, 8) + count.toString();
 
-      final res = await supabase.auth.signUp(
+      final result = await supabase.auth.signUp(
         email: '$newUserId@email.com',
         password: uuid,
         data: {'is_anonymous': true, 'password': uuid, 'userId': newUserId},
       );
-
-      return res.session!.user;
+      return result.session!.user;
     } catch (e) {
       throw customError(error: e);
     }
   }
 
   Future<User> login({required String userId, required String password}) async {
-    return await futureGuard(
+    return await asyncGuard(
       () async {
         // ユーザID、パスワードが登録条件を満たしていない場合スロー
         customError(userId: userId, password: password);
@@ -65,7 +69,7 @@ class AuthNotifier extends AsyncNotifier<User> {
   }
 
   Future<User> register({required String userId, required String password}) async {
-    return await futureGuard(
+    return await asyncGuard(
       () async {
         // ユーザID、パスワードが登録条件を満たしていない場合スロー
         customError(userId: userId, password: password);

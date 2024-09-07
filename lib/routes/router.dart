@@ -5,9 +5,7 @@ import 'package:programming_sns/common/scaffold_with_navbar.dart';
 import 'package:programming_sns/features/auth/screens/auth_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
 import 'package:programming_sns/features/auth/screens/signup_screen.dart';
-import 'package:programming_sns/features/chat/screens/old/chat_screen.dart';
-import 'package:programming_sns/features/chat/screens/old/chat_screen2.dart';
-import 'package:programming_sns/features/chat/screens/chat_screen3.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/notification/screens/notification_screen.dart';
 import 'package:programming_sns/features/user/screens/user_screen.dart';
@@ -39,7 +37,7 @@ final router = Provider((ref) {
   return GoRouter(
     navigatorKey: ref.read(rootNavigatorKeyProvider),
     // initialLocation: bottomItems.first['path'],
-    initialLocation: TestToolcreen.metaData['path'],
+    initialLocation: UserScreen.metaData['path'],
     routes: [
       ShellRoute(
         navigatorKey: ref.read(shellNavigatorKeyProvider),
@@ -68,12 +66,12 @@ final router = Provider((ref) {
             },
             routes: [
               GoRoute(
-                path: ChatScreen3.path,
+                path: ChatScreen.path,
                 // name: nameは一意出なければならない
                 parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
                 builder: (context, state) {
                   final map = state.extra as Map<String, dynamic>;
-                  return ChatScreen3(
+                  return ChatScreen(
                     label: map['label'],
                     chatRoomId: map['chatRoomId'],
                   );
@@ -164,7 +162,7 @@ final router = Provider((ref) {
         currentBottomMap['index'] = bottomItems.indexWhere((e) => uri == e['path']);
       }
 
-      if (uri.contains(ChatScreen3.path) && state.extra == null) {
+      if (uri.contains(ChatScreen.path) && state.extra == null) {
         return ChatThreadScreen.metaData['path'];
       }
       return null;

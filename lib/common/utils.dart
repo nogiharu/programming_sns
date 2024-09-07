@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:programming_sns/common/error_dialog.dart';
 import 'package:programming_sns/routes/router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -24,45 +23,27 @@ final snackBarProvider = AutoDisposeProvider((ref) {
   };
 });
 
-/// エラーダイアログ
-/// catchError専用
-/// chatScreenでしか使わない
-final showDialogProvider = Provider((ref) {
-  bool isDialogShowing = false;
-  return (e) async {
-    // showDialogが既に表示されている場合、何もしない
-    if (isDialogShowing) return;
-    isDialogShowing = true;
-    // 閉じられるのを待つ
-    await showDialog(
-      context: ref.read(rootNavigatorKeyProvider).currentContext!,
-      builder: (_) => ErrorDialog(error: e),
-    );
-    // ダイアログが閉じられたときにフラグをリセット
-    isDialogShowing = false;
-  };
-});
-
 customError({
   dynamic error,
   String? userId,
   String? password,
 }) {
-  //-------------- 認証系 --------------
-  if ((userId?.isEmpty ?? false) || (password?.isEmpty ?? false)) {
-    throw '入力は必須だよ(>_<)';
-  }
+  if (error == null) {
+    //-------------- 認証系 --------------
+    if ((userId?.isEmpty ?? false) || (password?.isEmpty ?? false)) {
+      throw '入力は必須だよ(>_<)';
+    }
 
-  if (userId != null && !RegExp(r'^[a-zA-Z0-9._]+$').hasMatch(userId)) {
-    throw 'IDに無効な文字が使われてるよ(>_<)';
-  }
+    if (userId != null && !RegExp(r'^[a-zA-Z0-9._]+$').hasMatch(userId)) {
+      throw 'IDに無効な文字が使われてるよ(>_<)';
+    }
 
-  if (password != null && password.length < 8) {
-    throw 'パスワードは８桁以上で入れてね(>_<)';
-  }
+    if (password != null && password.length < 8) {
+      throw 'パスワードは８桁以上で入れてね(>_<)';
+    }
+  } else {
+    debugPrint(error.toString());
 
-  //-------------- API系 --------------
-  if (error != null) {
     //-------------- AuthException系 --------------
     if (error is AuthException) {
       final isRegistered = error.message.contains('email address has already been registered');
@@ -77,10 +58,12 @@ customError({
       final isPasswordSame = error.message.contains('different from the old password');
       if (error.statusCode == '422' && isPasswordSame) throw 'パスワードは前のとは別のにしてね(>_<)';
     }
-    throw error;
+
+    if (error is! Exception) throw error;
     throw '''
       予期せぬエラーだあ(T ^ T)
       再立ち上げしてね(>_<)
+      ${error.toString()}
       ''';
   }
 }

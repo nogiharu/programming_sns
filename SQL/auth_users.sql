@@ -9,7 +9,7 @@ BEGIN
             new_user_id TEXT := SPLIT_PART(NEW.email, '@', 1);
         BEGIN
             -- 新しいユーザーを public.users テーブルに挿入
-            INSERT INTO public.users (id, user_id)
+            INSERT INTO public.users (id, mention_id)
             VALUES (NEW.id, new_user_id);
         END;
     ------------------------【DELETEトリガー】------------------------
@@ -41,11 +41,11 @@ BEGIN
     IF OLD.email_change != NEW.email_change THEN
         -- 新しいユーザーの user_id を生成
         DECLARE
-            new_user_id TEXT := SPLIT_PART(NEW.email_change, '@', 1);
+            new_mention_id TEXT := SPLIT_PART(NEW.email_change, '@', 1);
         BEGIN
             -- 新しいユーザーを public.users テーブルに更新
             UPDATE public.users
-            SET user_id = new_user_id
+            SET mention_id = new_mention_id
             WHERE id = NEW.id;
 
             NEW.email = NEW.email_change;

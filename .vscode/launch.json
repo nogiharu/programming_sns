@@ -5,15 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            // flutter run -d web-server  --web-port=1127 --web-renderer=html --dart-define env=.env.local
             "name": "programming_sns (local mode)",
             "request": "launch",
             "type": "dart",
             "args": [
                 "--web-port",
-                "1129",
+                "1136",
                 "--web-renderer",
                 "html",
-                // "web-server",
+                // "web-server", // ここは排他
                 // "--web-browser-flag",
                 // "--disable-web-security"
                 "--dart-define",

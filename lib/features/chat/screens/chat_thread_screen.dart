@@ -3,10 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/chat/models/chat_room_model2.dart';
+import 'package:programming_sns/features/chat/models/chat_room_model.dart';
 import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart';
-import 'package:programming_sns/features/chat/screens/old/chat_screen2.dart';
-import 'package:programming_sns/features/chat/screens/chat_screen3.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
 
 class ChatThreadScreen extends ConsumerStatefulWidget {
@@ -70,14 +69,13 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                       return GestureDetector(
                         onTap: () {
                           // ルームID追加
-                          if (!userModel.chatRoomIds!.contains(chatRooms[index].id!)) {
-                            userModel.chatRoomIds?.add(chatRooms[index].id!);
-                            // API
-                            ref.read(userProvider.notifier).upsertState(userModel);
+                          if (!chatRooms[index].memberUserIds.contains(userModel.id)) {
+                            chatRooms[index].memberUserIds.add(userModel.id);
+                            ref.read(chatRoomsProvider.notifier).upsertState(chatRooms[index]);
                           }
 
                           // CHAT画面に遷移
-                          context.go('${ChatThreadScreen.metaData['path']}/${ChatScreen3.path}',
+                          context.go('${ChatThreadScreen.metaData['path']}/${ChatScreen.path}',
                               extra: {
                                 'label': chatRooms[index].name,
                                 'chatRoomId': chatRooms[index].id,

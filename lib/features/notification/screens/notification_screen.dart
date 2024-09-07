@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
-import 'package:programming_sns/features/chat/screens/old/chat_screen.dart';
-import 'package:programming_sns/features/notification/providers/notification_list_provider.dart';
+import 'package:programming_sns/features/chat/screens/chat_screen.dart';
+import 'package:programming_sns/features/notification/providers/notifications_provider.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -44,7 +44,7 @@ class NotificationScreen extends ConsumerStatefulWidget {
 class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   final scrollController = ScrollController();
 
-  late final notificationNotifier = ref.read(notificationListProvider.notifier);
+  late final notificationNotifier = ref.read(notificationsProvider.notifier);
 
   @override
   void initState() {
@@ -56,7 +56,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     // await中にスクロールしたくないため消す
     scrollController.removeListener(scrollListener);
     if (MediaQuery.of(context).size.height < scrollController.position.pixels) {
-      await notificationNotifier.addStateList();
+      await notificationNotifier.pagination();
     }
     scrollController.addListener(scrollListener);
   }
@@ -72,13 +72,13 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       body: ref.watchEX(
         userProvider,
         complete: (userModel) => ref.watchEX(
-          notificationListProvider,
-          complete: (notificationModelList) {
+          notificationsProvider,
+          complete: (notifications) {
             return ListView.builder(
               controller: scrollController,
-              itemCount: notificationModelList.length,
+              itemCount: notifications.length,
               itemBuilder: (context, index) {
-                final notification = notificationModelList[index];
+                final notification = notifications[index];
 
                 return GestureDetector(
                   child: Container(
@@ -102,7 +102,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                               style: TextStyle(color: Colors.grey.shade500),
                             ),
                             TextSpan(
-                              text: notification.chatRoomLabel,
+                              text: notification.chatRoomName,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             const TextSpan(text: 'スレッドで'),
@@ -123,7 +123,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                           decoration: const BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(5)),
                           ),
-                          child: MarkdownBuilder(message: notification.text),
+                          child: MarkdownBuilder(message: notification.message),
                         ),
                       ],
                     ),
@@ -134,7 +134,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                         '${NotificationScreen.metadata['path']}/${ChatScreen.path}';
                     // 遷移
                     context.go(chatScreenPath, extra: {
-                      'label': notification.chatRoomLabel,
+                      'label': notification.chatRoomName,
                       'chatRoomId': notification.chatRoomId,
                     });
                     // メンション日付を入れる
