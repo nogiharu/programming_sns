@@ -64,43 +64,12 @@ COMMENT ON COLUMN public.messages.created_at IS 'レコード作成日時を設�
 
 COMMENT ON COLUMN public.messages.updated_at IS 'レコード更新日時を設定 (UTCタイムゾーンで現在時刻)';
 
-------------------------【BEFOREトリガー】------------------------
--- 操作を処理するトリガー関数
-CREATE
-OR REPLACE FUNCTION before_messages () RETURNS TRIGGER AS $$
-BEGIN
-    ------------------------【UPDATEトリガー】------------------------
-    IF TG_OP = 'UPDATE' THEN
-        -- updated_atを自動アップデートを処理する
-        NEW.updated_at = TIMEZONE('utc'::TEXT, NOW());
-    ------------------------【INSERTトリガー】------------------------
-    -- ELSIF TG_OP = 'INSERT' THEN
-
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- トリガー追加
-CREATE
-OR REPLACE TRIGGER before_messages_trigger BEFORE
-UPDATE ON public.messages FOR EACH ROW
-EXECUTE FUNCTION before_messages ();
-
 ------------------------【AFTERトリガー】------------------------
 -- 操作を処理するトリガー関数
 CREATE
 OR REPLACE FUNCTION after_messages () RETURNS TRIGGER AS $$
 BEGIN
     ------------------------【UPDATE OR INSERTトリガー】------------------------
-    -- IF TG_OP = 'INSERT' THEN
-
-
-    -- ELSIF TG_OP = 'UPDATE' THEN
-
-    -- END IF;
-    
         -- チャットルームの日付も更新
         UPDATE public.chat_rooms
         SET updated_at = TIMEZONE('utc', NOW())

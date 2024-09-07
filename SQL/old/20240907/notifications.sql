@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS
         -- ユーザー固有のIDを設定（宛先）
         user_id UUID NOT NULL,
         -- 通知の種類
-        notification_type TEXT NOT NULL,
+        notifications_type TEXT NOT NULL,
         -- 既読したか
         is_read BOOLEAN NOT NULL,
         -- どのメッセージか

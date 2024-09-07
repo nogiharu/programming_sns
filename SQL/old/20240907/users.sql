@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS
         updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT TIMEZONE ('utc'::TEXT, NOW()),
         -- プロフィール写真のパスを保存するカラム
         profile_photo VARCHAR,
+        -- チャットルームID配列（自分が参加している）
+        chat_room_ids UUID[],
         -- 消されたか
         is_deleted BOOL NOT NULL DEFAULT FALSE
     );
@@ -32,6 +34,8 @@ COMMENT ON COLUMN public.users.name IS '名前';
 
 COMMENT ON COLUMN public.users.profile_photo IS 'プロフィール写真のパスを保存するカラム';
 
+COMMENT ON COLUMN public.users.chat_room_ids IS 'チャットルームID配列（自分が参加している）';
+
 COMMENT ON COLUMN public.users.is_deleted IS '削除フラグ (true: 削除済み, false: 未削除)';
 
 COMMENT ON COLUMN public.users.created_at IS 'レコード作成日時';
@@ -40,3 +44,29 @@ COMMENT ON COLUMN public.users.updated_at IS 'レコード更新日時';
 
 ------------------------【インデックスの追加】------------------------
 CREATE INDEX idx_users_mention_id ON public.users (mention_id);
+
+------------------------【関数の追加】------------------------
+-- DROP TRIGGER IF EXISTS before_user_trigger;
+-- DROP FUNCTION IF EXISTS before_user ();
+-- 操作を処理するトリガー関数
+CREATE
+OR REPLACE FUNCTION before_users () RETURNS TRIGGER AS $$
+BEGIN
+    ------------------------【UPDATEトリガー】------------------------
+    IF TG_OP = 'UPDATE' THEN
+        -- updated_atを自動アップデートを処理する
+        NEW.updated_at = TIMEZONE('utc'::TEXT, NOW());
+    ------------------------【INSERTトリガー】------------------------
+    -- ELSIF TG_OP = 'INSERT' THEN
+
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+------------------------【トリガーの追加】------------------------
+CREATE
+OR REPLACE TRIGGER before_users_trigger BEFORE
+UPDATE ON public.users FOR EACH ROW
+EXECUTE FUNCTION before_users ();
