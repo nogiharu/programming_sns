@@ -65,7 +65,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        # ビルドしたウェブアプリをCloudflare Pagesにデプロイ、 環境変数を設定
+        # ビルドしたウェブアプリをCloudflare Pagesにデプロイ、環境変数を設定
 
       - name: デプロイURLをコミットステータスに追加
         uses: actions/github-script@v6
