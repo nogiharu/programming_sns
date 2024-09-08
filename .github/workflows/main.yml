@@ -48,7 +48,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: programming_sns
+          projectName: programming-sns  # ここをCloudflare Pagesの正確なプロジェクト名に変更
           directory: build/web
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
         env:
