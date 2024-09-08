@@ -51,9 +51,7 @@ jobs:
           flutter build web \
             --release \
             --web-renderer html \
-            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-            --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }} \
-            --dart-define=SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}      
+            --dart-define env=.env
         # Flutterプロジェクトをウェブアプリとしてリリースモードでビルド、環境変数を使用
 
       - name: Cloudflare Pagesへのデプロイ
