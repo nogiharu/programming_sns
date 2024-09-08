@@ -17,7 +17,6 @@ jobs:
       - name: Flutter SDKのバージョンを読み取る
         id: flutter_sdk_version
         run: |
-          # .vscode/settings.json からFlutter SDKのバージョンを抽出
           FLUTTER_SDK_VERSION=$(jq -r '.["dart.flutterSdkPath"]' .vscode/settings.json | cut -d'/' -f3)
           echo "FLUTTER_SDK_VERSION=$FLUTTER_SDK_VERSION" >> $GITHUB_OUTPUT
         shell: bash
@@ -28,9 +27,20 @@ jobs:
           flutter-version: ${{ steps.flutter_sdk_version.outputs.FLUTTER_SDK_VERSION }}
         # 指定されたバージョンのFlutter SDKをセットアップ
 
+      - name: .env ファイルの作成
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
+        # 環境変数を.envファイルに書き込む
+
       - name: Webアプリのビルド
-        run: flutter build web
-        # Flutterプロジェクトをウェブアプリとしてビルド
+        run: |
+          flutter build web \
+            --release \
+            --web-renderer html \
+            --dart-define-from-file=.env
+        # Flutterプロジェクトをウェブアプリとしてリリースモードでビルド、環境変数を使用
 
       - name: Cloudflare Pagesへのデプロイ
         id: deploy
@@ -41,7 +51,11 @@ jobs:
           projectName: programming_sns
           directory: build/web
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-        # ビルドしたウェブアプリをCloudflare Pagesにデプロイ
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        # ビルドしたウェブアプリをCloudflare Pagesにデプロイ、環境変数を設定
 
       - name: デプロイURLをコミットステータスに追加
         uses: actions/github-script@v6
