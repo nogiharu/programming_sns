@@ -8,6 +8,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest # Ubuntu の最新バージョンで実行
+    permissions:
+      contents: read
+      deployments: write
+      statuses: write # コミットステータスの書き込み権限を追加
 
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +24,7 @@ jobs:
           FLUTTER_SDK_VERSION=$(jq -r '.["dart.flutterSdkPath"]' .vscode/settings.json | cut -d'/' -f3)
           echo "FLUTTER_SDK_VERSION=$FLUTTER_SDK_VERSION" >> $GITHUB_OUTPUT
         shell: bash
+        # .vscode/settings.json からFlutter SDKのバージョンを抽出
 
       - name: Flutter環境のセットアップ
         uses: subosito/flutter-action@v2
@@ -43,12 +48,12 @@ jobs:
         # Flutterプロジェクトをウェブアプリとしてリリースモードでビルド、環境変数を使用
 
       - name: Cloudflare Pagesへのデプロイ
-        id: deploy
-        uses: cloudflare/pages-action@v1
+        id: cloudflare_pages_deploy
+        uses: cloudflare/pages-action@1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: programming-sns  # ここをCloudflare Pagesの正確なプロジェクト名に変更
+          projectName: programming-sns
           directory: build/web
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
         env:
@@ -68,6 +73,6 @@ jobs:
               description: 'Cloudflare Pagesへのデプロイ',
               state: 'success',
               sha: context.sha,
-              target_url: "${{ steps.deploy.outputs.url }}",
+              target_url: "${{ steps.cloudflare_pages_deploy.outputs.url }}",
             })
         # デプロイされたURLをGitHubのコミットステータスとして追加
