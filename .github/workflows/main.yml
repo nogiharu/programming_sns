@@ -16,7 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         name: リポジトリのコードをチェックアウト
-        # リポジトリのコードをGitHub Actionsの実行環境にクローン
+        with:
+          submodules: 'recursive'  # サブモジュールを再帰的に初期化
+          fetch-depth: 0  # 全履歴をフェッチ
+
+      - name: サブモジュールの更新
+        run: |
+          git submodule update --init --recursive
+          git submodule update --remote
 
       - name: Flutter SDKのバージョンを読み取る
         id: flutter_sdk_version
