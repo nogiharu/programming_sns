@@ -1,0 +1,59 @@
+name: Cloudflare Pages へのデプロイ
+
+on:
+  push:
+    branches:
+      - main # main ブランチへのプッシュ時にトリガー
+
+jobs:
+  デプロイ:
+    runs-on: ubuntu-latest # Ubuntu の最新バージョンで実行
+
+    steps:
+      - uses: actions/checkout@v4
+        name: リポジトリのコードをチェックアウト
+        # リポジトリのコードをGitHub Actionsの実行環境にクローン
+
+      - name: Flutter SDKのバージョンを読み取る
+        id: flutter_sdk_version
+        run: |
+          # .vscode/settings.json からFlutter SDKのバージョンを抽出
+          FLUTTER_SDK_VERSION=$(jq -r '.["dart.flutterSdkPath"]' .vscode/settings.json | cut -d'/' -f3)
+          echo "FLUTTER_SDK_VERSION=$FLUTTER_SDK_VERSION" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Flutter環境のセットアップ
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.flutter_sdk_version.outputs.FLUTTER_SDK_VERSION }}
+        # 指定されたバージョンのFlutter SDKをセットアップ
+
+      - name: Webアプリのビルド
+        run: flutter build web
+        # Flutterプロジェクトをウェブアプリとしてビルド
+
+      - name: Cloudflare Pagesへのデプロイ
+        id: デプロイ
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: programming_sns
+          directory: build/web
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        # ビルドしたウェブアプリをCloudflare Pagesにデプロイ
+
+      - name: デプロイURLをコミットステータスに追加
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              context: '本番URL',
+              description: 'Cloudflare Pagesへのデプロイ',
+              state: 'success',
+              sha: context.sha,
+              target_url: "${{ steps.デプロイ.outputs.url }}",
+            })
+        # デプロイされたURLをGitHubのコミットステータスとして追加
