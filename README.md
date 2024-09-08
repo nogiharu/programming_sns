@@ -38,24 +38,6 @@ rm /opt/homebrew/Caskroom/flutter/3.10.5/flutter/bin/cache/flutter_tools.stamp
 
 ##
 
-## docker INSTALL
-docker run -it --rm \
-    --volume /var/run/docker.sock:/var/run/docker.sock \
-    --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
-    --entrypoint="install" \
-    appwrite/appwrite:1.4.5
-
-## docker UPGRADE
-docker run -it --rm \
-    --volume /var/run/docker.sock:/var/run/docker.sock \
-    --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
-    --entrypoint="upgrade" \
-    appwrite/appwrite:1.5.3
-
-上やった後に下やる！
- 
-cd appwrite/
-docker compose exec appwrite migrate
 
 
 # WebServer
@@ -84,23 +66,6 @@ fvm use 3.16.9
 git submodule add https://github.com/nogiharu/flutter_chatview.git
 git submodule update --init --recursive
 git submodule update --remote
-
-# Supabase
-すべてのサービスを停止し、ローカル データベースをリセットするために使用します。
-
-         API URL: http://127.0.0.1:54321
-     GraphQL URL: http://127.0.0.1:54321/graphql/v1
-  S3 Storage URL: http://127.0.0.1:54321/storage/v1/s3
-          DB URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
-      Studio URL: http://127.0.0.1:54323
-    Inbucket URL: http://127.0.0.1:54324
-      JWT secret: super-secret-jwt-token-with-at-least-32-characters-long
-        anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
-service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
-   S3 Access Key: 625729a08b95bf1b7ff351a663f3a23c
-   S3 Secret Key: 850181e4652dd023b7a98c58ae0d2d34bd487ee0cc3254aed6eda37307425907
-       S3 Region: local
-
 
 
 # ローカル、サーバー問わず、Supabaseのダッシュボードからテーブルに変更を加えた時 現在のDBの状態(＝スキーマ)と、マイグレーションファイル に記録されているスキーマとの差分を取ります。
