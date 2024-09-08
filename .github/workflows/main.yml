@@ -6,7 +6,7 @@ on:
       - main # main ブランチへのプッシュ時にトリガー
 
 jobs:
-  デプロイ:
+  deploy:
     runs-on: ubuntu-latest # Ubuntu の最新バージョンで実行
 
     steps:
@@ -33,7 +33,7 @@ jobs:
         # Flutterプロジェクトをウェブアプリとしてビルド
 
       - name: Cloudflare Pagesへのデプロイ
-        id: デプロイ
+        id: deploy
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -54,6 +54,6 @@ jobs:
               description: 'Cloudflare Pagesへのデプロイ',
               state: 'success',
               sha: context.sha,
-              target_url: "${{ steps.デプロイ.outputs.url }}",
+              target_url: "${{ steps.deploy.outputs.url }}",
             })
         # デプロイされたURLをGitHubのコミットステータスとして追加
