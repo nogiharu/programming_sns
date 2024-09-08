@@ -39,24 +39,20 @@ jobs:
           flutter-version: ${{ steps.flutter_sdk_version.outputs.FLUTTER_SDK_VERSION }}
         # 指定されたバージョンのFlutter SDKをセットアップ
 
-      - name: .env ファイルの作成とデバッグ
+      - name: .env ファイルの作成
         run: |
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
           echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
           echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
-          echo "環境変数の内容:"
-          cat .env
+        # 環境変数を.envファイルに書き込む
 
       - name: Webアプリのビルド
         run: |
-          echo "環境変数の内容:"
-          cat .env
           flutter build web \
             --release \
             --web-renderer html \
             --dart-define-from-file=.env
-          echo "ビルド後の index.html の内容:"
-          cat build/web/index.html | grep SUPABASE_URL
+        # Flutterプロジェクトをウェブアプリとしてリリースモードでビルド、環境変数を使用
 
       - name: Cloudflare Pagesへのデプロイ
         id: cloudflare_pages_deploy
@@ -69,10 +65,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-
-      - name: デプロイ後の環境変数確認
-        run: |
-          curl -s "${{ steps.cloudflare_pages_deploy.outputs.url }}" | grep SUPABASE_URL
+        # ビルドしたウェブアプリをCloudflare Pagesにデプロイ、環境変数を設定
 
       - name: デプロイURLをコミットステータスに追加
         uses: actions/github-script@v6
