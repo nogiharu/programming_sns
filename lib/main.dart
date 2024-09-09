@@ -21,8 +21,8 @@ Future<void> main() async {
     url = dotenv.env['SUPABASE_URL'] ?? '';
     anonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
   } else {
-    url = dotenv.env['DEV_SUPABASE_URL'] ?? '';
-    anonKey = dotenv.env['DEV_SUPABASE_ANON_KEY'] ?? '';
+    url = dotenv.env['LOCAL_SUPABASE_URL'] ?? '';
+    anonKey = dotenv.env['LOCAL_SUPABASE_ANON_KEY'] ?? '';
   }
 
   await Supabase.initialize(
