@@ -10,7 +10,7 @@ import 'package:programming_sns/features/chat/screens/chat_thread_screen.dart';
 import 'package:programming_sns/features/notification/screens/notification_screen.dart';
 import 'package:programming_sns/features/user/screens/user_screen.dart';
 
-import 'package:programming_sns/test_tool/test_tool.dart';
+import 'package:programming_sns/test_tool.dart';
 
 /// ScaffoldWithNavbarの外側のスコープ
 /// navigatorKey:に設定するとボトムナビバーが出ない

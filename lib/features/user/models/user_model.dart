@@ -20,8 +20,6 @@ class UserModel {
 
   final bool isDeleted;
 
-  List<String>? chatRoomIds;
-
   UserModel({
     required this.id,
     required this.name,
@@ -30,7 +28,6 @@ class UserModel {
     required this.updatedAt,
     required this.mentionId,
     required this.isDeleted,
-    this.chatRoomIds,
   });
 
   UserModel copyWith({
@@ -41,7 +38,6 @@ class UserModel {
     DateTime? updatedAt,
     String? userId,
     bool? isDeleted,
-    List<String>? chatRoomIds,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -51,7 +47,6 @@ class UserModel {
       updatedAt: updatedAt ?? this.updatedAt,
       mentionId: userId ?? mentionId,
       isDeleted: isDeleted ?? this.isDeleted,
-      chatRoomIds: chatRoomIds ?? this.chatRoomIds,
     );
   }
 
@@ -66,9 +61,6 @@ class UserModel {
 
     result.addAll({'is_deleted': isDeleted});
 
-    if (chatRoomIds != null) {
-      result.addAll({'chat_room_ids': chatRoomIds});
-    }
     result.addAll({'updated_at': DateTime.now().toString()});
 
     return result;
@@ -83,13 +75,12 @@ class UserModel {
       updatedAt: DateTime.parse(map['updated_at']).toLocal(),
       mentionId: map['mention_id'],
       isDeleted: map['is_deleted'],
-      chatRoomIds: List<String>.from(map['chat_room_ids'] ?? []),
     );
   }
 
   @override
   String toString() =>
-      'UserModel(id: $id, name: $name, profilePhoto: $profilePhoto, createdAt: $createdAt, updatedAt: $updatedAt, mentionId: $mentionId, isDeleted: $isDeleted chatRoomIds: $chatRoomIds )';
+      'UserModel(id: $id, name: $name, profilePhoto: $profilePhoto, createdAt: $createdAt, updatedAt: $updatedAt, mentionId: $mentionId, isDeleted: $isDeleted )';
 
   @override
   bool operator ==(Object other) {
@@ -102,7 +93,6 @@ class UserModel {
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
         other.mentionId == mentionId &&
-        listEquals(other.chatRoomIds, chatRoomIds) &&
         other.isDeleted == isDeleted;
   }
 
@@ -114,7 +104,6 @@ class UserModel {
       createdAt.hashCode ^
       updatedAt.hashCode ^
       mentionId.hashCode ^
-      chatRoomIds.hashCode ^
       isDeleted.hashCode;
 
   factory UserModel.instance({
@@ -126,7 +115,6 @@ class UserModel {
     String? password,
     String? userId,
     bool? isAnonymous,
-    List<String>? chatRoomIds,
     bool? isDeleted,
   }) {
     return UserModel(
@@ -138,7 +126,6 @@ class UserModel {
       updatedAt: updatedAt ?? DateTime.now(),
       mentionId: userId ?? '',
       isDeleted: isDeleted ?? false,
-      chatRoomIds: chatRoomIds ?? [],
     );
   }
 
