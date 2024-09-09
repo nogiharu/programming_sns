@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,9 +15,19 @@ Future<void> main() async {
   const envFile = String.fromEnvironment('env');
   await dotenv.load(fileName: envFile);
 
+  String url;
+  String anonKey;
+  if (kReleaseMode) {
+    url = dotenv.env['SUPABASE_URL'] ?? '';
+    anonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
+  } else {
+    url = dotenv.env['DEV_SUPABASE_URL'] ?? '';
+    anonKey = dotenv.env['DEV_SUPABASE_ANON_KEY'] ?? '';
+  }
+
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL'] ?? '',
-    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
+    url: url,
+    anonKey: anonKey,
   );
 
   // リリースモードはログ出力を抑制(chromeだと何故か出てしまうため)
