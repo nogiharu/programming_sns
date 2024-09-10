@@ -29,14 +29,15 @@ jobs:
         id: flutter_sdk_version
         run: |
           FLUTTER_SDK_VERSION=$(jq -r '.["dart.flutterSdkPath"]' .vscode/settings.json | cut -d'/' -f3)
-          echo "FLUTTER_SDK_VERSION=$FLUTTER_SDK_VERSION" >> $GITHUB_OUTPUT
+          echo "FLUTTER_SDK_VERSION=$FLUTTER_SDK_VERSION" >> $GITHUB_ENV
         shell: bash
-        # .vscode/settings.json からFlutter SDKのバージョンを抽出
+        # .vscode/settings.json からFlutter SDKのバージョンを抽出。 JSON読取 引用符("")なし |'/' で分割し、3番目の部分
+        # GITHUB_ENVは予約語、後続のenvで使用
 
       - name: Flutter環境のセットアップ
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ steps.flutter_sdk_version.outputs.FLUTTER_SDK_VERSION }}
+          flutter-version: ${{ env.FLUTTER_SDK_VERSION }}
         # 指定されたバージョンのFlutter SDKをセットアップ
 
       - name: .env ファイルの作成
@@ -44,7 +45,7 @@ jobs:
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
           echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
           echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
-        # 環境変数を.envファイルに書き込む
+        # 環境変数を.envファイルに書き込む。 pabspec.yamlが読めないため
 
       - name: Webアプリのビルド
         run: |
