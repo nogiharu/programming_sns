@@ -15,19 +15,9 @@ Future<void> main() async {
   const envFile = String.fromEnvironment('env');
   await dotenv.load(fileName: envFile);
 
-  String url;
-  String anonKey;
-  if (kReleaseMode) {
-    url = dotenv.env['SUPABASE_URL'] ?? '';
-    anonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
-  } else {
-    url = dotenv.env['LOCAL_SUPABASE_URL'] ?? '';
-    anonKey = dotenv.env['LOCAL_SUPABASE_ANON_KEY'] ?? '';
-  }
-
   await Supabase.initialize(
-    url: url,
-    anonKey: anonKey,
+    url: dotenv.env[kReleaseMode ? 'SUPABASE_URL' : 'LOCAL_SUPABASE_URL'] ?? '',
+    anonKey: dotenv.env[kReleaseMode ? 'SUPABASE_ANON_KEY' : 'LOCAL_SUPABASE_ANON_KEY'] ?? '',
   );
 
   // urlの#を消す
