@@ -30,9 +30,6 @@ Future<void> main() async {
     anonKey: anonKey,
   );
 
-  // リリースモードはログ出力を抑制(chromeだと何故か出てしまうため)
-  // if (kReleaseMode) debugPrint = (message, {wrapWidth}) {};
-
   // urlの#を消す
   usePathUrlStrategy();
 

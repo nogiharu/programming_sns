@@ -1,8 +1,4 @@
-// ignore_for_file: overridden_fields
-
 import 'package:chatview/chatview.dart';
-import 'package:flutter/foundation.dart';
-// import 'package:flutter/foundation.dart';
 
 class UserModel {
   final String id;
