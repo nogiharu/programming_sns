@@ -8,8 +8,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/enums/notification_type.dart';
 import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/features/chat/models/chat_room_model.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
+import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart';
 import 'package:programming_sns/features/chat/widgets/chat_card.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
 import 'package:programming_sns/features/notification/providers/notifications_provider.dart';
@@ -59,6 +61,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   CancelableOperation? _initMentionScrollCancel;
 
+  late ChatRoomModel chatRoomModel;
+
   @override
   void initState() {
     super.initState();
@@ -68,6 +72,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     WidgetsBinding.instance.endOfFrame.then((_) async {
       await onMentionMessageReaded();
     });
+    // 現在のチャットルーム取得(ソートに使用)
+    chatRoomModel = ref.read(chatRoomsProvider).value!.firstWhere((e) => e.id == widget.chatRoomId);
   }
 
   @override
@@ -120,6 +126,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   // enableSwipeToReply: !kIsWeb,
                   enableSwipeToSeeTime: false,
                   enablePagination: true, // ページネーション
+                  // enableDoubleTapToLike: true, // TODO ダブルタップ
                 ),
 
                 /// ページネーション
@@ -297,6 +304,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         // メッセージ更新リセット
         updateMessage = null;
       }
+    }
+    // ルームID追加
+    if (!chatRoomModel.memberUserIds.contains(_currentChatUser.id)) {
+      chatRoomModel.memberUserIds.add(_currentChatUser.id);
+      await ref.read(chatRoomsProvider.notifier).upsertState(chatRoomModel);
     }
 
     // 【メンション】　awaitはしない
