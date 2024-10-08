@@ -14,6 +14,8 @@ class UserModel {
   /// ユーザが変えられるID　メンションに使用
   final String mentionId;
 
+  final String profileDetails;
+
   final bool isDeleted;
 
   UserModel({
@@ -24,6 +26,7 @@ class UserModel {
     required this.updatedAt,
     required this.mentionId,
     required this.isDeleted,
+    required this.profileDetails,
   });
 
   UserModel copyWith({
@@ -34,6 +37,7 @@ class UserModel {
     DateTime? updatedAt,
     String? userId,
     bool? isDeleted,
+    String? profileDetails,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -43,6 +47,7 @@ class UserModel {
       updatedAt: updatedAt ?? this.updatedAt,
       mentionId: userId ?? mentionId,
       isDeleted: isDeleted ?? this.isDeleted,
+      profileDetails: profileDetails ?? this.profileDetails,
     );
   }
 
@@ -56,6 +61,8 @@ class UserModel {
     result.addAll({'mention_id': mentionId});
 
     result.addAll({'is_deleted': isDeleted});
+
+    result.addAll({'profile_details': profileDetails});
 
     result.addAll({'updated_at': DateTime.now().toString()});
 
@@ -71,12 +78,13 @@ class UserModel {
       updatedAt: DateTime.parse(map['updated_at']).toLocal(),
       mentionId: map['mention_id'],
       isDeleted: map['is_deleted'],
+      profileDetails: map['profileDetails'] ?? '', // 空にしとく
     );
   }
 
   @override
   String toString() =>
-      'UserModel(id: $id, name: $name, profilePhoto: $profilePhoto, createdAt: $createdAt, updatedAt: $updatedAt, mentionId: $mentionId, isDeleted: $isDeleted )';
+      'UserModel(id: $id, name: $name, profilePhoto: $profilePhoto, profileDetails: $profileDetails, createdAt: $createdAt, updatedAt: $updatedAt, mentionId: $mentionId, isDeleted: $isDeleted )';
 
   @override
   bool operator ==(Object other) {
@@ -89,7 +97,8 @@ class UserModel {
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
         other.mentionId == mentionId &&
-        other.isDeleted == isDeleted;
+        other.isDeleted == isDeleted &&
+        other.profileDetails == profileDetails;
   }
 
   @override
@@ -100,7 +109,8 @@ class UserModel {
       createdAt.hashCode ^
       updatedAt.hashCode ^
       mentionId.hashCode ^
-      isDeleted.hashCode;
+      isDeleted.hashCode ^
+      profileDetails.hashCode;
 
   factory UserModel.instance({
     String? id,
@@ -112,6 +122,7 @@ class UserModel {
     String? userId,
     bool? isAnonymous,
     bool? isDeleted,
+    String? profileDetails,
   }) {
     return UserModel(
       id: id ?? '',
@@ -122,6 +133,7 @@ class UserModel {
       updatedAt: updatedAt ?? DateTime.now(),
       mentionId: userId ?? '',
       isDeleted: isDeleted ?? false,
+      profileDetails: profileDetails ?? '',
     );
   }
 

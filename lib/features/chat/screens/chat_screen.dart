@@ -437,9 +437,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   RenderObject? getMessageLocation(DateTime mentionCreatedAt) {
     return _chatController.initialMessageList
-        .firstWhereOrNull((e) {
-          return mentionCreatedAt == e.createdAt;
-        })
+        .firstWhereOrNull((e) => mentionCreatedAt == e.createdAt)
         ?.key
         .currentContext
         ?.findRenderObject();

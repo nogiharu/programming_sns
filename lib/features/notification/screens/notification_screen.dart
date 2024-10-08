@@ -19,8 +19,8 @@ class NotificationScreen extends ConsumerStatefulWidget {
     'icon': getIconBadge(),
   };
 
-  static Widget getIconBadge({int notificationCount = 0}) {
-    if (notificationCount == 0) {
+  static Widget getIconBadge({int count = 0}) {
+    if (count == 0) {
       return const Icon(Icons.notifications);
     }
     return badges.Badge(
@@ -30,7 +30,7 @@ class NotificationScreen extends ConsumerStatefulWidget {
         badgeColor: Colors.amber.shade800,
       ),
       badgeContent: Text(
-        '$notificationCount',
+        '$count',
         style: const TextStyle(color: Colors.white),
       ),
       child: const Icon(Icons.notifications),

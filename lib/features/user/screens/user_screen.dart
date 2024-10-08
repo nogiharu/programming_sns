@@ -26,13 +26,42 @@ class UserScreen extends ConsumerWidget {
       body: ref.watchEX(
         userProvider,
         complete: (data) {
-          final auth = ref.read(authProvider).value;
-          // TODO watchEXを使うとエラー時SignupScreenでもダイアログが出てしまう
+          final auth = ref.watch(authProvider).value;
           if (auth == null) return const Center(child: CircularProgressIndicator());
 
           return Center(
             child: Column(
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          data.profilePhoto ??
+                              "https://akm-img-a-in.tosshub.com/indiatoday/images/story/202103/photo-1511367461989-f85a21fda1_0_1200x768.jpeg?YVCV8xj2CmtZldc_tJAkykymqxE3fxNf&size=770:433",
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    SizedBox(
+                      width: 150,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(data.mentionId, style: const TextStyle(color: Colors.blue)),
+                          Text(
+                            data.name,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Text(data.profileDetails),
                 if (auth.userMetadata!['is_anonymous'] as bool) ...[
                   Tooltip(
                     message: '登録をお勧めするよ(*^_^*)',
@@ -40,9 +69,7 @@ class UserScreen extends ConsumerWidget {
                       onPressed: () {
                         context.goNamed(SignupScreen.path);
                       },
-                      child: const Text(
-                        'アカウント登録',
-                      ),
+                      child: const Text('アカウント登録'),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -50,19 +77,14 @@ class UserScreen extends ConsumerWidget {
                     onPressed: () {
                       context.goNamed(LoginScreen.path);
                     },
-                    child: const Text(
-                      'アカウント持ってる',
-                      style: TextStyle(color: Colors.black),
-                    ),
+                    child: const Text('アカウント持ってる'),
                   ),
                 ] else ...[
                   ElevatedButton(
                     onPressed: () {
                       context.goNamed(AuthUpdateScreen.path);
                     },
-                    child: const Text(
-                      'アカウント更新',
-                    ),
+                    child: const Text('アカウント更新'),
                   )
                 ],
               ],

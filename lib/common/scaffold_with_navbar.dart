@@ -25,7 +25,7 @@ class ScaffoldWithNavbar extends ConsumerWidget {
           data: (data) => bottomItems.map((meta) {
             if (meta['label'] == '通知') {
               meta['icon'] = NotificationScreen.getIconBadge(
-                notificationCount: data.where((e) => !e.isRead).length,
+                count: data.where((e) => !e.isRead).length,
               );
             }
             return BottomNavigationBarItem(icon: meta['icon'], label: meta['label']);
