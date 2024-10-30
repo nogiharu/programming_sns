@@ -78,7 +78,7 @@ class UserModel {
       updatedAt: DateTime.parse(map['updated_at']).toLocal(),
       mentionId: map['mention_id'],
       isDeleted: map['is_deleted'],
-      profileDetails: map['profileDetails'] ?? '', // 空にしとく
+      profileDetails: map['profile_details'] ?? '', // 空にしとく
     );
   }
 

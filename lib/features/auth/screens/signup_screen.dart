@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
-import 'package:programming_sns/features/auth/widgets/auth_field.dart';
+import 'package:programming_sns/widgets/input_field.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -21,6 +21,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final userIdController = TextEditingController();
   final passwordController = TextEditingController();
   String errorMessage = '';
+  bool isObscureText = false;
 
   @override
   Widget build(BuildContext context) {
@@ -40,16 +41,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AuthField(
+              InputField(
                 labelText: 'ユーザーID',
                 controller: userIdController,
                 hintText: 'ユーザーIDは記号、日本語以外で半角で入力してね(^^)',
+                contentPadding: 20,
               ),
               const SizedBox(height: 10),
-              AuthField(
+              InputField(
                 labelText: 'パスワード',
                 controller: passwordController,
                 hintText: 'パスワードは日本語以外で半角で8桁以上で入れてね(^^)',
+                contentPadding: 20,
               ),
               const SizedBox(height: 10),
               Align(

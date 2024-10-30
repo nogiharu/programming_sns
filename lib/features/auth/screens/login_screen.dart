@@ -5,6 +5,7 @@ import 'package:programming_sns/common/utils.dart';
 
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/auth/widgets/auth_field.dart';
+import 'package:programming_sns/widgets/input_field.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -39,16 +40,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AuthField(
+            InputField(
               labelText: 'ID',
               controller: userIdController,
               hintText: 'IDは記号、日本語以外で半角で入力してね(^^)',
+              contentPadding: 20,
             ),
             const SizedBox(height: 10),
-            AuthField(
+            InputField(
               labelText: 'パスワード',
               controller: passwordController,
               hintText: 'パスワードは日本語以外で半角で8桁以上で入れてね(^^)',
+              contentPadding: 20,
             ),
             const SizedBox(height: 10),
             Align(
