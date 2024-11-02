@@ -79,10 +79,17 @@ class TestToolcreen extends ConsumerWidget {
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () async {
-                    var a = supabase.auth.currentSession;
-                    // print(a);
-                    print(a?.user.email);
-                    print(a?.user.userMetadata);
+                    final aa = await supabase
+                        .schema('auth')
+                        .from('users')
+                        .select()
+                        .eq('id', supabase.auth.currentUser!.id);
+                    print(aa);
+
+                    // var a = supabase.auth.currentSession;
+                    // // print(a);
+                    // print(a?.user.email);
+                    // print(a?.user.userMetadata);
                   },
                   child: const Text('状態'),
                 ),

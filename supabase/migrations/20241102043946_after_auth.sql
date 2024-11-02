@@ -1,4 +1,3 @@
--- 【auth.usersのAFTER TRIGGERイベント】
 CREATE
 OR REPLACE FUNCTION after_auth () RETURNS TRIGGER AS $$
 BEGIN
@@ -40,38 +39,3 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- アフタートリガー
-CREATE
-OR REPLACE TRIGGER after_auth_trigger
-AFTER INSERT
-OR
-UPDATE
-OR DELETE ON auth.users FOR EACH ROW
-EXECUTE FUNCTION after_auth ();
-
--- -- 【auth.usersのBEFORE TRIGGERイベント】
--- CREATE
--- OR REPLACE FUNCTION before_auth () RETURNS TRIGGER AS $$
--- BEGIN
---     ------------------------【UPDATEトリガー】------------------------
---     IF OLD.email_change != NEW.email_change THEN
---         -- 新しいユーザーの user_id を生成
---         DECLARE
---             new_mention_id TEXT := SPLIT_PART(NEW.email_change, '@', 1);
---         BEGIN
---             -- 新しいユーザーを public.users テーブルに更新
---             UPDATE public.users
---             SET mention_id = new_mention_id
---             WHERE id = NEW.id;
---             NEW.email = NEW.email_change;
---         END;
---     END IF;
---     RETURN NEW;
--- END; 
--- $$ LANGUAGE plpgsql SECURITY DEFINER;
--- -- ビフォートリガー
--- CREATE
--- OR REPLACE TRIGGER before_auth_trigger BEFORE
--- UPDATE ON auth.users FOR EACH ROW
--- EXECUTE FUNCTION before_auth ();

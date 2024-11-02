@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:programming_sns/common/constans.dart';
 import 'package:programming_sns/common/utils.dart';
 import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
+import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:uuid/uuid.dart';
@@ -52,18 +53,27 @@ class AuthNotifier extends AsyncNotifier<User> {
         // 現在の匿名ユーザを取得
         final previous = state.requireValue;
 
+        final functionResponse =
+            await supabase.from('users').select().eq('mention_id', userId).then((v) async {
+          if (v.isNotEmpty) {
+            return await supabase.functions
+                .invoke("get-user", body: {'id': UserModel.fromMap(v[0]).id});
+          }
+          throw '予期せぬエラーだ（；＿；）';
+        });
+
         // ログイン
         await supabase.auth.signInWithPassword(
-          email: '$userId@email.com',
+          email: functionResponse.data['data']['user']['email'],
           password: password,
         );
         // セッション再作成
-        final res = await supabase.auth.refreshSession();
+        final authResponse = await supabase.auth.refreshSession();
 
         // 匿名ログインを削除
         await supabase.functions.invoke("delete-user", body: {'id': previous.id});
 
-        return res.user!;
+        return authResponse.user!;
       },
     );
   }
@@ -77,8 +87,7 @@ class AuthNotifier extends AsyncNotifier<User> {
         // 更新
         await supabase.auth.updateUser(
           UserAttributes(
-            data: {'password': password, 'is_anonymous': false},
-            email: '$userId@email.com',
+            data: {'password': password, 'is_anonymous': false, 'userId': userId},
             password: password,
           ),
         );
