@@ -9,6 +9,7 @@ import 'package:programming_sns/features/chat/models/chat_room_model.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
+import 'package:programming_sns/features/user/providers/user_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:collection/src/iterable_extensions.dart';
 
@@ -122,10 +123,17 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
             ),
             callback: (payload) {
               update(
-                (data) {
+                (data) async {
                   Message newData = MessageEX.fromMap(payload.newRecord);
                   // 【INSERTイベント】
                   if (PostgresChangeEvent.insert == payload.eventType) {
+                    final isNotUser = data.chatUsers.every((e) => e.id != newData.sendBy);
+                    if (isNotUser) {
+                      final userModel =
+                          await ref.read(userProvider.notifier).getUserModel(newData.sendBy);
+                      data.chatUsers.add(UserModel.toChatUser(userModel));
+                    }
+
                     data.initialMessageList.add(newData);
                     debugPrint('【INSERT:メッセージ】');
                   }

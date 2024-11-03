@@ -14,12 +14,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
     return ref.watch(authProvider).maybeWhen(
           data: (auth) async {
             // TODO StreamNotifierにしてリアルタイムに返してupsertStateをvoidにするか検討必要
-            return await supabase
-                .from('users')
-                .select()
-                .eq('id', auth.id)
-                .then((v) => UserModel.fromMap(v[0]))
-                .catchErrorEX();
+            return await getUserModel(auth.id);
           },
           orElse: () => UserModel.instance(),
         );
@@ -37,5 +32,16 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
             .then((v) => UserModel.fromMap(v[0]));
       },
     );
+  }
+
+  /// ユーザー更新
+  Future<UserModel> getUserModel(String id) async {
+    // SQL
+    return await supabase
+        .from('users')
+        .select()
+        .eq('id', id)
+        .then((v) => UserModel.fromMap(v[0]))
+        .catchErrorEX();
   }
 }

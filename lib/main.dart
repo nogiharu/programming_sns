@@ -45,15 +45,15 @@ class Main extends ConsumerWidget {
         // テキストボタン
         textButtonTheme: const TextButtonThemeData(
           style: ButtonStyle(
-            foregroundColor: MaterialStatePropertyAll(ThemeColor.strong),
+            foregroundColor: WidgetStatePropertyAll(ThemeColor.strong),
           ),
         ),
         // エレベイテッドボタン
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
-            backgroundColor: const MaterialStatePropertyAll(ThemeColor.main),
-            foregroundColor: const MaterialStatePropertyAll(Colors.black),
-            shape: MaterialStatePropertyAll(
+            backgroundColor: const WidgetStatePropertyAll(ThemeColor.main),
+            foregroundColor: const WidgetStatePropertyAll(Colors.black),
+            shape: WidgetStatePropertyAll(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5),
               ),

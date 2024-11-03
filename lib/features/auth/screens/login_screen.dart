@@ -59,11 +59,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: ElevatedButton(
                 onPressed: () async {
                   // ログイン処理
-                  final authNotifier = ref.read(authProvider.notifier);
-                  await authNotifier.login(
-                    userId: userIdController.text,
-                    password: passwordController.text,
-                  );
+                  await ref.read(authProvider.notifier).login(
+                        userId: userIdController.text,
+                        password: passwordController.text,
+                      );
 
                   // エラーチェック
                   final authState = ref.watch(authProvider);
