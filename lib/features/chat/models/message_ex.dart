@@ -1,5 +1,5 @@
 import 'package:chatview/chatview.dart';
-import 'package:programming_sns/enums/message_type_ex.dart';
+import 'package:programming_sns/core/enums.dart';
 
 extension MessageEX on Message {
   Map<String, dynamic> toMap() {

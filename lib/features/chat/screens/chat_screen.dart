@@ -6,8 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/enums/notification_type.dart';
-import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/core/constans.dart';
+import 'package:programming_sns/core/enums.dart';
+import 'package:programming_sns/core/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/core/utils.dart';
 import 'package:programming_sns/features/chat/models/chat_room_model.dart';
 import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_controller_provider.dart';
@@ -22,6 +24,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:collection/collection.dart';
 import 'package:async/async.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// FIXME 適当に作ったから消します。
 class ChatScreen extends ConsumerStatefulWidget {
@@ -445,60 +448,52 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   /// 画像ダウンロード
   Future<void> downloadImage(String url) async {
-    // final isSaved = await ref
-    //     .read(storageAPIProvider)
-    //     .downloadImage(url, AppwriteConstants.kMessageImagesBucket)
-    //     .catchError(ref.read(showDialogProvider));
-    // if (isSaved) {
-    //   ref.read(snackBarProvider)(message: '${kIsWeb ? 'ダウンロード' : '写真'}に保存完了したよ(*^_^*)');
-    // }
+    final Uri parsedUrl = Uri.parse(url);
+    if (await canLaunchUrl(parsedUrl)) {
+      await launchUrl(parsedUrl);
+      ref.read(snackBarProvider)(message: '保存が完了したよ(*^_^*)');
+    } else {
+      throw 'ダウンロードできない(T ^ T)';
+    }
   }
 
   /// 画像アップロード
   Future<String?> uploadImage(XFile? xFile) async {
     String? imagePath = xFile?.path;
-    // if (xFile != null) {
-    //   imagePath = await ref
-    //       .read(storageAPIProvider)
-    //       .uploadImage(
-    //         xFile,
-    //         AppwriteConstants.kMessageImagesBucket,
-    //       )
-    //       .catchError(ref.read(showDialogProvider));
-    // }
+    if (xFile != null) {
+      imagePath = await supabase.functions
+          .invoke("upload-image", body: {
+            'bucket': 'programming-sns',
+            'key': xFile.name,
+            'body': (await xFile.readAsBytes())
+          })
+          .then((res) => res.data['url'])
+          .catchErrorEX();
+    }
+
     return imagePath;
   }
 
   /// 画像プレビュー
   Future<void> previewImage(String url) async {
-    // final uint8List = await ref
-    //     .read(storageAPIProvider)
-    //     .previewImgae(
-    //       url,
-    //       AppwriteConstants.kMessageImagesBucket,
-    //     )
-    //     .catchError(ref.read(showDialogProvider));
-
-    // await showDialog(
-    //   barrierDismissible: true,
-    //   context: ref.read(rootNavigatorKeyProvider).currentContext!,
-    //   builder: (context) {
-    //     return GestureDetector(
-    //       onTap: () => context.pop(),
-    //       child: Stack(
-    //         alignment: Alignment.center,
-    //         children: [
-    //           InteractiveViewer(
-    //             minScale: 0.1,
-    //             maxScale: 5,
-    //             child: Image.memory(
-    //               uint8List,
-    //             ),
-    //           ),
-    //         ],
-    //       ),
-    //     );
-    //   },
-    // );
+    await showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          onTap: () => context.pop(),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              InteractiveViewer(
+                minScale: 0.1,
+                maxScale: 5,
+                child: Image.network(url),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

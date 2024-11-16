@@ -1,1 +1,0 @@
--- drop function if exists "public"."handle_auth_user"();

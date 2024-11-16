@@ -134,3 +134,6 @@ DROP FUNCTION IF EXISTS "public"."handle_new_user" () CASCADE;
 
 
 
+nicolas.ns.cloudflare.com
+
+paloma.ns.cloudflare.com

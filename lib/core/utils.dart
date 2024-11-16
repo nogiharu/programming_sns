@@ -7,6 +7,7 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 final snackBarProvider = AutoDisposeProvider((ref) {
   final context = ref.read(shellNavigatorKeyProvider).currentState!.context;
+
   return ({required String message, VoidCallback? onTap}) {
     showTopSnackBar(
       Overlay.of(context),

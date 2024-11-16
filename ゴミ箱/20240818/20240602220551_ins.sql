@@ -1,1 +1,0 @@
-DROP TRIGGER delete_auth_trigger ON auth.users;

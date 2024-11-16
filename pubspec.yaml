@@ -50,6 +50,8 @@ dependencies:
   top_snackbar_flutter: ^3.1.0
   supabase_flutter: ^2.8.0
   uuid: ^4.4.0
+  aws_s3_api: ^2.0.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

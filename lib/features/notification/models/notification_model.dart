@@ -1,4 +1,4 @@
-import 'package:programming_sns/enums/notification_type.dart';
+import 'package:programming_sns/core/enums.dart';
 
 class NotificationModel {
   String? id;

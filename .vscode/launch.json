@@ -16,7 +16,7 @@
                 "html",
                 // "web-server", // ここは排他
                 // "--web-browser-flag",
-                // "--disable-web-security"
+                // "--disable-web-security",
                 "--dart-define",
                 "env=.env",
             ]

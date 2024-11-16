@@ -2,7 +2,7 @@ import 'package:chatview/markdown/markdown_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/core/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/features/notification/providers/notifications_provider.dart';
 import 'package:badges/badges.dart' as badges;
