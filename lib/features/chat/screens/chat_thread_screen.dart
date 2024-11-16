@@ -45,6 +45,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true, // キーボードが表示されるときにビューのサイズを調整
       appBar: AppBar(
         title: const Text('チャットスレッド'),
       ),
