@@ -1,7 +1,0 @@
--- in supabase/seed.sql
--- INSERT INTO
---     public.employees (NAME)
--- VALUES
---     ('Erlich Bachman'),
---     ('Richard Hendricks'),
---     ('Monica Hall');

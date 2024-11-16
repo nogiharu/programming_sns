@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:programming_sns/common/constans.dart';
-import 'package:programming_sns/common/utils.dart';
-import 'package:programming_sns/extensions/async_notifier_base_ex.dart';
+import 'package:programming_sns/core/constans.dart';
+import 'package:programming_sns/core/utils.dart';
+import 'package:programming_sns/core/extensions/async_notifier_base_ex.dart';
 import 'package:programming_sns/features/user/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

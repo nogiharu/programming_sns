@@ -1,16 +1,24 @@
+import 'dart:convert';
+
+import 'package:aws_s3_api/s3-2006-03-01.dart';
 import 'package:chatview/chatview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:programming_sns/common/constans.dart';
-import 'package:programming_sns/extensions/widget_ref_ex.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:programming_sns/core/constans.dart';
+import 'package:programming_sns/core/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
 import 'package:programming_sns/features/notification/providers/notifications_provider.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
+import 'package:programming_sns/routes/router.dart';
 import 'package:uuid/uuid.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class TestToolcreen extends ConsumerWidget {
+class TestToolcreen extends ConsumerStatefulWidget {
   const TestToolcreen({super.key});
 
   static const Map<String, dynamic> metaData = {
@@ -20,7 +28,13 @@ class TestToolcreen extends ConsumerWidget {
   };
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _TestToolcreenState();
+}
+
+class _TestToolcreenState extends ConsumerState<TestToolcreen> {
+  String imageStr = '';
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('text')),
       body: Center(
@@ -191,6 +205,68 @@ class TestToolcreen extends ConsumerWidget {
                   },
                   child: const Text('通知'),
                 ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    final ImagePicker picker = ImagePicker();
+                    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                    print(image);
+
+                    // final s3 = S3(
+                    //   region: 'auto', // R2では'auto'を使用
+                    //   endpointUrl:
+                    //       'https://58baa1400a6b1109671d50f748d28f97.r2.cloudflarestorage.com',
+                    //   credentials: AwsClientCredentials(
+                    //     accessKey: 'a18f5d7c39a0b913af15d79d8fa7b6bc',
+                    //     secretKey:
+                    //         '2c6a1b8e65fe5f546e11ef4349791c2221a169f0cc792144cff96253fd33297b',
+                    //   ),
+                    // );
+                    // final aa = await s3.putObject(
+                    //     bucket: 'messages', key: image!.name, body: (await image.readAsBytes()));
+
+                    // 匿名ログインを削除
+                    final aaa = await supabase.functions.invoke("upload-image", body: {
+                      'bucket': 'programming-sns',
+                      'key': 'test/${image!.name}',
+                      'body': (await image.readAsBytes())
+                    });
+                    imageStr = aaa.data['url'];
+// アップロードしてURL返却まで！！！！！！！！！１１１
+                    print('来たかな？３${aaa.data}');
+                    setState(() {});
+                  },
+                  child: const Text('UPLOAD'),
+                ),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  child: InteractiveViewer(
+                    // minScale: 0.1, // より小さな値に設定
+                    // maxScale: 1.0, // 最大でも元のサイズまで
+                    // boundaryMargin: const EdgeInsets.all(20.0), // ビューポートの余白を設定
+                    // constrained: false, // 親のサイズに制約されないようにする
+                    child: Image.network(
+                      fit: BoxFit.contain, // fitHeightからcontainに変更
+                      imageStr,
+                    ),
+                  ),
+                  onTap: () async {
+                    await previewImage(context);
+                  },
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    // 'https://messages.58baa1400a6b1109671d50f748d28f97.r2.cloudflarestorage.com/test/anzu.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=a18f5d7c39a0b913af15d79d8fa7b6bc%2F20241110%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20241110T005140Z&X-Amz-Expires=3600&X-Amz-Signature=2e9352593d208ab5e656c79adc77f712a59b6bf76a148dd1f82e8c98b5fcb420&X-Amz-SignedHeaders=host&x-id=GetObject';
+
+                    final Uri parsedUrl = Uri.parse(imageStr);
+                    if (await canLaunchUrl(parsedUrl)) {
+                      await launchUrl(parsedUrl);
+                    } else {
+                      throw 'Could not launch $imageStr';
+                    }
+                  },
+                  child: const Text('ダウンロード'),
+                ),
                 ref.watchEX(
                   userProvider,
                   complete: (p0) {
@@ -202,6 +278,31 @@ class TestToolcreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  /// 画像プレビュー
+  Future<void> previewImage(BuildContext context) async {
+    const url = 'https://pub-fc01b0945155426b885cf534d131de7d.r2.dev/test/anzu.jpeg';
+
+    await showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          onTap: () => context.pop(),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              InteractiveViewer(
+                minScale: 0.1,
+                maxScale: 5,
+                child: Image.network(imageStr),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

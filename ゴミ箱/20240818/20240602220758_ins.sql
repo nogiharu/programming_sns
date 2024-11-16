@@ -1,1 +1,0 @@
-DROP TRIGGER insert_auth_trigger ON auth.users;
