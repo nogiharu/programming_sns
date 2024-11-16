@@ -95,44 +95,48 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   void createThreadBottomSheet({required String userId}) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true, // 追加
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
       ),
       constraints: const BoxConstraints.expand(width: double.infinity, height: 50),
       builder: (context) {
-        return SafeArea(
-          child: TextFormField(
-            // maxLines: 20,
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: 'スレ名は5文字以上で入れてね(*^_^*)',
-              contentPadding: const EdgeInsets.all(15),
-              suffixIcon: IconButton(
-                onPressed: () async {
-                  await chatRoomsNotifier
-                      .upsertState(
-                    ChatRoomModel.instance(
-                      ownerId: userId,
-                      name: textController.text,
-                      memberUserIds: [userId],
-                    ),
-                  )
-                      .whenComplete(() {
-                    // なぜかキャッチされないためwhenComplete使用
-                    if (!ref.watch(chatRoomsProvider).hasError) {
-                      context.pop();
-                      textController.text = '';
-                      ref.read(snackBarProvider)(message: '作成完了だよ(*^_^*)');
-                    }
-                  });
-                },
-                icon: const Icon(
-                  Icons.send,
-                  color: Colors.amber,
+        return Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: SingleChildScrollView(
+            child: TextFormField(
+              // maxLines: 20,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: 'スレ名は5文字以上で入れてね(*^_^*)',
+                contentPadding: const EdgeInsets.all(15),
+                suffixIcon: IconButton(
+                  onPressed: () async {
+                    await chatRoomsNotifier
+                        .upsertState(
+                      ChatRoomModel.instance(
+                        ownerId: userId,
+                        name: textController.text,
+                        memberUserIds: [userId],
+                      ),
+                    )
+                        .whenComplete(() {
+                      // なぜかキャッチされないためwhenComplete使用
+                      if (!ref.watch(chatRoomsProvider).hasError) {
+                        context.pop();
+                        textController.text = '';
+                        ref.read(snackBarProvider)(message: '作成完了だよ(*^_^*)');
+                      }
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.send,
+                    color: Colors.amber,
+                  ),
                 ),
               ),
+              controller: textController,
             ),
-            controller: textController,
           ),
         );
       },
