@@ -183,17 +183,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
                 // TODO わからん
                 chatBubbleConfig: ChatBubbleConfiguration(
-                  onDoubleTap: (message) {
-                    // これ入れないとハートになる　ChatBubbleWidget → 337行目
-                    setState(() {});
-                  },
-                  // TODO わからん
-                  outgoingChatBubbleConfig: const ChatBubble(
-                    receiptsWidgetConfig: ReceiptsWidgetConfig(
-                      showReceiptsIn: ShowReceiptsIn.all, // チャット横幅
+                    onDoubleTap: (message) {
+                      // これ入れないとハートになる　ChatBubbleWidget → 337行目
+                      setState(() {});
+                    },
+                    // TODO わからん
+                    outgoingChatBubbleConfig: const ChatBubble(
+                      receiptsWidgetConfig: ReceiptsWidgetConfig(
+                        showReceiptsIn: ShowReceiptsIn.all, // チャット横幅
+                      ),
                     ),
-                  ),
-                ),
+                    inComingChatBubbleConfig: const ChatBubble(senderNameTextStyle: TextStyle())),
 
                 messageConfig: MessageConfiguration(
                   customMessageBuilder: (message) {

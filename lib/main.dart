@@ -41,6 +41,8 @@ class Main extends ConsumerWidget {
         appBarTheme: const AppBarTheme(color: ThemeColor.main),
         // プライマリーカラー
         primaryColor: ThemeColor.main,
+        // textTheme: TextTheme(
+        //     bodyLarge: TextStyle(fontSize: MediaQuery.of(context).size.width < 400 ? 12 : 16)),
         // テキストボタン
         textButtonTheme: const TextButtonThemeData(
           style: ButtonStyle(

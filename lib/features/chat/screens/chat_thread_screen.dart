@@ -100,38 +100,40 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
       ),
       constraints: const BoxConstraints.expand(width: double.infinity, height: 50),
       builder: (context) {
-        return TextFormField(
-          // maxLines: 20,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: 'スレ名は5文字以上で入れてね(*^_^*)',
-            contentPadding: const EdgeInsets.all(15),
-            suffixIcon: IconButton(
-              onPressed: () async {
-                await chatRoomsNotifier
-                    .upsertState(
-                  ChatRoomModel.instance(
-                    ownerId: userId,
-                    name: textController.text,
-                    memberUserIds: [userId],
-                  ),
-                )
-                    .whenComplete(() {
-                  // なぜかキャッチされないためwhenComplete使用
-                  if (!ref.watch(chatRoomsProvider).hasError) {
-                    context.pop();
-                    textController.text = '';
-                    ref.read(snackBarProvider)(message: '作成完了だよ(*^_^*)');
-                  }
-                });
-              },
-              icon: const Icon(
-                Icons.send,
-                color: Colors.amber,
+        return SafeArea(
+          child: TextFormField(
+            // maxLines: 20,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: 'スレ名は5文字以上で入れてね(*^_^*)',
+              contentPadding: const EdgeInsets.all(15),
+              suffixIcon: IconButton(
+                onPressed: () async {
+                  await chatRoomsNotifier
+                      .upsertState(
+                    ChatRoomModel.instance(
+                      ownerId: userId,
+                      name: textController.text,
+                      memberUserIds: [userId],
+                    ),
+                  )
+                      .whenComplete(() {
+                    // なぜかキャッチされないためwhenComplete使用
+                    if (!ref.watch(chatRoomsProvider).hasError) {
+                      context.pop();
+                      textController.text = '';
+                      ref.read(snackBarProvider)(message: '作成完了だよ(*^_^*)');
+                    }
+                  });
+                },
+                icon: const Icon(
+                  Icons.send,
+                  color: Colors.amber,
+                ),
               ),
             ),
+            controller: textController,
           ),
-          controller: textController,
         );
       },
     );
