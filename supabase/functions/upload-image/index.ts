@@ -106,7 +106,7 @@ Deno.serve(async (req) => {
 
     if (res.$metadata.httpStatusCode === 200) {
       // パブリックURLを生成
-      const url = `https://programming-sns.com/${key}`;
+      const url = `https://r2.programming-sns.com/${key}`;
 
       return new Response(JSON.stringify({ url }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
