@@ -36,7 +36,6 @@ class Main extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      // title: 'Flutter Demo',
       theme: ThemeData(
         // アプバー
         appBarTheme: const AppBarTheme(color: ThemeColor.main),
@@ -67,7 +66,6 @@ class Main extends ConsumerWidget {
       ),
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(router),
-
       scaffoldMessengerKey: ref.read(scaffoldMessengerKeyProvider),
     );
   }
