@@ -137,6 +137,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             complete: (chatController) {
               _chatController = chatController;
               return ChatView(
+                onChatListTap: () {
+                  FocusScope.of(context).unfocus();
+                },
                 currentUser: _currentChatUser,
                 chatController: _chatController,
                 onSendTap: onSendTap,
