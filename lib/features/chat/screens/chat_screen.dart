@@ -25,6 +25,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:collection/collection.dart';
 import 'package:async/async.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:html';
 
 /// FIXME 適当に作ったから消します。
 class ChatScreen extends ConsumerStatefulWidget {
@@ -45,6 +46,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   // AppTheme theme = LightTheme();
   bool isDarkTheme = false;
+  bool _isKeyboardVisible = false;
 
   ChatController _chatController = ChatController(
     initialMessageList: [],
@@ -77,6 +79,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
     // 現在のチャットルーム取得(ソートに使用)
     chatRoomModel = ref.read(chatRoomsProvider).value!.firstWhere((e) => e.id == widget.chatRoomId);
+
+    // SafariやWebでキーボードの表示状態を監視
+    window.onResize.listen((event) {
+      final windowHeight = window.innerHeight ?? 0;
+      final clientHeight = document.documentElement?.clientHeight ?? 0;
+
+      // キーボード表示状態が変わった場合のみsetStateを呼び出す
+      if (_isKeyboardVisible != (windowHeight < clientHeight)) {
+        setState(() {
+          _isKeyboardVisible = windowHeight < clientHeight;
+        });
+      }
+    });
   }
 
   @override
@@ -87,9 +102,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     // キーボードの状態が変わったときにのみ処理を実行
-    if (MediaQuery.of(context).viewInsets.bottom > 0 && FocusScope.of(context).hasFocus) {
+    if (_isKeyboardVisible && FocusScope.of(context).hasFocus) {
       FocusScope.of(context).unfocus();
-      _textEditingController?.text = MediaQuery.of(context).viewInsets.bottom.toString();
+      _textEditingController?.text = 'Keyboard is visible';
     }
 
     WidgetsBinding.instance.endOfFrame.then((_) async {
