@@ -86,10 +86,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.width <= 400
-        ? (MediaQuery.of(context).size.height - AppBar().preferredSize.height) -
-            MediaQuery.of(context).viewInsets.bottom
-        : null;
+    // final height = MediaQuery.of(context).size.width <= 400
+    //     ? (MediaQuery.of(context).size.height - AppBar().preferredSize.height) -
+    //         MediaQuery.of(context).viewInsets.bottom
+    //     : null;
 
     WidgetsBinding.instance.endOfFrame.then((_) async {
       final isNotEmpty = _chatController.initialMessageList.isNotEmpty;
@@ -100,7 +100,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(widget.label),
         leading: IconButton(
@@ -145,9 +145,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 chatViewState: ChatViewState.hasMessages,
 
                 /// TODO chat全体背景
-                chatBackgroundConfig: ChatBackgroundConfiguration(
+                chatBackgroundConfig: const ChatBackgroundConfiguration(
                   backgroundColor: ThemeColor.weak, // 背景色(chat全体背景)
-                  height: height,
+                  // height: height,
                 ),
                 // 追加
                 textEditingController: _textEditingController!,
