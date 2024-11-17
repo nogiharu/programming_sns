@@ -86,6 +86,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.width <= 400
+        ? (MediaQuery.of(context).size.height - AppBar().preferredSize.height) -
+            MediaQuery.of(context).viewInsets.bottom
+        : null;
+
     WidgetsBinding.instance.endOfFrame.then((_) async {
       final isNotEmpty = _chatController.initialMessageList.isNotEmpty;
       final isMention = ref.read(notificationsProvider.notifier).mentionCreatedAt != null;
@@ -140,8 +145,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 chatViewState: ChatViewState.hasMessages,
 
                 /// TODO chat全体背景
-                chatBackgroundConfig: const ChatBackgroundConfiguration(
+                chatBackgroundConfig: ChatBackgroundConfiguration(
                   backgroundColor: ThemeColor.weak, // 背景色(chat全体背景)
+                  height: height,
                 ),
                 // 追加
                 textEditingController: _textEditingController!,
