@@ -140,7 +140,10 @@
     // 空白問題追加
     document.addEventListener('focusin', (e) => {
     if (e.target.closest("input, textarea")) {
-      window.scrollTo(0, 0);      
+      window.scrollTo(0, 0);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 100);
     }
   });
   </script>
