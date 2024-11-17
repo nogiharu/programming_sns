@@ -46,7 +46,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   // AppTheme theme = LightTheme();
   bool isDarkTheme = false;
-  // final bool _isKeyboardVisible = false;
+  bool _isKeyboardVisible = false;
 
   ChatController _chatController = ChatController(
     initialMessageList: [],
@@ -79,19 +79,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
     // 現在のチャットルーム取得(ソートに使用)
     chatRoomModel = ref.read(chatRoomsProvider).value!.firstWhere((e) => e.id == widget.chatRoomId);
-
-    // // SafariやWebでキーボードの表示状態を監視
-    // window.onResize.listen((event) {
-    //   final windowHeight = window.innerHeight ?? 0;
-    //   final clientHeight = document.documentElement?.clientHeight ?? 0;
-
-    //   // キーボード表示状態が変わった場合のみsetStateを呼び出す
-    //   if (_isKeyboardVisible != (windowHeight < clientHeight)) {
-    //     setState(() {
-    //       _isKeyboardVisible = windowHeight < clientHeight;
-    //     });
-    //   }
-    // });
   }
 
   @override
@@ -101,14 +88,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // // キーボードの状態が変わったときにのみ処理を実行
-    // if (_isKeyboardVisible && FocusScope.of(context).hasFocus) {
-    //   FocusScope.of(context).unfocus();
-    //   _textEditingController?.text = 'Keyboard is visible';
-    // }
+    // MediaQuery でキーボードの表示状態を監視
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
-    if (FocusScope.of(context).hasPrimaryFocus || FocusScope.of(context).hasFocus) {
-      _textEditingController?.text = 'aaaああ';
+    // キーボードの状態が変わったときにのみ処理を実行
+    if (_isKeyboardVisible != isKeyboardVisible) {
+      if (!isKeyboardVisible) {
+        // キーボードが閉じた場合、unfocusを実行
+        FocusScope.of(context).unfocus();
+      }
+      _isKeyboardVisible = isKeyboardVisible;
     }
 
     WidgetsBinding.instance.endOfFrame.then((_) async {
