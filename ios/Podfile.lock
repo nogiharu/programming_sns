@@ -1,5 +1,5 @@
 PODS:
-  - app_links (0.0.1):
+  - app_links (0.0.2):
     - Flutter
   - audio_waveforms (0.0.1):
     - Flutter
@@ -10,6 +10,8 @@ PODS:
   - file_saver (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - flutter_keyboard_visibility (0.0.1):
+    - Flutter
   - flutter_native_splash (0.0.1):
     - Flutter
   - flutter_web_auth_2 (3.0.0):
@@ -36,6 +38,7 @@ DEPENDENCIES:
   - emoji_picker_flutter (from `.symlinks/plugins/emoji_picker_flutter/ios`)
   - file_saver (from `.symlinks/plugins/file_saver/ios`)
   - Flutter (from `Flutter`)
+  - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - flutter_web_auth_2 (from `.symlinks/plugins/flutter_web_auth_2/ios`)
   - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
@@ -58,6 +61,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/file_saver/ios"
   Flutter:
     :path: Flutter
+  flutter_keyboard_visibility:
+    :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
   flutter_web_auth_2:
@@ -76,20 +81,21 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  app_links: e70ca16b4b0f88253b3b3660200d4a10b4ea9795
+  app_links: e7a6750a915a9e161c58d91bc610e8cd1d4d0ad0
   audio_waveforms: cd736909ebc6b6a164eb74701d8c705ce3241e1c
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   emoji_picker_flutter: fe2e6151c5b548e975d546e6eeb567daf0962a58
   file_saver: 503e386464dbe118f630e17b4c2e1190fa0cf808
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_native_splash: 52501b97d1c0a5f898d687f1646226c1f93c56ef
+  flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
+  flutter_native_splash: edf599c81f74d093a4daf8e17bd7a018854bc778
   flutter_web_auth_2: 051cf9f5dc366f31b5dcc4e2952c2b954767be8a
   image_gallery_saver: cb43cc43141711190510e92c460eb1655cd343cb
-  image_picker_ios: 4a8aadfbb6dc30ad5141a2ce3832af9214a705b5
-  package_info_plus: 58f0028419748fad15bf008b270aaa8e54380b1c
-  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
-  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
-  url_launcher_ios: bf5ce03e0e2088bad9cc378ea97fa0ed5b49673b
+  image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
+  package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 
