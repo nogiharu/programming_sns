@@ -46,7 +46,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   // AppTheme theme = LightTheme();
   bool isDarkTheme = false;
-  bool _isKeyboardVisible = false;
+  // final bool _isKeyboardVisible = false;
 
   ChatController _chatController = ChatController(
     initialMessageList: [],
@@ -80,18 +80,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     // 現在のチャットルーム取得(ソートに使用)
     chatRoomModel = ref.read(chatRoomsProvider).value!.firstWhere((e) => e.id == widget.chatRoomId);
 
-    // SafariやWebでキーボードの表示状態を監視
-    window.onResize.listen((event) {
-      final windowHeight = window.innerHeight ?? 0;
-      final clientHeight = document.documentElement?.clientHeight ?? 0;
+    // // SafariやWebでキーボードの表示状態を監視
+    // window.onResize.listen((event) {
+    //   final windowHeight = window.innerHeight ?? 0;
+    //   final clientHeight = document.documentElement?.clientHeight ?? 0;
 
-      // キーボード表示状態が変わった場合のみsetStateを呼び出す
-      if (_isKeyboardVisible != (windowHeight < clientHeight)) {
-        setState(() {
-          _isKeyboardVisible = windowHeight < clientHeight;
-        });
-      }
-    });
+    //   // キーボード表示状態が変わった場合のみsetStateを呼び出す
+    //   if (_isKeyboardVisible != (windowHeight < clientHeight)) {
+    //     setState(() {
+    //       _isKeyboardVisible = windowHeight < clientHeight;
+    //     });
+    //   }
+    // });
   }
 
   @override
@@ -101,10 +101,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // キーボードの状態が変わったときにのみ処理を実行
-    if (_isKeyboardVisible && FocusScope.of(context).hasFocus) {
-      FocusScope.of(context).unfocus();
-      _textEditingController?.text = 'Keyboard is visible';
+    // // キーボードの状態が変わったときにのみ処理を実行
+    // if (_isKeyboardVisible && FocusScope.of(context).hasFocus) {
+    //   FocusScope.of(context).unfocus();
+    //   _textEditingController?.text = 'Keyboard is visible';
+    // }
+
+    if (FocusScope.of(context).hasPrimaryFocus || FocusScope.of(context).hasFocus) {
+      _textEditingController?.text = 'aaaああ';
     }
 
     WidgetsBinding.instance.endOfFrame.then((_) async {
