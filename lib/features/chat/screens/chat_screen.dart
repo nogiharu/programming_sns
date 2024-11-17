@@ -87,7 +87,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     // キーボードの状態が変わったときにのみ処理を実行
-    if (MediaQuery.of(context).viewInsets.bottom > 0 && FocusScope.of(context).hasFocus) {
+    if (MediaQuery.of(context).viewInsets.bottom == 0 && FocusScope.of(context).hasFocus) {
       FocusScope.of(context).unfocus();
       _textEditingController?.text = MediaQuery.of(context).viewInsets.bottom.toString();
     }
