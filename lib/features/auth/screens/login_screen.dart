@@ -20,6 +20,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final userIdController = TextEditingController();
   final passwordController = TextEditingController();
   String errorMessage = '';
+  bool isObscureText = false;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +45,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               controller: userIdController,
               hintText: 'IDは記号、日本語以外で半角で入力してね(^^)',
               contentPadding: 20,
+              isLabelAnimation: false,
             ),
             const SizedBox(height: 10),
             InputField(
@@ -51,6 +53,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               controller: passwordController,
               hintText: 'パスワードは日本語以外で半角で8桁以上で入れてね(^^)',
               contentPadding: 20,
+              isLabelAnimation: false,
+              isObscureText: isObscureText,
+              suffixIcon: IconButton(
+                icon: Icon(isObscureText ? Icons.visibility_off : Icons.visibility),
+                onPressed: () => setState(() => isObscureText = !isObscureText),
+              ),
             ),
             const SizedBox(height: 10),
             Align(

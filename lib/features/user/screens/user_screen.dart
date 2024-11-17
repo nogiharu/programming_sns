@@ -74,7 +74,7 @@ class _UserScreenState extends ConsumerState<UserScreen> {
                             // 名前
                             InputField(
                               controller: nameController,
-                              isBorderBlack: false,
+                              borderColor: Colors.grey.shade300,
                               isMaxLines: true,
                               isReadOnly: isReadOnly,
                               labelText: '名前',
@@ -89,7 +89,7 @@ class _UserScreenState extends ConsumerState<UserScreen> {
                   // 自己紹介
                   InputField(
                     controller: profileDetailsController,
-                    isBorderBlack: false,
+                    borderColor: Colors.grey.shade300,
                     isMaxLines: true,
                     isReadOnly: isReadOnly,
                     labelText: '自己紹介',

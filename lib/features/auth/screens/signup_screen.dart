@@ -46,6 +46,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 controller: userIdController,
                 hintText: 'ユーザーIDは記号、日本語以外で半角で入力してね(^^)',
                 contentPadding: 20,
+                isLabelAnimation: false,
               ),
               const SizedBox(height: 10),
               InputField(
@@ -53,6 +54,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 controller: passwordController,
                 hintText: 'パスワードは日本語以外で半角で8桁以上で入れてね(^^)',
                 contentPadding: 20,
+                isObscureText: isObscureText,
+                isLabelAnimation: false,
+                suffixIcon: IconButton(
+                  icon: Icon(isObscureText ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () => setState(() => isObscureText = !isObscureText),
+                ),
               ),
               const SizedBox(height: 10),
               Align(

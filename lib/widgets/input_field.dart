@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:programming_sns/theme/theme_color.dart';
 
 // ignore: must_be_immutable
 class InputField extends StatefulWidget {
@@ -14,9 +15,6 @@ class InputField extends StatefulWidget {
   /// リードオンリー
   bool isReadOnly;
 
-  /// ボーダーカラーを黒くする
-  bool isBorderBlack;
-
   /// バリデーション
   final String? Function(String?)? validator;
 
@@ -29,17 +27,32 @@ class InputField extends StatefulWidget {
   /// マックスレングス
   int? maxLength;
 
+  /// 末尾アイコン
+  Widget? suffixIcon;
+
+  /// 入力値を隠す
+  bool isObscureText;
+
+  /// ラベルのアニメーション
+  bool isLabelAnimation;
+
+  /// ボーダーカラー
+  Color? borderColor;
+
   InputField({
     super.key,
     required this.controller,
     this.hintText,
     this.labelText,
     this.isReadOnly = false,
-    this.isBorderBlack = true,
     this.validator,
     this.isMaxLines = false,
     this.contentPadding = 15,
     this.maxLength,
+    this.suffixIcon,
+    this.isObscureText = false,
+    this.isLabelAnimation = false,
+    this.borderColor,
   });
 
   @override
@@ -47,51 +60,59 @@ class InputField extends StatefulWidget {
 }
 
 class _InputFieldState extends State<InputField> {
-  bool isObscureText = false;
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      setState(() {}); // フォーカスの変更時にUIを更新
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    bool isPassword = widget.labelText?.contains('パスワード') ?? false;
-
     return TextFormField(
+      focusNode: _focusNode,
       maxLength: widget.maxLength,
       readOnly: widget.isReadOnly,
       validator: widget.validator,
       controller: widget.controller,
       maxLines: widget.isMaxLines ? null : 1, // 複数行の入力を許可
       keyboardType: widget.isMaxLines ? TextInputType.multiline : null, // 複数行の入力を許可
-      obscureText: isPassword && isObscureText,
+      obscureText: widget.isObscureText,
       decoration: InputDecoration(
         counterText: '', // カウンターを非表示にする
         // padding除去
         isDense: true,
         // アイコン
-        suffixIcon: isPassword
-            ? IconButton(
-                icon: Icon(isObscureText ? Icons.visibility_off : Icons.visibility),
-                onPressed: () => setState(() => isObscureText = !isObscureText),
-              )
-            : null,
-        floatingLabelBehavior: widget.labelText != null ? FloatingLabelBehavior.always : null,
+        suffixIcon: widget.suffixIcon,
+
+        floatingLabelBehavior: widget.isLabelAnimation ? null : FloatingLabelBehavior.always,
         // ラベル
         label: widget.labelText != null
             ? Text(
                 widget.labelText!,
-                style: const TextStyle(fontSize: 15),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: _focusNode.hasFocus
+                      ? ThemeColor.strong
+                      : widget.isLabelAnimation
+                          ? ThemeColor.strong
+                          : null,
+                ),
               )
             : null,
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
           borderSide: const BorderSide(
-            color: Colors.amber,
+            color: ThemeColor.main,
             width: 3,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(
-            color: widget.isBorderBlack ? Colors.black : Colors.grey.shade300,
-          ),
+          borderSide: BorderSide(color: widget.borderColor ?? Colors.black),
         ),
         contentPadding: EdgeInsets.all(widget.contentPadding),
         hintText: widget.hintText,

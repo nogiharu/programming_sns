@@ -21,6 +21,7 @@ class _AuthUpdateScreenState extends ConsumerState<AuthUpdateScreen> {
   final userIdController = TextEditingController();
   final passwordController = TextEditingController();
 
+  bool isObscureText = false;
   String errorMessage = '';
 
   @override
@@ -54,6 +55,7 @@ class _AuthUpdateScreenState extends ConsumerState<AuthUpdateScreen> {
                 controller: userIdController,
                 hintText: 'ユーザーIDは記号、日本語以外で半角で入力してね(^^)',
                 contentPadding: 20,
+                isLabelAnimation: false,
               ),
               const SizedBox(height: 10),
               InputField(
@@ -61,6 +63,12 @@ class _AuthUpdateScreenState extends ConsumerState<AuthUpdateScreen> {
                 controller: passwordController,
                 hintText: 'パスワードは日本語以外で半角で8桁以上で入れてね(^^)',
                 contentPadding: 20,
+                isLabelAnimation: false,
+                isObscureText: isObscureText,
+                suffixIcon: IconButton(
+                  icon: Icon(isObscureText ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () => setState(() => isObscureText = !isObscureText),
+                ),
               ),
               const SizedBox(height: 10),
               Align(

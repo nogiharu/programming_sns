@@ -7,6 +7,8 @@ import 'package:programming_sns/features/chat/models/chat_room_model.dart';
 import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart';
 import 'package:programming_sns/features/chat/screens/chat_screen.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
+import 'package:programming_sns/theme/theme_color.dart';
+import 'package:programming_sns/widgets/input_field.dart';
 
 class ChatThreadScreen extends ConsumerStatefulWidget {
   const ChatThreadScreen({super.key});
@@ -45,24 +47,39 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true, // キーボードが表示されるときにビューのサイズを調整
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('チャットスレッド'),
       ),
       body: ref.watchEX(userProvider, complete: (userModel) {
         return Column(
           children: [
-            TextButton(
-              onPressed: () => createThreadBottomSheet(userId: userModel.id),
-              child: const Text('スレを立てる'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: InputField(
+                labelText: 'スレッドを立てる',
+                controller: textController,
+                hintText: 'スレッド名は5文字以上で入れてね(^^)',
+                contentPadding: 20,
+                isMaxLines: true,
+                isLabelAnimation: true,
+                borderColor: ThemeColor.main,
+                suffixIcon: IconButton(
+                  onPressed: () async {
+                    await onSend(userModel.id);
+                  },
+                  icon: const Icon(
+                    Icons.send,
+                    color: ThemeColor.main,
+                  ),
+                ),
+              ),
             ),
             Expanded(
               child: ref.watchEX(
                 chatRoomsProvider,
-                isBackgroundColorNone: ref.watch(chatRoomsProvider).hasError,
                 complete: (chatRooms) {
                   // チャットルームイベント
-
                   return ListView.builder(
                     itemCount: chatRooms.length,
                     controller: scrollController,
@@ -93,54 +110,16 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
     );
   }
 
-  void createThreadBottomSheet({required String userId}) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true, // 追加
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-      ),
-      constraints: const BoxConstraints.expand(width: double.infinity, height: 50),
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: SingleChildScrollView(
-            child: TextFormField(
-              // maxLines: 20,
-              autofocus: true,
-              decoration: InputDecoration(
-                hintText: 'スレ名は5文字以上で入れてね(*^_^*)',
-                contentPadding: const EdgeInsets.all(15),
-                suffixIcon: IconButton(
-                  onPressed: () async {
-                    await chatRoomsNotifier
-                        .upsertState(
-                      ChatRoomModel.instance(
-                        ownerId: userId,
-                        name: textController.text,
-                        memberUserIds: [userId],
-                      ),
-                    )
-                        .whenComplete(() {
-                      // なぜかキャッチされないためwhenComplete使用
-                      if (!ref.watch(chatRoomsProvider).hasError) {
-                        context.pop();
-                        textController.text = '';
-                        ref.read(snackBarProvider)(message: '作成完了だよ(*^_^*)');
-                      }
-                    });
-                  },
-                  icon: const Icon(
-                    Icons.send,
-                    color: Colors.amber,
-                  ),
-                ),
-              ),
-              controller: textController,
-            ),
-          ),
-        );
-      },
-    );
+  Future<void> onSend(String userId) async {
+    await chatRoomsNotifier.upsertState(ChatRoomModel.instance(
+      ownerId: userId,
+      name: textController.text,
+      memberUserIds: [userId],
+    ));
+
+    if (!ref.watch(chatRoomsProvider).hasError) {
+      textController.text = '';
+      ref.read(snackBarProvider)(message: '作成完了だよ(*^_^*)');
+    }
   }
 }
