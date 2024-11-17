@@ -57,6 +57,10 @@
       min-height: 100%;
       background-color: #FFFFFF;
           background-size: 100% 100%;
+          overflow-x: hidden;
+  position: fixed;
+  width: 100%;
+
     }
 
     .center {
@@ -138,14 +142,20 @@
     });
     
     // 空白問題追加
-    document.addEventListener('focusin', (e) => {
-    if (e.target.closest("input, textarea")) {
-      window.scrollTo(0, 0);
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-      }, 100);
+    window.addEventListener('resize', function() {
+    if (window.innerHeight < window.outerHeight) {
+      // キーボードが表示されているとき
+      console.log('キーボードが表示されているとき');
+    } else {
+      // キーボードが閉じられたとき
+      console.log('キーボードが閉じられたとき');
+      // フォーカスを外す
+      if (document.activeElement) {
+        document.activeElement.blur();  // フォーカスされている要素からフォーカスを外す
+      }
     }
   });
+  
   </script>
 
 
