@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -33,6 +34,10 @@ final router = Provider((ref) {
     NotificationScreen.metadata,
     UserScreen.metaData,
   ];
+
+  if (kReleaseMode) {
+    bottomItems.removeWhere((e) => e['path'] == TestToolcreen.metaData['path']);
+  }
 
   return GoRouter(
     navigatorKey: ref.read(rootNavigatorKeyProvider),
