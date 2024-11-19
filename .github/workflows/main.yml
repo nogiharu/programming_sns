@@ -40,32 +40,37 @@ jobs:
           flutter-version: ${{ env.FLUTTER_SDK_VERSION }}
         # 指定されたバージョンのFlutter SDKをセットアップ
 
-      # - name: .env ファイルの作成
-      #   run: |
-      #     echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
-      #     echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-      #     echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
-      #   # 環境変数を.envファイルに書き込む。 pabspec.yamlが読めないため
-
-      # - name: Webアプリのビルド
-      #   run: |
-      #     flutter build web \
-      #       --release \
-      #       --web-renderer html \
-      #       --dart-define env=.env
-      #   # Flutterプロジェクトをウェブアプリとしてリリースモードでビルド、環境変数を使用
+      - name: .env ファイルの作成
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
+        # 環境変数を.envファイルに書き込む。 pabspec.yamlが読めないため
 
       - name: Webアプリのビルド
         run: |
           flutter build web \
             --release \
             --web-renderer html \
-            --dart-define SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-            --dart-define SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }} \
-            --dart-define SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }} \
-            sed -i "s/{{VERSION_ID}}/$REVISION_ID/" build/web/index.html
+            --dart-define env=.env
         # Flutterプロジェクトをウェブアプリとしてリリースモードでビルド、環境変数を使用
-        # `index.html` にキャッシュバスティング用のバージョンIDを埋め込む
+
+      # TODO
+      # - name: Webアプリのビルド
+      #   run: |
+      #     flutter build web \
+      #       --release \
+      #       --web-renderer html \
+      #       --dart-define SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+      #       --dart-define SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }} \
+      #       --dart-define SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      
+      - name: バージョンIDをindex.htmlに埋め込む（キャッシュリフレッシュ）
+        run: |
+          REVISION_ID=$(git rev-parse --short HEAD)
+          sed -i "s/{{VERSION_ID}}/$REVISION_ID/" build/web/index.html
+        # `flutter build web` が完了した後に、index.html のバージョンIDを置き換える
+    
 
       - name: Cloudflare Pagesへのデプロイ
         id: cloudflare_pages_deploy
