@@ -1,8 +1,4 @@
-import 'dart:convert';
-
-import 'package:aws_s3_api/s3-2006-03-01.dart';
 import 'package:chatview/chatview.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +10,6 @@ import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart
 import 'package:programming_sns/features/notification/models/notification_model.dart';
 import 'package:programming_sns/features/notification/providers/notifications_provider.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
-import 'package:programming_sns/routes/router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:url_launcher/url_launcher.dart';
 

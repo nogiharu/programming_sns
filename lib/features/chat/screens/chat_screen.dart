@@ -25,7 +25,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:collection/collection.dart';
 import 'package:async/async.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:html';
 
 /// FIXME 適当に作ったから消します。
 class ChatScreen extends ConsumerStatefulWidget {
@@ -46,7 +45,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   // AppTheme theme = LightTheme();
   bool isDarkTheme = false;
-  bool _isKeyboardVisible = false;
+  final bool _isKeyboardVisible = false;
 
   ChatController _chatController = ChatController(
     initialMessageList: [],
@@ -88,17 +87,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // MediaQuery でキーボードの表示状態を監視
-    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+    final isKeyboardVisible2 = ref.watch(_chatControllerNotifier.keyboardVisibleProvider(context));
 
-    // キーボードの状態が変わったときにのみ処理を実行
-    if (_isKeyboardVisible != isKeyboardVisible) {
-      if (!isKeyboardVisible) {
-        // キーボードが閉じた場合、unfocusを実行
-        FocusScope.of(context).unfocus();
-      }
-      _isKeyboardVisible = isKeyboardVisible;
+    if (!isKeyboardVisible2) {
+      // キーボードが閉じた場合、実行
+      FocusScope.of(context).unfocus();
     }
+
+    // // MediaQuery でキーボードの表示状態を監視
+    // final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+
+    // // キーボードの状態が変わったときにのみ処理を実行
+    // if (_isKeyboardVisible != isKeyboardVisible) {
+    //   if (!isKeyboardVisible) {
+    //     // キーボードが閉じた場合、実行
+    //     FocusScope.of(context).unfocus();
+    //   }
+    //   _isKeyboardVisible = isKeyboardVisible;
+    // }
 
     WidgetsBinding.instance.endOfFrame.then((_) async {
       final isNotEmpty = _chatController.initialMessageList.isNotEmpty;
