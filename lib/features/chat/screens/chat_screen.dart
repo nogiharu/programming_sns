@@ -93,7 +93,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     // キーボードの状態が変わったときにのみ処理を実行
     if (_isKeyboardVisible != isKeyboardVisible) {
       if (!isKeyboardVisible) {
-        // キーボードが閉じた場合、実行
+        // キーボードが閉じた場合
         FocusScope.of(context).unfocus();
       }
       _isKeyboardVisible = isKeyboardVisible;
