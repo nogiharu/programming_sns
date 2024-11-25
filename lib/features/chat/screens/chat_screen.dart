@@ -45,7 +45,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   // AppTheme theme = LightTheme();
   bool isDarkTheme = false;
-  final bool _isKeyboardVisible = false;
+  bool _isKeyboardVisible = false;
 
   ChatController _chatController = ChatController(
     initialMessageList: [],
@@ -87,24 +87,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isKeyboardVisible2 = ref.watch(_chatControllerNotifier.keyboardVisibleProvider(context));
+    // MediaQuery でキーボードの表示状態を監視
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
-    if (!isKeyboardVisible2) {
-      // キーボードが閉じた場合、実行
-      FocusScope.of(context).unfocus();
+    // キーボードの状態が変わったときにのみ処理を実行
+    if (_isKeyboardVisible != isKeyboardVisible) {
+      if (!isKeyboardVisible) {
+        // キーボードが閉じた場合、実行
+        FocusScope.of(context).unfocus();
+      }
+      _isKeyboardVisible = isKeyboardVisible;
     }
-
-    // // MediaQuery でキーボードの表示状態を監視
-    // final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
-
-    // // キーボードの状態が変わったときにのみ処理を実行
-    // if (_isKeyboardVisible != isKeyboardVisible) {
-    //   if (!isKeyboardVisible) {
-    //     // キーボードが閉じた場合、実行
-    //     FocusScope.of(context).unfocus();
-    //   }
-    //   _isKeyboardVisible = isKeyboardVisible;
-    // }
 
     WidgetsBinding.instance.endOfFrame.then((_) async {
       final isNotEmpty = _chatController.initialMessageList.isNotEmpty;
@@ -144,7 +137,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               _chatController = chatController;
               return ChatView(
                 onChatListTap: () {
-                  FocusScope.of(context).unfocus();
+                  // FocusScope.of(context).unfocus();
                 },
                 currentUser: _currentChatUser,
                 chatController: _chatController,
