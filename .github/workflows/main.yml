@@ -54,24 +54,18 @@ jobs:
             --web-renderer html \
             --dart-define env=.env
         # Flutterプロジェクトをウェブアプリとしてリリースモードでビルド、環境変数を使用
-
-      # TODO
-      # - name: Webアプリのビルド
-      #   run: |
-      #     flutter build web \
-      #       --release \
-      #       --web-renderer html \
-      #       --dart-define SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-      #       --dart-define SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }} \
-      #       --dart-define SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       
-      - name: バージョンIDをindex.htmlに埋め込む（キャッシュリフレッシュ）
+      # Cloudflare キャッシュをクリア
+      - name: Cloudflare キャッシュをパージ
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
         run: |
-          REVISION_ID=$(git rev-parse --short HEAD)
-          sed -i "s/{{VERSION_ID}}/$REVISION_ID/" build/web/index.html
-        # `flutter build web` が完了した後に、index.html のバージョンIDを置き換える
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'
     
-
       - name: Cloudflare Pagesへのデプロイ
         id: cloudflare_pages_deploy
         uses: cloudflare/wrangler-action@v3
