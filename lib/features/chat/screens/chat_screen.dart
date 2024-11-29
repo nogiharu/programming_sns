@@ -143,7 +143,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 chatController: _chatController,
                 onSendTap: onSendTap,
                 featureActiveConfig: const FeatureActiveConfig(
-                  // enableSwipeToReply: !kIsWeb,
+                  enableSwipeToReply: false, // スワイプ
                   enableSwipeToSeeTime: false,
                   enablePagination: true, // ページネーション
                   // enableDoubleTapToLike: true, // TODO ダブルタップ
@@ -190,6 +190,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         // color: theme.textFieldTextColor,
                         ),
                     textCapitalization: TextCapitalization.none, // フォーマットしない
+                    textInputType: TextInputType.multiline, // 改行サポート
                   ),
                   // 編集フラグ
                   isSendReplyUpdateMessage: updateMessage != null,

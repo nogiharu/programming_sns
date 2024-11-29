@@ -23,10 +23,6 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
     return {};
   });
 
-  final keyboardVisibleProvider = StateProviderFamily<bool, BuildContext>((ref, context) {
-    return MediaQuery.of(context).viewInsets.bottom > 0;
-  });
-
   /// 最初のレコードid
   /// ページネーションで使用
   String firstId = '';
