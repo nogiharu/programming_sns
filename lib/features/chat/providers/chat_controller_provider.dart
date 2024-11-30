@@ -159,4 +159,12 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
       isLoading: false,
     );
   }
+
+  /// エラーハンドリング
+  Future<void> asyncGuardWrapper(Future<void> Function() futureFunction) async {
+    await asyncGuard<void>(
+      futureFunction,
+      isLoading: true,
+    );
+  }
 }

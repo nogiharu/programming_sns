@@ -315,7 +315,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       );
 
       // メッセージ送信 _chatControllerNotifierがnullになる
-      await ref.read(chatControllerProvider(widget.chatRoomId).notifier).upsertState(msg);
+      await _chatControllerNotifier.upsertState(msg);
     } else {
       // 【更新処理】
       // メッセージ更新 前回のメッセージ違うなら更新
@@ -468,26 +468,41 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   /// 画像ダウンロード
   Future<void> downloadImage(String url) async {
     final Uri parsedUrl = Uri.parse(url);
-    if (await canLaunchUrl(parsedUrl)) {
-      await launchUrl(parsedUrl);
-      ref.read(snackBarProvider)(message: '保存が完了したよ(*^_^*)');
-    } else {
-      throw 'ダウンロードできない(T ^ T)';
-    }
+
+    await _chatControllerNotifier.asyncGuardWrapper(() async {
+      if (await canLaunchUrl(parsedUrl)) {
+        await launchUrl(parsedUrl);
+        ref.read(snackBarProvider)(message: '保存が完了したよ(*^_^*)');
+      } else {
+        throw 'ダウンロードできない(T ^ T)';
+      }
+    });
   }
 
   /// 画像アップロード
   Future<String?> uploadImage(XFile? xFile) async {
     String? imagePath = xFile?.path;
     if (xFile != null) {
-      imagePath = await supabase.functions
-          .invoke("upload-image", body: {
-            'bucket': 'programming-sns',
-            'key': 'messages/${widget.chatRoomId}/${DateTime.now()}_${xFile.name}',
-            'body': (await xFile.readAsBytes())
-          })
-          .then((res) => res.data['url'])
-          .catchErrorEX();
+      // MIMEタイプをチェックして画像かどうかを確認
+      final String? contentType = xFile.mimeType;
+      const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+      await _chatControllerNotifier.asyncGuardWrapper(() async {
+        if (contentType == null || !allowedMimeTypes.contains(contentType)) {
+          // 画像ファイルでない場合はエラーメッセージを返す
+          throw '画像ファイルでお願い(>_<)';
+        }
+
+        imagePath = await supabase.functions
+            .invoke("upload-image", body: {
+              'bucket': 'programming-sns',
+              'key': 'messages/${widget.chatRoomId}/${DateTime.now()}_${xFile.name}',
+              'body': (await xFile.readAsBytes()),
+              'contentType': contentType,
+            })
+            .then((res) => res.data['url'])
+            .catchErrorEX();
+      });
     }
 
     return imagePath;
