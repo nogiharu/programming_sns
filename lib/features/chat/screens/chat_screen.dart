@@ -246,6 +246,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
                 profileCircleConfig: ProfileCircleConfiguration(
                   // profileImageUrl: Data.profileImage,
+                  bottomPadding: 22, // アバターの下
+
                   onAvatarTap: (p0) {
                     print(p0); // プロフィール画像タップ
                   },
