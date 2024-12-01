@@ -216,6 +216,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
                 messageConfig: MessageConfiguration(
                   customMessageBuilder: (message) {
+                    final isLast = message.id == _chatController.initialMessageList.last.id;
+
                     if (message.isDeleted ?? false) {
                       return Text(
                         '削除されました',
@@ -226,6 +228,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       currentUser: _currentChatUser,
                       chatController: _chatController,
                       message: message,
+                      isLast: isLast,
                     );
                   },
                   // 画像 TODO

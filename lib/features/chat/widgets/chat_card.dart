@@ -15,11 +15,13 @@ class ChatCard extends StatefulWidget {
     required this.currentUser,
     required this.message,
     required this.chatController,
+    required this.isLast,
   });
 
   final ChatUser currentUser;
   final ChatController chatController;
   final Message message;
+  final bool isLast;
 
   @override
   State<ChatCard> createState() => _ChatCardState();
@@ -75,13 +77,10 @@ class _ChatCardState extends State<ChatCard> {
         alignment: isSendByCurrentUser ? WrapAlignment.end : WrapAlignment.start,
         crossAxisAlignment: WrapCrossAlignment.end,
         children: [
-          if (isSendByCurrentUser)
-            // 時間
-            timeWidget,
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             constraints: BoxConstraints(
-              maxWidth: kIsWeb ? webWidth / 1.5 : 250,
+              maxWidth: webWidth / 1.2,
               minWidth: 55,
             ),
             decoration: BoxDecoration(
@@ -135,15 +134,18 @@ class _ChatCardState extends State<ChatCard> {
               ],
             ),
           ),
-          if (!isSendByCurrentUser) timeWidget,
-          if (widget.message.reaction.reactions.isNotEmpty && isShowReaction)
-            Align(
-              alignment: isSendByCurrentUser ? Alignment.bottomRight : Alignment.bottomLeft,
-              child: ReactionWidget(
-                reaction: widget.message.reaction,
-                chatController: widget.chatController,
-              ),
-            ),
+          Row(
+            mainAxisAlignment:
+                isSendByCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            children: [
+              if (widget.message.reaction.reactions.isNotEmpty && isShowReaction)
+                ReactionWidget(
+                  reaction: widget.message.reaction,
+                  chatController: widget.chatController,
+                ),
+              if (!isSendByCurrentUser || (isSendByCurrentUser && !widget.isLast)) timeWidget
+            ],
+          ),
         ],
       ),
     );
