@@ -64,23 +64,23 @@ jobs:
           command: pages deploy build/web --project-name=programming-sns
         # ビルドしたウェブアプリをCloudflare Pagesにデプロイ
 
-      # Cloudflare Pagesへのデプロイ後にキャッシュをパージ
-      - name: Cloudflare キャッシュをパージ
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-        run: |
-          response=$(curl -X POST "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data '{"purge_everything":true}' \
-            --write-out "%{http_code}" \
-            --silent \
-            --output /dev/null)
-          if [ "$response" -ne 200 ]; then
-            echo "キャッシュパージに失敗しました。HTTPステータス: $response"
-            exit 1
-          fi
+      # # Cloudflare Pagesへのデプロイ後にキャッシュをパージ
+      # - name: Cloudflare キャッシュをパージ
+      #   env:
+      #     CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      #     CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      #   run: |
+      #     response=$(curl -X POST "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
+      #       -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+      #       -H "Content-Type: application/json" \
+      #       --data '{"purge_everything":true}' \
+      #       --write-out "%{http_code}" \
+      #       --silent \
+      #       --output /dev/null)
+      #     if [ "$response" -ne 200 ]; then
+      #       echo "キャッシュパージに失敗しました。HTTPステータス: $response"
+      #       exit 1
+      #     fi
 
       - name: デプロイURLをコミットステータスに追加
         uses: actions/github-script@v6
