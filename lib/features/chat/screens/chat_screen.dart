@@ -342,9 +342,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     onSendMention(message: message, currentTime: currentTime);
 
     // スクロールが100件超えていたら25件にリセット
-    if (_chatController.initialMessageList.length > 100) {
-      _chatController.initialMessageList = await _chatControllerNotifier.getMessages();
-    }
+    // if (_chatController.initialMessageList.length > 100) {
+    //   _chatController.initialMessageList = await _chatControllerNotifier.getMessages();
+    // }
   }
 
   /// ページング
