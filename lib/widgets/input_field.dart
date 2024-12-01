@@ -94,7 +94,6 @@ class _InputFieldState extends State<InputField> {
             ? Text(
                 widget.labelText!,
                 style: TextStyle(
-                  fontSize: 15,
                   color: _focusNode.hasFocus
                       ? ThemeColor.strong
                       : widget.isLabelAnimation
@@ -116,7 +115,7 @@ class _InputFieldState extends State<InputField> {
         ),
         contentPadding: EdgeInsets.all(widget.contentPadding),
         hintText: widget.hintText,
-        hintStyle: TextStyle(fontSize: 15, color: Colors.grey.shade500),
+        hintStyle: TextStyle(color: Colors.grey.shade500),
       ),
     );
   }

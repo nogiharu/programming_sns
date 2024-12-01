@@ -14,11 +14,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:collection/src/iterable_extensions.dart';
 
 final chatControllerProvider =
-    AutoDisposeAsyncNotifierProviderFamily<ChatControllerNotifier, ChatController, String>(
+    AsyncNotifierProviderFamily<ChatControllerNotifier, ChatController, String>(
   ChatControllerNotifier.new,
 );
 
-class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatController, String> {
+class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String> {
   final textEditingProvider = Provider<Map<String, TextEditingController>>((ref) {
     return {};
   });
@@ -164,7 +164,7 @@ class ChatControllerNotifier extends AutoDisposeFamilyAsyncNotifier<ChatControll
   Future<void> asyncGuardWrapper(Future<void> Function() futureFunction) async {
     await asyncGuard<void>(
       futureFunction,
-      isLoading: true,
+      isLoading: false,
     );
   }
 }
