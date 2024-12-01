@@ -18,23 +18,13 @@ Deno.serve(async (req) => {
     });
 
     // リクエストボディから必要な情報を取得
-    const { bucket, key, body, contentType } = await req.json();
-
-    // 画像ファイルかどうかをチェック（JPEG, PNG, GIF）
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (!allowedMimeTypes.includes(contentType)) {
-      return new Response(JSON.stringify({ error: "Only image files (JPEG, PNG, GIF) are allowed." }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400, // Bad Request
-      });
-    }
-
+    const { bucket, key, body } = await req.json();
+      
     // S3に画像をアップロード
     const res = await s3Client.send(new PutObjectCommand({
       Bucket: bucket,
       Key: key,
       Body: body,
-      ContentType: contentType, // ContentTypeを設定
     }));
 
     if (res.$metadata.httpStatusCode === 200) {

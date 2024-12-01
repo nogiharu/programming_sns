@@ -494,12 +494,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         }
 
         imagePath = await supabase.functions
-            .invoke("upload-image", body: {
-              'bucket': 'programming-sns',
-              'key': 'messages/${widget.chatRoomId}/${DateTime.now()}_${xFile.name}',
-              'body': (await xFile.readAsBytes()),
-              'contentType': contentType,
-            })
+            .invoke(
+              "upload-image",
+              body: {
+                'bucket': 'programming-sns',
+                'key': 'messages/${widget.chatRoomId}/${DateTime.now()}_${xFile.name}',
+                'body': (await xFile.readAsBytes()),
+              },
+            )
             .then((res) => res.data['url'])
             .catchErrorEX();
       });
