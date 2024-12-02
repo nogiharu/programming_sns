@@ -59,7 +59,7 @@ class AuthNotifier extends AsyncNotifier<User> {
             return await supabase.functions
                 .invoke("get-user", body: {'id': UserModel.fromMap(v[0]).id});
           }
-          throw '予期せぬエラーだ（；＿；）';
+          throw 'ユーザーがいないよ（；＿；）';
         });
 
         // ログイン
