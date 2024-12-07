@@ -37,7 +37,7 @@ class ReactionWidget extends StatelessWidget {
               onTap: () => _showReactionBottomSheet(context),
               // なぜかカーソルポインタが変化しないため無視。
               child: IgnorePointer(
-                child: Text(reactionMap[e]!),
+                child: Text(reactionMap[e] ?? ''),
               ),
             ),
           );
@@ -61,20 +61,15 @@ class ReactionWidget extends StatelessWidget {
           child: ListView.builder(
             itemCount: reaction.reactions.length,
             itemBuilder: (context, index) {
+              final chatUser = chatController.chatUsers
+                  .firstWhereOrNull((e) => e.id == reaction.reactedUserIds[index]);
+
               return Card(
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      chatController
-                          .getUserFromId(
-                            reaction.reactedUserIds[index],
-                          )
-                          .profilePhoto!,
-                    ),
+                    backgroundImage: NetworkImage(chatUser?.profilePhoto ?? ''),
                   ),
-                  title: Text(
-                    chatController.getUserFromId(reaction.reactedUserIds[index]).name,
-                  ),
+                  title: Text(chatUser?.name ?? ''),
                   trailing: Text(reaction.reactions[index]),
                 ),
               );

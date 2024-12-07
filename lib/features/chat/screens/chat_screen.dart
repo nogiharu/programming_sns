@@ -224,6 +224,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         style: TextStyle(color: Colors.grey.shade500),
                       );
                     }
+
                     return ChatCard(
                       currentUser: _currentChatUser,
                       chatController: _chatController,
@@ -333,10 +334,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       }
     }
     // ルームID追加
-    if (!chatRoomModel.memberUserIds.contains(_currentChatUser.id)) {
-      chatRoomModel.memberUserIds.add(_currentChatUser.id);
-      await ref.read(chatRoomsProvider.notifier).upsertState(chatRoomModel);
-    }
+    // if (!chatRoomModel.memberUserIds.contains(_currentChatUser.id)) {
+    //   chatRoomModel.memberUserIds.add(_currentChatUser.id);
+    //   await ref.read(chatRoomsProvider.notifier).upsertState(chatRoomModel);
+    // }
 
     // 【メンション】　awaitはしない
     onSendMention(message: message, currentTime: currentTime);

@@ -86,6 +86,12 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () {
+                          // ルームID追加
+                          if (!chatRooms[index].memberUserIds.contains(userModel.id)) {
+                            chatRooms[index].memberUserIds.add(userModel.id);
+                            ref.read(chatRoomsProvider.notifier).upsertState(chatRooms[index]);
+                          }
+
                           // CHAT画面に遷移
                           context.go('${ChatThreadScreen.metaData['path']}/${ChatScreen.path}',
                               extra: {

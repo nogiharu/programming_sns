@@ -16,15 +16,11 @@ extension MessageEX on Message {
     result.addAll({'updated_at': DateTime.now().toUtc().toIso8601String()});
     result.addAll({'created_at': createdAt.toUtc().toIso8601String()});
 
-    if (reaction.reactedUserIds.isEmpty) {
-      result.addAll({'reactions': null});
-    } else {
-      List.generate(reaction.reactedUserIds.length, (index) {
-        result.addAll({
-          'reactions': {reaction.reactedUserIds[index]: reaction.reactions[index]}
-        });
-      });
-    }
+    Map<String, dynamic> reactions = {};
+    List.generate(reaction.reactedUserIds.length, (index) {
+      reactions[reaction.reactedUserIds[index]] = reaction.reactions[index];
+    });
+    result.addAll({'reactions': reactions});
 
     if (replyMessage.messageId.isNotEmpty) {
       result.addAll({
