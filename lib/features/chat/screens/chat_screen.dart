@@ -261,15 +261,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
                 replyPopupConfig: ReplyPopupConfiguration(
                   // メッセージ編集
-                  onUnsendTap: (message) {
+                  onUpdateTap: (message) {
                     _textEditingController!.text = message.message;
                     setState(() {
                       updateMessage = message;
                     });
                   },
                   // メッセージ削除
-                  onMoreTap: (message) async {
-                    // await _chatControllerNotifier.deleteMessage(message);
+                  onDeleteTap: (message) async {
+                    await _chatControllerNotifier.upsertState(message.copyWith(isDeleted: true));
+                  },
+                  // メッセージコピー
+                  onCopyTap: (message) {
+                    setState(() {
+                      _textEditingController!.text = message.message;
+                    });
                   },
                 ),
 
