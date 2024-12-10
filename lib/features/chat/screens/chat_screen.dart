@@ -4,6 +4,7 @@ import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/at_mention_paragraph_node.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/core/constans.dart';
@@ -272,10 +273,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     await _chatControllerNotifier.upsertState(message.copyWith(isDeleted: true));
                   },
                   // メッセージコピー
-                  onCopyTap: (message) {
-                    setState(() {
-                      _textEditingController!.text = message.message;
-                    });
+                  onCopyTap: (message) async {
+                    await Clipboard.setData(ClipboardData(text: message.message));
                   },
                 ),
 
