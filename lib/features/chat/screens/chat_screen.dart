@@ -311,40 +311,23 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   /// 送信 or 更新
   Future<void> onSendTap(String message, ReplyMessage replyMessage, MessageType messageType) async {
-    if (message.trim().isEmpty) return;
+    if (message.trim().isEmpty || updateMessage?.message == message) return;
 
     final currentTime = DateTime.now();
-    // 【作成処理】
-    if (updateMessage == null) {
-      // メッセージ送信
-      final msg = Message(
-        createdAt: currentTime,
-        message: message,
-        sendBy: _currentChatUser.id,
-        replyMessage: replyMessage,
-        messageType: MessageType.text == messageType ? MessageType.custom : messageType,
-        chatRoomId: widget.chatRoomId,
-        updatedAt: currentTime,
-      );
 
-      // メッセージ送信 _chatControllerNotifierがnullになる
-      await _chatControllerNotifier.upsertState(msg);
-    } else {
-      // 【更新処理】
-      // メッセージ更新 前回のメッセージ違うなら更新
-      if (updateMessage!.message != message) {
-        updateMessage = updateMessage!.copyWith(message: message);
-        // メッセージ送信
-        await _chatControllerNotifier.upsertState(updateMessage!);
-        // メッセージ更新リセット
-        updateMessage = null;
-      }
-    }
-    // ルームID追加
-    // if (!chatRoomModel.memberUserIds.contains(_currentChatUser.id)) {
-    //   chatRoomModel.memberUserIds.add(_currentChatUser.id);
-    //   await ref.read(chatRoomsProvider.notifier).upsertState(chatRoomModel);
-    // }
+    final msg = Message(
+      id: updateMessage?.id,
+      createdAt: updateMessage?.createdAt ?? currentTime,
+      message: message,
+      sendBy: _currentChatUser.id,
+      replyMessage: updateMessage?.replyMessage ?? replyMessage,
+      messageType: MessageType.text == messageType ? MessageType.custom : messageType,
+      chatRoomId: widget.chatRoomId,
+      updatedAt: currentTime,
+    );
+    await _chatControllerNotifier.upsertState(msg);
+
+    updateMessage = null;
 
     // 【メンション】　awaitはしない
     onSendMention(message: message, currentTime: currentTime);
