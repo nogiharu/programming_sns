@@ -58,6 +58,10 @@
 		<!-- image_gallery_saver  追加だよ -->
 		<key>NSPhotoLibraryAddUsageDescription</key>
     	<string>ライブラリに保存するよ(*^^*)</string>
+		<key>LSSupportsOpeningDocumentsInPlace</key>
+		<true/>
+		<key>UIFileSharingEnabled</key>
+		<true/>
 		<!-- image_gallery_saver  追加だよ -->
 		<key>UIStatusBarHidden</key>
 		<true/>

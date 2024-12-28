@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/at_mention_paragraph_node.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -274,6 +275,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   },
                   // メッセージコピー
                   onCopyTap: (message) async {
+                    if (message.messageType.isImage) return;
                     await Clipboard.setData(ClipboardData(text: message.message));
                   },
                 ),
@@ -478,16 +480,41 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   /// 画像ダウンロード
   Future<void> downloadImage(String url) async {
-    final Uri parsedUrl = Uri.parse(url);
-
     await _chatControllerNotifier.asyncGuardWrapper(() async {
+      final Uri parsedUrl = Uri.parse(url);
+
       if (await canLaunchUrl(parsedUrl)) {
-        await launchUrl(parsedUrl);
-        ref.read(snackBarProvider)(message: '保存が完了したよ(*^_^*)');
+        final res = await supabase.functions.invoke(
+          "download-image",
+          body: {
+            'url': url,
+          },
+        );
+
+        final base64 = Uint8List.fromList(List<int>.from(res.data['base64']));
+
+        final fileName = url.split('_')[1];
+        final ext = fileName.split('.').last;
+
+        await FileSaver.instance.saveFile(fileName, base64, ext);
+
+        // await ImageGallerySaver.saveImage(base64, name: fileName, isReturnImagePathOfIOS: true);
+        // 保存
+        // bool isSave = false;
+        // if (kIsWeb) {
+        //   isSave =
+        //       (await FileSaver.instance.saveFile(file.name, uint8List, file.name.split('.')[1]))
+        //           .isNotEmpty;
+        // } else {
+        //   isSave = (await ImageGallerySaver.saveImage(uint8List))['isSuccess'] as bool;
+        // }
+        // return isSave;
       } else {
         throw 'ダウンロードできない(T ^ T)';
       }
     });
+
+    // ref.read(snackBarProvider)(message: '$pathに保存が完了したよ(*^_^*)');
   }
 
   /// 画像アップロード

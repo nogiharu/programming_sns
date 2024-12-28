@@ -221,14 +221,14 @@ class _TestToolcreenState extends ConsumerState<TestToolcreen> {
                     //     bucket: 'messages', key: image!.name, body: (await image.readAsBytes()));
 
                     // 匿名ログインを削除
-                    final aaa = await supabase.functions.invoke("upload-image", body: {
-                      'bucket': 'programming-sns',
-                      'key': 'test/${image!.name}',
-                      'body': (await image.readAsBytes())
-                    });
-                    imageStr = aaa.data['url'];
-// アップロードしてURL返却まで！！！！！！！！！１１１
-                    print('来たかな？３${aaa.data}');
+//                     final aaa = await supabase.functions.invoke("upload-image", body: {
+//                       'bucket': 'programming-sns',
+//                       'key': 'test/${image.name}',
+//                       'body': (await image.readAsBytes())
+//                     });
+//                     imageStr = aaa.data['url'];
+// // アップロードしてURL返却まで！！！！！！！！！１１１
+//                     print('来たかな？３${aaa.data}');
                     setState(() {});
                   },
                   child: const Text('UPLOAD'),
