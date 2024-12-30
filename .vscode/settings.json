@@ -8,5 +8,8 @@
   ],
   "deno.lint": true,
   "deno.unstable": true,
-  "deno.enable": true
+  "deno.enable": true,
+  
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
 }

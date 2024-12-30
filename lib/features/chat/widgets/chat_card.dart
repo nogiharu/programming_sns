@@ -3,11 +3,7 @@ import 'package:chatview/markdown/markdown_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:programming_sns/features/chat/widgets/reaction_widget.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/foundation.dart';
 import 'package:any_link_preview/any_link_preview.dart';
-// import 'package:programming_sns/utils/markdown/markdown_builder.dart';
-
-// import 'package:chatview/src/widgets/reaction_widget.dart' as chatview;
 
 class ChatCard extends StatefulWidget {
   const ChatCard({
@@ -44,31 +40,6 @@ class _ChatCardState extends State<ChatCard> {
     double webWidth = MediaQuery.of(context).size.width;
 
     final isSendByCurrentUser = widget.message.sendBy == widget.currentUser.id;
-
-    double? mobileFontSize; // FIXME共通化したい
-    if (kIsWeb) mobileFontSize = MediaQuery.of(context).size.width < 400 ? 8 : 10;
-
-    // 時間
-    final timeWidget = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: Column(
-        children: [
-          Tooltip(
-            message: 'ここを長押しするとリアクションできるよ(*^^*)',
-            triggerMode: TooltipTriggerMode.tap,
-            child: Icon(
-              Icons.help_outline_sharp,
-              size: mobileFontSize,
-            ),
-          ),
-          Text(
-            DateFormat.MMMd('ja').format(widget.message.createdAt) +
-                DateFormat.Hm('ja').format(widget.message.createdAt),
-            style: TextStyle(fontSize: mobileFontSize, color: Colors.grey.shade500),
-          ),
-        ],
-      ),
-    );
 
     return GestureDetector(
       onDoubleTap: () => setState(() => isShowReaction = !isShowReaction),
@@ -108,7 +79,7 @@ class _ChatCardState extends State<ChatCard> {
                 ),
 
                 // リンクプレビュー
-                if (!kIsWeb && urlMatches.isNotEmpty)
+                if (urlMatches.isNotEmpty)
                   // if (urlMatches.isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.only(
@@ -119,10 +90,10 @@ class _ChatCardState extends State<ChatCard> {
                       margin: const EdgeInsets.only(bottom: 10),
                       child: AnyLinkPreview(
                         link: urlMatches.first!,
-                        // proxyUrl: 'https://cors-anywhere.herokuapp.com/',
-                        // headers: const {
-                        //   'Access-Control-Allow-Origin': 'https://example.net',
-                        // },
+                        proxyUrl: 'https://cors-anywhere.herokuapp.com/',
+                        headers: const {
+                          'Access-Control-Allow-Origin': '*',
+                        },
                         borderRadius: 0,
                         errorWidget: Container(
                           color: Colors.grey[200],
@@ -143,7 +114,22 @@ class _ChatCardState extends State<ChatCard> {
                   reaction: widget.message.reaction,
                   chatController: widget.chatController,
                 ),
-              if (!isSendByCurrentUser || (isSendByCurrentUser && !widget.isLast)) timeWidget
+              if (!isSendByCurrentUser || (isSendByCurrentUser && !widget.isLast))
+                Padding(
+                  padding: const EdgeInsets.only(top: 3),
+                  child: Tooltip(
+                    message: '長押しするとリアクションできるよ(*^^*)',
+                    triggerMode: TooltipTriggerMode.tap,
+                    child: Text(
+                      DateFormat.MMMd('ja').format(widget.message.createdAt) +
+                          DateFormat.Hm('ja').format(widget.message.createdAt),
+                      style: TextStyle(
+                        fontSize: (Theme.of(context).textTheme.bodyLarge?.fontSize ?? 0) - 6.0,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ],
