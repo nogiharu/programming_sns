@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:programming_sns/core/constans.dart';
 import 'package:programming_sns/core/utils.dart';
 import 'package:programming_sns/core/extensions/async_notifier_base_ex.dart';
@@ -43,5 +44,37 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
         .eq('id', id)
         .then((v) => UserModel.fromMap(v[0]))
         .catchErrorEX();
+  }
+
+  Future<void> uploadImage() async {
+    final path = await asyncGuard<String?>(() async {
+      final picker = ImagePicker();
+      final xFile = await picker.pickImage(source: ImageSource.gallery);
+      String? imagePath = xFile?.path;
+      if (xFile != null) {
+        // MIMEタイプをチェックして画像かどうかを確認
+        final String? contentType = xFile.mimeType;
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (contentType == null || !allowedMimeTypes.contains(contentType)) {
+          // 画像ファイルでない場合はエラーメッセージを返す
+          throw '画像ファイルでお願い(>_<)';
+        }
+
+        imagePath = await supabase.functions
+            .invoke(
+              "upload-image",
+              body: {
+                'bucket': 'programming-sns',
+                'key': 'profiles/${state.value!.id}/${DateTime.now()}_${xFile.name}',
+                'body': (await xFile.readAsBytes()),
+              },
+            )
+            .then((res) => res.data['url'])
+            .catchErrorEX();
+      }
+      return imagePath;
+    });
+
+    await upsertState(state.value!.copyWith(profilePhoto: path));
   }
 }

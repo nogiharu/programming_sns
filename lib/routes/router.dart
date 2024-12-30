@@ -32,7 +32,7 @@ final router = Provider((ref) {
     ChatThreadScreen.metaData,
     // ScreenB.metaData,
     NotificationScreen.metadata,
-    UserScreen.metaData,
+    ProfileScreen.metaData,
   ];
 
   if (kReleaseMode) {
@@ -42,7 +42,7 @@ final router = Provider((ref) {
   return GoRouter(
     navigatorKey: ref.read(rootNavigatorKeyProvider),
     // initialLocation: bottomItems.first['path'],
-    initialLocation: UserScreen.metaData['path'],
+    initialLocation: ProfileScreen.metaData['path'],
     routes: [
       ShellRoute(
         navigatorKey: ref.read(shellNavigatorKeyProvider),
@@ -123,10 +123,10 @@ final router = Provider((ref) {
 
           /// HOME
           GoRoute(
-            path: UserScreen.metaData['path'],
-            name: UserScreen.metaData['path'],
+            path: ProfileScreen.metaData['path'],
+            name: ProfileScreen.metaData['path'],
             pageBuilder: (context, state) {
-              return _pageAnimation(const UserScreen(), state, ref: ref);
+              return _pageAnimation(const ProfileScreen(), state, ref: ref);
             },
             routes: [
               GoRoute(

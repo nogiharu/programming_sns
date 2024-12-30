@@ -9,8 +9,8 @@ import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
 import 'package:programming_sns/widgets/input_field.dart';
 
-class UserScreen extends ConsumerStatefulWidget {
-  const UserScreen({super.key});
+class ProfileScreen extends ConsumerStatefulWidget {
+  const ProfileScreen({super.key});
 
   static const Map<String, dynamic> metaData = {
     'path': '/profile',
@@ -19,10 +19,10 @@ class UserScreen extends ConsumerStatefulWidget {
   };
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _UserScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _ProfileScreenState();
 }
 
-class _UserScreenState extends ConsumerState<UserScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   /// リードオンリー
   bool isReadOnly = true;
 
@@ -54,10 +54,14 @@ class _UserScreenState extends ConsumerState<UserScreen> {
                       SizedBox(
                         width: 100,
                         height: 100,
-                        child: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            data.profilePhoto ??
-                                "https://akm-img-a-in.tosshub.com/indiatoday/images/story/202103/photo-1511367461989-f85a21fda1_0_1200x768.jpeg?YVCV8xj2CmtZldc_tJAkykymqxE3fxNf&size=770:433",
+                        child: InkWell(
+                          mouseCursor: isReadOnly ? null : SystemMouseCursors.click,
+                          onTap: isReadOnly ? null : ref.read(userProvider.notifier).uploadImage,
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              data.profilePhoto ??
+                                  "https://akm-img-a-in.tosshub.com/indiatoday/images/story/202103/photo-1511367461989-f85a21fda1_0_1200x768.jpeg?YVCV8xj2CmtZldc_tJAkykymqxE3fxNf&size=770:433",
+                            ),
                           ),
                         ),
                       ),
