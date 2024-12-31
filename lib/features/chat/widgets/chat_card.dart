@@ -79,29 +79,28 @@ class _ChatCardState extends State<ChatCard> {
                 ),
 
                 // リンクプレビュー
-                if (urlMatches.isNotEmpty)
-                  // if (urlMatches.isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
-                      bottomRight: !isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
-                    ),
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      child: AnyLinkPreview(
-                        link: urlMatches.first!,
-                        proxyUrl: 'https://cors-anywhere.herokuapp.com/',
-                        headers: const {
-                          'Access-Control-Allow-Origin': '*',
-                        },
-                        borderRadius: 0,
-                        errorWidget: Container(
-                          color: Colors.grey[200],
-                          child: const Center(child: Text('エラーが発生しました(´；ω；`)')),
-                        ),
-                      ),
-                    ),
-                  ),
+                // if (urlMatches.isNotEmpty)
+                //   ClipRRect(
+                //     borderRadius: BorderRadius.only(
+                //       bottomLeft: isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
+                //       bottomRight: !isSendByCurrentUser ? const Radius.circular(20) : Radius.zero,
+                //     ),
+                //     child: Container(
+                //       margin: const EdgeInsets.only(bottom: 10),
+                //       child: AnyLinkPreview(
+                //         link: urlMatches.first!,
+                //         proxyUrl: 'https://cors-anywhere.herokuapp.com/',
+                //         headers: const {
+                //           'Access-Control-Allow-Origin': '*',
+                //         },
+                //         borderRadius: 0,
+                //         errorWidget: Container(
+                //           color: Colors.grey[200],
+                //           child: const Center(child: Text('エラーが発生しました(´；ω；`)')),
+                //         ),
+                //       ),
+                //     ),
+                //   ),
               ],
             ),
           ),

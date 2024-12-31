@@ -9,8 +9,8 @@ import 'package:programming_sns/features/auth/screens/signup_screen.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
 import 'package:programming_sns/widgets/input_field.dart';
 
-class ProfileScreen extends ConsumerStatefulWidget {
-  const ProfileScreen({super.key});
+class UserScreen extends ConsumerStatefulWidget {
+  const UserScreen({super.key});
 
   static const Map<String, dynamic> metaData = {
     'path': '/profile',
@@ -19,10 +19,10 @@ class ProfileScreen extends ConsumerStatefulWidget {
   };
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _ProfileScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _UserScreenState();
 }
 
-class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+class _UserScreenState extends ConsumerState<UserScreen> {
   /// リードオンリー
   bool isReadOnly = true;
 
@@ -56,7 +56,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         height: 100,
                         child: InkWell(
                           mouseCursor: isReadOnly ? null : SystemMouseCursors.click,
-                          onTap: isReadOnly ? null : ref.read(userProvider.notifier).uploadImage,
+                          onTap: isReadOnly
+                              ? null
+                              : ref.read(userProvider.notifier).uploadImageWrapper,
                           child: CircleAvatar(
                             backgroundImage: NetworkImage(
                               data.profilePhoto ??

@@ -162,7 +162,7 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
 
   /// エラーハンドリング
   Future<void> asyncGuardWrapper(Future<void> Function() futureFunction) async {
-    await asyncGuard<void>(
+    await asyncGuard(
       futureFunction,
       isLoading: false,
     );

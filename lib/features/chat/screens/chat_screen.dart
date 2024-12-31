@@ -171,7 +171,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   enableCameraImagePicker: false, // カメラなし
                   imagePickerConfiguration: ImagePickerConfiguration(
                     // 画像送信
-                    onImagePicked: uploadImage,
+                    onImagePicked: uploadImagedWrapper,
                   ),
                   replyMessageColor: Colors.black, // リプライメッセージの色(送信フォーム)
                   defaultSendButtonColor: ThemeColor.main, // 送信ボタン(送信フォーム)
@@ -242,9 +242,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     shareIconConfig: ShareIconConfiguration(
                       // defaultIconBackgroundColor: theme.shareIconBackgroundColor,
                       // defaultIconColor: theme.shareIconColor,
-                      onPressed: downloadImage,
+                      onPressed: downloadImagedWrapper,
                     ),
-                    onTap: previewImage,
+                    onTap: (url) async {
+                      await previewImage(url: url, context: context);
+                    },
                   ),
                 ),
                 profileCircleConfig: ProfileCircleConfiguration(
@@ -431,28 +433,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
-  // void onMentionMessageReaded() {
-  //   Future.delayed(const Duration(milliseconds: 500), () {
-  //     ref.watch(notificationsProvider).whenOrNull(
-  //       data: (notifications) {
-  //         Future.forEach(notifications, (notification) async {
-  //           if (notification.chatRoomId == widget.chatRoomId && !notification.isRead) {
-  //             final mentionMessageLocation = getMessageLocation(notification.createdAt);
-
-  //             if (mentionMessageLocation != null) {
-  //               // 既読にする
-  //               await ref
-  //                   .read(notificationsProvider.notifier)
-  //                   .upsertState(notification.copyWith(isRead: true));
-  //             }
-  //             print('こんなにもEND');
-  //           }
-  //         });
-  //       },
-  //     );
-  //   });
-  // }
-
   RenderObject? getMessageLocation(DateTime mentionCreatedAt) {
     return _chatController.initialMessageList
         .firstWhereOrNull((e) => mentionCreatedAt == e.createdAt)
@@ -462,95 +442,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   /// 画像ダウンロード
-  Future<void> downloadImage(String url) async {
+  Future<void> downloadImagedWrapper(String url) async {
     await _chatControllerNotifier.asyncGuardWrapper(() async {
-      final Uri parsedUrl = Uri.parse(url);
-
-      if (await canLaunchUrl(parsedUrl)) {
-        final res = await supabase.functions.invoke(
-          "download-image",
-          body: {
-            'url': url,
-          },
-        );
-
-        final base64 = Uint8List.fromList(List<int>.from(res.data['base64']));
-
-        final fileName = url.split('_')[1];
-        final ext = fileName.split('.').last;
-
-        await FileSaver.instance.saveFile(fileName, base64, ext);
-
-        // await ImageGallerySaver.saveImage(base64, name: fileName, isReturnImagePathOfIOS: true);
-        // 保存
-        // bool isSave = false;
-        // if (kIsWeb) {
-        //   isSave =
-        //       (await FileSaver.instance.saveFile(file.name, uint8List, file.name.split('.')[1]))
-        //           .isNotEmpty;
-        // } else {
-        //   isSave = (await ImageGallerySaver.saveImage(uint8List))['isSuccess'] as bool;
-        // }
-        // return isSave;
-      } else {
-        throw 'ダウンロードできない(T ^ T)';
-      }
+      await downloadImage(url);
     });
-
-    // ref.read(snackBarProvider)(message: '$pathに保存が完了したよ(*^_^*)');
   }
 
   /// 画像アップロード
-  Future<String?> uploadImage(XFile? xFile) async {
-    String? imagePath = xFile?.path;
-    if (xFile != null) {
-      // MIMEタイプをチェックして画像かどうかを確認
-      final String? contentType = xFile.mimeType;
-      const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-
-      await _chatControllerNotifier.asyncGuardWrapper(() async {
-        if (contentType == null || !allowedMimeTypes.contains(contentType)) {
-          // 画像ファイルでない場合はエラーメッセージを返す
-          throw '画像ファイルでお願い(>_<)';
-        }
-
-        imagePath = await supabase.functions
-            .invoke(
-              "upload-image",
-              body: {
-                'bucket': 'programming-sns',
-                'key': 'messages/${widget.chatRoomId}/${DateTime.now()}_${xFile.name}',
-                'body': (await xFile.readAsBytes()),
-              },
-            )
-            .then((res) => res.data['url'])
-            .catchErrorEX();
-      });
-    }
-
+  Future<String?> uploadImagedWrapper(XFile? xFile) async {
+    String? imagePath;
+    await _chatControllerNotifier.asyncGuardWrapper(() async {
+      imagePath = await uploadImage('messages/${widget.chatRoomId}/', xFile: xFile);
+    });
     return imagePath;
-  }
-
-  /// 画像プレビュー
-  Future<void> previewImage(String url) async {
-    await showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (context) {
-        return GestureDetector(
-          onTap: () => context.pop(),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              InteractiveViewer(
-                minScale: 0.1,
-                maxScale: 5,
-                child: Image.network(url),
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 }
