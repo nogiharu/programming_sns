@@ -1,6 +1,7 @@
 import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 import "package:collection/collection.dart";
+import 'package:programming_sns/core/utils.dart';
 
 /// TODO safariだとバグる
 class ReactionWidget extends StatelessWidget {
@@ -66,8 +67,12 @@ class ReactionWidget extends StatelessWidget {
 
               return Card(
                 child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(chatUser?.profilePhoto ?? ''),
+                  leading: InkWell(
+                    mouseCursor: SystemMouseCursors.click,
+                    onTap: () => previewImage(url: chatUser?.profilePhoto ?? '', context: context),
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(chatUser?.profilePhoto ?? ''),
+                    ),
                   ),
                   title: Text(chatUser?.name ?? ''),
                   trailing: Text(reaction.reactions[index]),

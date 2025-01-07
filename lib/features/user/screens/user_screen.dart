@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:programming_sns/core/extensions/widget_ref_ex.dart';
+import 'package:programming_sns/core/utils.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
 import 'package:programming_sns/features/auth/screens/auth_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
@@ -56,9 +57,16 @@ class _UserScreenState extends ConsumerState<UserScreen> {
                         height: 100,
                         child: InkWell(
                           mouseCursor: isReadOnly ? null : SystemMouseCursors.click,
-                          onTap: isReadOnly
-                              ? null
-                              : ref.read(userProvider.notifier).uploadImageWrapper,
+                          onTap: () async {
+                            if (isReadOnly) {
+                              await previewImage(
+                                  url: data.profilePhoto ??
+                                      "https://akm-img-a-in.tosshub.com/indiatoday/images/story/202103/photo-1511367461989-f85a21fda1_0_1200x768.jpeg?YVCV8xj2CmtZldc_tJAkykymqxE3fxNf&size=770:433",
+                                  context: context);
+                            } else {
+                              await ref.read(userProvider.notifier).uploadImageWrapper();
+                            }
+                          },
                           child: CircleAvatar(
                             backgroundImage: NetworkImage(
                               data.profilePhoto ??
