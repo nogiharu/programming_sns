@@ -17,8 +17,8 @@ jobs:
       - uses: actions/checkout@v4
         name: リポジトリのコードをチェックアウト
         with:
-          submodules: 'recursive'  # サブモジュールを再帰的に初期化
-          fetch-depth: 0  # 全履歴をフェッチ
+          submodules: "recursive" # サブモジュールを再帰的に初期化
+          fetch-depth: 0 # 全履歴をフェッチ
 
       - name: サブモジュールの更新
         run: |
@@ -51,10 +51,9 @@ jobs:
         run: |
           flutter build web \
             --release \
-            --web-renderer html \
             --dart-define env=.env
         # Flutterプロジェクトをウェブアプリとしてリリースモードでビルド、環境変数を使用
-      
+
       # Cloudflare キャッシュをクリア
       - name: Cloudflare キャッシュをパージ
         env:
@@ -65,7 +64,7 @@ jobs:
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
             -H "Content-Type: application/json" \
             --data '{"purge_everything":true}'
-    
+
       - name: Cloudflare Pagesへのデプロイ
         id: cloudflare_pages_deploy
         uses: cloudflare/wrangler-action@v3
