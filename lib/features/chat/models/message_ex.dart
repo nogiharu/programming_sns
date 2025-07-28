@@ -32,6 +32,7 @@ extension MessageEX on Message {
         }
       });
     }
+    result.addAll({'read_user_ids': readUserIds});
 
     return result;
   }
@@ -75,6 +76,7 @@ extension MessageEX on Message {
       updatedAt: DateTime.parse(map['updated_at']).toLocal(),
       replyMessage: replyMessage,
       status: MessageStatus.read,
+      readUserIds: List<String>.from(map['read_user_ids'] ?? []),
     );
   }
 

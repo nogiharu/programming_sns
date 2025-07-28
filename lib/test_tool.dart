@@ -6,12 +6,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:programming_sns/core/constans.dart';
 import 'package:programming_sns/core/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/features/auth/providers/auth_provider.dart';
+import 'package:programming_sns/features/chat/models/message_ex.dart';
 import 'package:programming_sns/features/chat/providers/chat_rooms_provider.dart';
 import 'package:programming_sns/features/notification/models/notification_model.dart';
 import 'package:programming_sns/features/notification/providers/notifications_provider.dart';
 import 'package:programming_sns/features/user/providers/user_provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class TestToolcreen extends ConsumerStatefulWidget {
   const TestToolcreen({super.key});
@@ -42,6 +42,25 @@ class _TestToolcreenState extends ConsumerState<TestToolcreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      final count = await supabase.from('users').count();
+                      final uuid = const Uuid().v4();
+                      final newUserId = uuid.substring(0, 8) + count.toString();
+
+                      final result = await supabase.auth.signUp(
+                        email: '$newUserId@gmail.com',
+                        password: uuid,
+                        data: {'is_anonymous': true, 'password': uuid, 'userId': newUserId},
+                      );
+                      print(result);
+                    } catch (e) {
+                      print(e);
+                    }
+                  },
+                  child: const Text('AUTH'),
+                ),
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () async {
@@ -251,16 +270,17 @@ class _TestToolcreenState extends ConsumerState<TestToolcreen> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // 'https://messages.58baa1400a6b1109671d50f748d28f97.r2.cloudflarestorage.com/test/anzu.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=a18f5d7c39a0b913af15d79d8fa7b6bc%2F20241110%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20241110T005140Z&X-Amz-Expires=3600&X-Amz-Signature=2e9352593d208ab5e656c79adc77f712a59b6bf76a148dd1f82e8c98b5fcb420&X-Amz-SignedHeaders=host&x-id=GetObject';
+                    final response = await supabase.rpc(
+                      'send_user_messages',
+                      params: {'user_id': 'f74a0456-5b41-4922-ae2c-71a7a7f56f84'},
+                    ).then((e) => (e as List<dynamic>).map((e) => MessageEX.fromMap(e)).toList());
 
-                    final Uri parsedUrl = Uri.parse(imageStr);
-                    if (await canLaunchUrl(parsedUrl)) {
-                      await launchUrl(parsedUrl);
-                    } else {
-                      throw 'Could not launch $imageStr';
-                    }
+                    print(response[0].message);
+                    // response.forEach((e) {
+                    //   print(e);
+                    // });
                   },
-                  child: const Text('ダウンロード'),
+                  child: const Text('ORDER BY'),
                 ),
                 ref.watchEX(
                   userProvider,

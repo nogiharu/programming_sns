@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:programming_sns/features/chat/screens/chat_history_screen.dart';
 import 'package:programming_sns/widgets/scaffold_with_navbar.dart';
 import 'package:programming_sns/features/auth/screens/auth_update_screen.dart';
 import 'package:programming_sns/features/auth/screens/login_screen.dart';
@@ -32,6 +33,7 @@ final router = Provider((ref) {
     ChatThreadScreen.metaData,
     // ScreenB.metaData,
     NotificationScreen.metadata,
+    ChatHistoryScreen.metadata,
     UserScreen.metaData,
   ];
 
@@ -118,6 +120,24 @@ final router = Provider((ref) {
                   return ChatScreen(label: map['label'], chatRoomId: map['chatRoomId']);
                 },
               ),
+            ],
+          ),
+          GoRoute(
+            path: ChatHistoryScreen.metadata['path'],
+            name: ChatHistoryScreen.metadata['path'],
+            pageBuilder: (context, state) {
+              return _pageAnimation(const ChatHistoryScreen(), state, ref: ref);
+            },
+            routes: const [
+              // GoRoute(
+              //   path: ChatScreen.path,
+              //   // name: nameは一意出なければならない
+              //   parentNavigatorKey: ref.read(rootNavigatorKeyProvider),
+              //   builder: (context, state) {
+              //     final map = state.extra as Map<String, dynamic>;
+              //     return ChatScreen(label: map['label'], chatRoomId: map['chatRoomId']);
+              //   },
+              // ),
             ],
           ),
 

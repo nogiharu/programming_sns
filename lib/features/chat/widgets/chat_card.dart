@@ -3,7 +3,6 @@ import 'package:chatview/markdown/markdown_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:programming_sns/features/chat/widgets/reaction_widget.dart';
 import 'package:intl/intl.dart';
-import 'package:any_link_preview/any_link_preview.dart';
 
 class ChatCard extends StatefulWidget {
   const ChatCard({

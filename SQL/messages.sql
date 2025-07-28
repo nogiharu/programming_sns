@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS
         -- リプライ（message_id,user_id,message_type,message）
         -- 正気化してVIEWで関連メッセージを取得したいが、supabaseはVIEWのリアルタイムをサポートしていないため、JSONBで全部突っ込む
         reply_to JSONB,
+        -- 既読ユーザーID
+        read_user_ids TEXT[],
         -- 消されたか
         is_deleted BOOL DEFAULT FALSE,
         -- レコード作成日時を設定 (UTCタイムゾーンで現在時刻)
@@ -99,3 +101,37 @@ EXECUTE FUNCTION after_messages ();
 -- FROM
 --     public.messages m
 --     LEFT JOIN public.messages r ON m.reply_message_id = r.id;
+CREATE
+OR REPLACE FUNCTION send_user_messages (user_id UUID) RETURNS SETOF messages AS $$
+BEGIN
+    RETURN QUERY
+    SELECT * 
+    FROM (
+        SELECT DISTINCT ON (chat_room_id) *
+        FROM messages
+        WHERE send_by_user_id = user_id
+        ORDER BY chat_room_id, created_at DESC
+    ) m
+    ORDER BY m.created_at DESC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+SELECT
+    cr.name chat_room_name,
+    COUNT(m.read_user_ids),
+    m.*
+FROM
+    (
+        SELECT DISTINCT
+            ON (chat_room_id) *
+        FROM
+            messages
+        WHERE
+            send_by_user_id = 'f74a0456-5b41-4922-ae2c-71a7a7f56f84'
+        ORDER BY
+            chat_room_id,
+            created_at DESC
+    ) m
+    INNER JOIN chat_rooms cr ON m.chat_room_id = cr.id
+ORDER BY
+    m.created_at DESC;

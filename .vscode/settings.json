@@ -2,14 +2,13 @@
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "dart.flutterSdkPath": ".fvm/versions/3.24.4",
+  "dart.flutterSdkPath": ".fvm/versions/3.32.7",
   "deno.enablePaths": [
     "supabase/functions"
   ],
   "deno.lint": true,
   "deno.unstable": true,
   "deno.enable": true,
-  
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true
 }

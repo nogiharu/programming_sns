@@ -1,48 +1,48 @@
 {
-    // IntelliSense を使用して利用可能な属性を学べます。
-    // 既存の属性の説明をホバーして表示します。
-    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            // flutter run -d web-server  --web-port=1127 --web-renderer=html --dart-define env=.env.local
-            "name": "programming_sns (local mode)",
-            "request": "launch",
-            "type": "dart",
-            "args": [
-                "--web-port",
-                "1142",
-                "--web-renderer",
-                "html",
-                // "web-server", // ここは排他
-                // "--web-browser-flag",
-                // "--disable-web-security",
-                "--dart-define",
-                "env=.env",
-            ]
-        },
-        {
-            "name": "programming_sns (profile mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "programming_sns (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release",
-            "args": [
-                "--web-port",
-                "1128",
-                "--web-renderer",
-                "html",
-                "web-server",
-                // "--web-browser-flag",
-                // "--disable-web-security"
-                "--dart-define",
-                "env=.env",
-            ]
-        }
-    ]
+  // IntelliSense を使用して利用可能な属性を学べます。
+  // 既存の属性の説明をホバーして表示します。
+  // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // flutter run -d web-server  --web-port=1127 --web-renderer=html --dart-define env=.env.local
+      "name": "programming_sns (local mode)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--web-port",
+        "1143",
+        // "--web-renderer",
+        "html",
+        // "web-server", // ここは排他
+        // "--web-browser-flag",
+        // "--disable-web-security",
+        "--dart-define",
+        "env=.env"
+      ]
+    },
+    {
+      "name": "programming_sns (profile mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "programming_sns (release mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "args": [
+        "--web-port",
+        "1128",
+        "--web-renderer",
+        "html",
+        "web-server",
+        // "--web-browser-flag",
+        // "--disable-web-security"
+        "--dart-define",
+        "env=.env"
+      ]
+    }
+  ]
 }

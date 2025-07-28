@@ -2,13 +2,11 @@ import 'dart:async';
 
 import 'package:chatview/chatview.dart';
 import 'package:chatview/markdown/at_mention_paragraph_node.dart';
-import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:programming_sns/core/constans.dart';
 import 'package:programming_sns/core/enums.dart';
 import 'package:programming_sns/core/extensions/widget_ref_ex.dart';
 import 'package:programming_sns/core/utils.dart';
@@ -26,7 +24,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:collection/collection.dart';
 import 'package:async/async.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// FIXME 適当に作ったから消します。
 class ChatScreen extends ConsumerStatefulWidget {
@@ -330,6 +327,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     await _chatControllerNotifier.upsertState(msg);
 
     updateMessage = null;
+
+    // ルームID追加
+    if (!chatRoomModel.memberUserIds.contains(_currentChatUser.id)) {
+      chatRoomModel.memberUserIds.add(_currentChatUser.id);
+      await ref.read(chatRoomsProvider.notifier).upsertState(chatRoomModel);
+
+      if (!_chatController.chatUsers.contains(_currentChatUser)) {
+        _chatController.chatUsers.add(_currentChatUser);
+      }
+    }
 
     // 【メンション】　awaitはしない
     onSendMention(message: message, currentTime: currentTime);
