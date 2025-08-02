@@ -459,7 +459,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Future<String?> uploadImagedWrapper(XFile? xFile) async {
     String? imagePath;
     await _chatControllerNotifier.asyncGuardWrapper(() async {
-      imagePath = await uploadImage('messages/${widget.chatRoomId}/', xFile: xFile);
+      imagePath = await uploadImage('messages/${widget.chatRoomId}', xFile: xFile);
     });
     return imagePath;
   }
