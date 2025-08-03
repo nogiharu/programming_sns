@@ -48,7 +48,7 @@ class UserModelNotifier extends AsyncNotifier<UserModel> {
   Future<void> uploadImageWrapper() async {
     String? path;
     await asyncGuard<void>(() async {
-      path = await uploadImage('users/${state.value!.id}/');
+      path = await uploadImage('users/${state.value!.id}');
     });
 
     if (path != null) {

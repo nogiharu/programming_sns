@@ -11,6 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 final snackBarProvider = AutoDisposeProvider((ref) {
   final context = ref.read(shellNavigatorKeyProvider).currentState!.context;
@@ -113,11 +114,13 @@ Future<String?> uploadImage(String r2Path, {XFile? xFile}) async {
       throw '画像ファイルでお願い(>_<)';
     }
 
+    final formatted = DateFormat('yyyyMMddHHmmss').format(DateTime.now());
+
     imagePath = await supabase.functions.invoke(
       "upload-image",
       body: {
         'bucket': 'programming-sns',
-        'key': '$r2Path/${DateTime.now()}_${xFile.name}',
+        'key': '$r2Path/${formatted}_${xFile.name}',
         'body': (await xFile.readAsBytes()),
       },
     ).then((res) => res.data['url']);
