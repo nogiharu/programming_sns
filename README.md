@@ -151,6 +151,13 @@ paloma.ns.cloudflare.com
 
 supabase functions deploy hello-world
 
+supabase start # start the supabase stack
+supabase functions serve # start the Functions watcher
+
+supabase functions deploy hello-world --project-ref jbuiuoftvrjmtkhdxtbf
+
+# ログイン時のメール認証を除外
+
 Authentication
 ↓
 Sign In / Providers
@@ -158,3 +165,8 @@ Sign In / Providers
 Email
 ↓
 Confirm email 　チェック外す！メールを送らないようにする
+
+# CloudFlare
+
+デプロイしても更新されない時は以下
+Caching 構成 すべてパージ

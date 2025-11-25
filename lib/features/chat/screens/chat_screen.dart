@@ -324,7 +324,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       chatRoomId: widget.chatRoomId,
       updatedAt: currentTime,
     );
-    await _chatControllerNotifier.upsertState(msg);
+
+    // TODO 画像送信を考慮してawaitしない？？
+    await _chatControllerNotifier.upsertState(msg, isLoading: messageType.isImage);
 
     updateMessage = null;
 

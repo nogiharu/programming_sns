@@ -151,12 +151,12 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
   }
 
   /// 更新、作成
-  Future<void> upsertState(Message message) async {
+  Future<void> upsertState(Message message, {bool isLoading = false}) async {
     await asyncGuard<void>(
       () async {
         await supabase.from('messages').upsert(message.toMap());
       },
-      isLoading: false,
+      isLoading: isLoading,
     );
   }
 
