@@ -98,6 +98,7 @@ extension StreamEX<T> on Stream<T> {
 }
 
 Future<String?> uploadImage(String r2Path, {XFile? xFile}) async {
+  // 渡されなかった場合はピッカーを起動
   if (xFile == null) {
     final picker = ImagePicker();
     xFile = await picker.pickImage(source: ImageSource.gallery);
@@ -116,14 +117,21 @@ Future<String?> uploadImage(String r2Path, {XFile? xFile}) async {
 
     final formatted = DateFormat('yyyyMMddHHmmss').format(DateTime.now());
 
-    imagePath = await supabase.functions.invoke(
+    final key = '$r2Path/${formatted}_${xFile.name}';
+
+    final body = await xFile.readAsBytes();
+
+    imagePath = 'https://r2.programming-sns.com/$key';
+
+    // 待たない（awaitしない）
+    supabase.functions.invoke(
       "upload-image",
       body: {
         'bucket': 'programming-sns',
-        'key': '$r2Path/${formatted}_${xFile.name}',
-        'body': (await xFile.readAsBytes()),
+        'key': key,
+        'body': body,
       },
-    ).then((res) => res.data['url']);
+    );
   }
   return imagePath;
 }

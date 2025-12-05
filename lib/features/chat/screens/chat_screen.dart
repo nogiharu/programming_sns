@@ -325,8 +325,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       updatedAt: currentTime,
     );
 
-    // TODO 画像送信を考慮してawaitしない？？
-    await _chatControllerNotifier.upsertState(msg, isLoading: messageType.isImage);
+    // 送信
+    await _chatControllerNotifier.upsertState(msg);
 
     updateMessage = null;
 
@@ -460,9 +460,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   /// 画像アップロード
   Future<String?> uploadImagedWrapper(XFile? xFile) async {
     String? imagePath;
-    await _chatControllerNotifier.asyncGuardWrapper(() async {
-      imagePath = await uploadImage('messages/${widget.chatRoomId}', xFile: xFile);
-    });
+    if (xFile == null) return imagePath;
+
+    await _chatControllerNotifier.asyncGuardWrapper(
+      () async {
+        imagePath = await uploadImage('messages/${widget.chatRoomId}', xFile: xFile);
+      },
+    );
     return imagePath;
   }
 }
