@@ -27,8 +27,6 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
   /// ページネーションで使用
   String firstId = '';
 
-  // late RealtimeChannel channel;
-
   @override
   FutureOr<ChatController> build(arg) async {
     if (firstId.isEmpty) {
@@ -114,10 +112,9 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
   void realtimeEvent() {
     // 【メッセージテーブル】
     supabase
-        .channel('public:messages')
+        .channel('messages:$arg')
         .onPostgresChanges(
             event: PostgresChangeEvent.all,
-            schema: 'public',
             table: 'messages',
             // filter: PostgresChangeFilter(
             //   type: PostgresChangeFilterType.eq,
@@ -155,12 +152,7 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
                 },
               );
             })
-        .subscribe((status, [error]) {
-      debugPrint('Realtime status: $status');
-      if (error != null) {
-        debugPrint('Realtime error: $error');
-      }
-    });
+        .subscribe();
   }
 
   /// 更新、作成
