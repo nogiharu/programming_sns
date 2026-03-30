@@ -124,14 +124,10 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
             callback: (payload) {
               update(
                 (data) async {
-                  debugPrint('【callback:メッセージ】PostgresChangeEvent:$payload');
-                  debugPrint('【data:メッセージ】PostgresChangeEvent:$data');
                   Message newData = MessageEX.fromMap(payload.newRecord);
                   // 【INSERTイベント】
-                  debugPrint('【INSERT:メッセージ】PostgresChangeEvent:$newData');
                   if (PostgresChangeEvent.insert == payload.eventType) {
                     final isNotUser = data.chatUsers.every((e) => e.id != newData.sendBy);
-                    debugPrint('【INSERT:メッセージ】PostgresChangeEvent.insert:$isNotUser');
                     if (isNotUser) {
                       final userModel =
                           await ref.read(userProvider.notifier).getUserModel(newData.sendBy);
@@ -143,7 +139,6 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
                   }
                   // 【UPDATEイベント】
                   else if (PostgresChangeEvent.update == payload.eventType) {
-                    debugPrint('【INSERT:メッセージ】PostgresChangeEvent.update:$newData');
                     final index = data.initialMessageList.indexWhere((e) => e.id == newData.id);
                     if (index != -1) data.initialMessageList[index] = newData;
                     debugPrint('【UPDATE:メッセージ】');
