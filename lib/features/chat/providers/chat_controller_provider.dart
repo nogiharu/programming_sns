@@ -27,6 +27,8 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
   /// ページネーションで使用
   String firstId = '';
 
+  // late RealtimeChannel channel;
+
   @override
   FutureOr<ChatController> build(arg) async {
     if (firstId.isEmpty) {
@@ -115,19 +117,24 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
         .channel('public:messages')
         .onPostgresChanges(
             event: PostgresChangeEvent.all,
+            schema: 'public',
             table: 'messages',
-            filter: PostgresChangeFilter(
-              type: PostgresChangeFilterType.eq,
-              column: 'chat_room_id',
-              value: arg,
-            ),
+            // filter: PostgresChangeFilter(
+            //   type: PostgresChangeFilterType.eq,
+            //   column: 'chat_room_id',
+            //   value: arg,
+            // ),
             callback: (payload) {
               update(
                 (data) async {
+                  debugPrint('【callback:メッセージ】PostgresChangeEvent:$payload');
+                  debugPrint('【data:メッセージ】PostgresChangeEvent:$data');
                   Message newData = MessageEX.fromMap(payload.newRecord);
                   // 【INSERTイベント】
+                  debugPrint('【INSERT:メッセージ】PostgresChangeEvent:$newData');
                   if (PostgresChangeEvent.insert == payload.eventType) {
                     final isNotUser = data.chatUsers.every((e) => e.id != newData.sendBy);
+                    debugPrint('【INSERT:メッセージ】PostgresChangeEvent.insert:$isNotUser');
                     if (isNotUser) {
                       final userModel =
                           await ref.read(userProvider.notifier).getUserModel(newData.sendBy);
@@ -139,6 +146,7 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
                   }
                   // 【UPDATEイベント】
                   else if (PostgresChangeEvent.update == payload.eventType) {
+                    debugPrint('【INSERT:メッセージ】PostgresChangeEvent.update:$newData');
                     final index = data.initialMessageList.indexWhere((e) => e.id == newData.id);
                     if (index != -1) data.initialMessageList[index] = newData;
                     debugPrint('【UPDATE:メッセージ】');
@@ -147,7 +155,12 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
                 },
               );
             })
-        .subscribe();
+        .subscribe((status, [error]) {
+      debugPrint('Realtime status: $status');
+      if (error != null) {
+        debugPrint('Realtime error: $error');
+      }
+    });
   }
 
   /// 更新、作成
