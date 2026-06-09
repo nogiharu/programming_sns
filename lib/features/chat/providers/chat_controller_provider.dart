@@ -115,12 +115,13 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
         .channel('messages:$arg')
         .onPostgresChanges(
             event: PostgresChangeEvent.all,
+            schema: 'public',
             table: 'messages',
-            // filter: PostgresChangeFilter(
-            //   type: PostgresChangeFilterType.eq,
-            //   column: 'chat_room_id',
-            //   value: arg,
-            // ),
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'chat_room_id',
+              value: arg,
+            ),
             callback: (payload) {
               update(
                 (data) async {
