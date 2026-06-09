@@ -125,6 +125,7 @@ class ChatControllerNotifier extends FamilyAsyncNotifier<ChatController, String>
             callback: (payload) {
               update(
                 (data) async {
+                  debugPrint('filter反映後');
                   Message newData = MessageEX.fromMap(payload.newRecord);
                   // 【INSERTイベント】
                   if (PostgresChangeEvent.insert == payload.eventType) {
